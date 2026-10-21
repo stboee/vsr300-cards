@@ -1,0 +1,23 @@
+# VSR300 – 02-Kontrollpanel.yaml
+# Kortpakke: 1.0.0
+# Endret: 2026-10-21
+type: custom:vsr300-control-card
+title: Kontrollpanel
+entities:
+  mode: sensor.systemair_save_modus
+  auto_source: sensor.loft_systemair_save_auto_styrekilde
+  mode_select: select.systemair_save_modusvalg
+  manual_speed: select.systemair_save_manuell_viftehastighet
+  auto_button: button.systemair_save_auto
+  low_button: button.systemair_save_lav
+  normal_button: button.systemair_save_normal
+  high_button: button.systemair_save_hoy
+  boost_button: button.systemair_save_boost
+  party_button: button.systemair_save_party
+  away_button: button.systemair_save_borte
+  holiday_button: button.systemair_save_ferie
+  fireplace_duration: sensor.systemair_save_fireplace_mode_duration
+  boost_duration: number.systemair_save_oppfriskning_varighet
+  party_duration: number.systemair_save_party_varighet
+  away_duration: number.systemair_save_borte_varighet
+  holiday_duration: number.systemair_save_ferietid_varighet

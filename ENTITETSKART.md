@@ -1,0 +1,58 @@
+# Entitetskart – custom cards 1.0.0
+
+Startkoblingene er hentet fra det gjennomgåtte HA-oppsettet. De er ikke universelle entitetsnavn. Mottakeren kan velge egne entiteter i den grafiske editoren.
+
+## SVG
+
+| Rolle | Startentitet |
+|---|---|
+| `mode` | `sensor.systemair_save_modus` |
+| `outdoor_temperature` | `sensor.systemair_save_utetemperatur` |
+| `supply_temperature` | `sensor.systemair_save_tilluftstemperatur` |
+| `extract_temperature` | `sensor.systemair_save_avtrekkstemperatur` |
+| `extract_humidity` | `sensor.systemair_save_luftfuktighet` |
+| `supply_flow` | `sensor.systemair_save_tilluft_luftmengde` |
+| `extract_flow` | `sensor.systemair_save_avkast_luftmengde` |
+| `supply_rpm` | `sensor.systemair_save_tilluftsvifte_hastighet_rpm` |
+| `extract_rpm` | `sensor.systemair_save_avtrekksvifte_hastighet_rpm` |
+| `recovery_output` | `sensor.systemair_save_varmegjenvinning` |
+| `heater_output` | `sensor.systemair_save_triac_after_manual_override` |
+| `heater_active` | `binary_sensor.loft_systemair_save_ettervarme_aktiv` |
+| `free_cooling_active` | `binary_sensor.systemair_save_frikjoling_aktiv` |
+| `countdown` | `sensor.systemair_save_countdown_mode_time` |
+| `filter_warning` | `binary_sensor.systemair_save_filtervarsel` |
+| `filter_alarm` | `binary_sensor.systemair_save_filteralarm` |
+| `outdoor_humidity` | `sensor.a4_c1_38_23_90_74_9074_humidity` |
+| `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
+| `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
+| `party_duration` | `number.systemair_save_party_varighet` |
+| `away_duration` | `number.systemair_save_borte_varighet` |
+| `holiday_duration` | `number.systemair_save_ferietid_varighet` |
+
+## Kontrollpanel
+
+| Rolle | Startentitet |
+|---|---|
+| `mode` | `sensor.systemair_save_modus` |
+| `auto_source` | `sensor.loft_systemair_save_auto_styrekilde` |
+| `mode_select` | `select.systemair_save_modusvalg` |
+| `manual_speed` | `select.systemair_save_manuell_viftehastighet` |
+| `auto_button` | `button.systemair_save_auto` |
+| `low_button` | `button.systemair_save_lav` |
+| `normal_button` | `button.systemair_save_normal` |
+| `high_button` | `button.systemair_save_hoy` |
+| `boost_button` | `button.systemair_save_boost` |
+| `party_button` | `button.systemair_save_party` |
+| `away_button` | `button.systemair_save_borte` |
+| `holiday_button` | `button.systemair_save_ferie` |
+| `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
+| `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
+| `party_duration` | `number.systemair_save_party_varighet` |
+| `away_duration` | `number.systemair_save_borte_varighet` |
+| `holiday_duration` | `number.systemair_save_ferietid_varighet` |
+
+SVG-kortets utendørs RF kommer fra en separat HA-føler. Alle øvrige datakilder og all betjening i disse to kortene kommer fra Howard-integrasjonen. Luftmengdene er likevel integrasjonens estimater.
+
+Valgfrie felt: `outdoor_humidity` og de fem `*_duration`-feltene i SVG; varighetsfeltene i Kontrollpanel. Resttidens kilde er `countdown`, ikke varighetsfeltene.
+
+Innstilte varigheter må velges med de enhetene editoren angir: min, timer og døgn.

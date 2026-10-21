@@ -1,0 +1,28 @@
+# VSR300 – 01-SVG.yaml
+# Kortpakke: 1.0.0
+# Endret: 2026-10-21
+type: custom:vsr300-svg-card
+title: Systemair SVG
+entities:
+  mode: sensor.systemair_save_modus
+  outdoor_temperature: sensor.systemair_save_utetemperatur
+  supply_temperature: sensor.systemair_save_tilluftstemperatur
+  extract_temperature: sensor.systemair_save_avtrekkstemperatur
+  extract_humidity: sensor.systemair_save_luftfuktighet
+  supply_flow: sensor.systemair_save_tilluft_luftmengde
+  extract_flow: sensor.systemair_save_avkast_luftmengde
+  supply_rpm: sensor.systemair_save_tilluftsvifte_hastighet_rpm
+  extract_rpm: sensor.systemair_save_avtrekksvifte_hastighet_rpm
+  recovery_output: sensor.systemair_save_varmegjenvinning
+  heater_output: sensor.systemair_save_triac_after_manual_override
+  heater_active: binary_sensor.loft_systemair_save_ettervarme_aktiv
+  free_cooling_active: binary_sensor.systemair_save_frikjoling_aktiv
+  countdown: sensor.systemair_save_countdown_mode_time
+  filter_warning: binary_sensor.systemair_save_filtervarsel
+  filter_alarm: binary_sensor.systemair_save_filteralarm
+  outdoor_humidity: sensor.a4_c1_38_23_90_74_9074_humidity
+  fireplace_duration: sensor.systemair_save_fireplace_mode_duration
+  boost_duration: number.systemair_save_oppfriskning_varighet
+  party_duration: number.systemair_save_party_varighet
+  away_duration: number.systemair_save_borte_varighet
+  holiday_duration: number.systemair_save_ferietid_varighet
