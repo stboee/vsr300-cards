@@ -11,10 +11,12 @@ Referanseoppsettet er HA 2026.10.2 og
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
 3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.1.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til **Systemair SVG** og **Systemair Kontrollpanel** fra kortvelgeren.
-5. Åpne **Entitetskoblinger** i hvert korts editor og velg dine entiteter. De forhåndsutfylte navnene er eksempler fra referanseoppsettet.
+5. **Tilpass entitetskoblingene i begge kort.** Åpne **Entitetskoblinger**, kontroller hvert felt og bytt eksempelnavnene til tilsvarende entiteter i din egen Home Assistant-installasjon. Tøm valgfrie felt du ikke bruker.
 
 Komplette YAML-oppsett ligger i [01-SVG.yaml](examples/01-SVG.yaml) og
-[02-Kontrollpanel.yaml](examples/02-Kontrollpanel.yaml).
+[02-Kontrollpanel.yaml](examples/02-Kontrollpanel.yaml). **Bruker du disse
+oppsettene, må du også kontrollere og tilpasse alle entitets-ID-er under
+`entities:` før kortene tas i bruk.** Navnene er eksempler fra én installasjon.
 Selve frontendfilen krever ingen omstart av Home Assistant.
 
 ## Oppdatering

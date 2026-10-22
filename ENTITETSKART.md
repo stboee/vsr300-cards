@@ -1,6 +1,9 @@
 # Entitetskart – custom cards 1.1.0
 
-Startkoblingene er hentet fra det gjennomgåtte HA-oppsettet. De er ikke universelle entitetsnavn. Mottakeren kan velge egne entiteter i den grafiske editoren.
+Startkoblingene er eksempler fra referanseoppsettet. Brukeren må kontrollere alle
+koblinger i begge kort og endre dem til tilsvarende entiteter i sin egen
+HA-installasjon. Dette gjøres i editorens **Entitetskoblinger**, eller under
+`entities:` i kortets YAML. Tøm valgfrie felt som ikke skal brukes.
 
 ## SVG
 
