@@ -9,8 +9,8 @@ Two Home Assistant dashboard cards for **Systemair SAVE VSR300**, using
 | Systemair Kontrollpanel | `custom:vsr300-control-card` | Operating mode buttons and configured durations. |
 
 Both cards have a **graphical entity editor**. All labels currently use Norwegian.
-Version **1.0.0** is recorded in the JavaScript header and configuration comments;
-it is not added to the visible card titles.
+Version **1.1.0** is recorded in the JavaScript header and configuration comments.
+Both cards hide their headings by default. The SVG has no fixed footer text.
 
 [Norsk installasjonsveiledning](README.nb.md) · [Entity bindings](ENTITETSKART.md) ·
 [Changelog](CHANGELOG.md) · [Verification](VERIFIKASJON.md)
@@ -33,7 +33,8 @@ measurement or a screenshot from a connected ventilation unit.*
 - No local template sensors, helpers, Node-RED flows, button-card or card-mod are
   required for these two cards. Outdoor humidity is an optional external sensor.
 - Local simulated-state and browser checks were completed. The maintainer has
-  reported that initial testing in the actual HA installation works. Full
+  reported that initial testing of 1.0.0 in the actual HA installation works.
+  Version 1.1.0 has not yet been checked on the actual Pixel 8 Pro or HA. Full
   graphical-editor, control and HACS installation acceptance checks remain open.
   See [VERIFIKASJON.md](VERIFIKASJON.md).
 
@@ -75,7 +76,7 @@ registered until the page is reloaded.
    using GitHub's **Download raw file** button.
 2. Place it at `/config/www/vsr300/vsr300-cards.js` in Home Assistant.
 3. Add a dashboard resource:
-   - URL: `/local/vsr300/vsr300-cards.js?v=1.0.0`
+   - URL: `/local/vsr300/vsr300-cards.js?v=1.1.0`
    - Type: **JavaScript module**.
 4. Reload the browser page.
 
@@ -111,19 +112,45 @@ that are absent are reported in the card.
 
 The following mappings are optional:
 
-- SVG: `outdoor_humidity` and the five duration fields.
+- SVG: `outdoor_humidity`, `alarm_a`, `alarm_b`, `alarm_c`, and the five duration fields.
 - Control panel: the five duration fields.
 
 Duration fields must use the units shown in the editor: minutes, hours or days.
 The `countdown` sensor must report **seconds**. See the complete role-to-entity
 table in [ENTITETSKART.md](ENTITETSKART.md).
 
+## Animation and appearance
+
+The SVG editor offers **Animasjoner** with these choices:
+
+| Editor choice | YAML value | Behaviour |
+| --- | --- | --- |
+| På (default) | `'on'` | Animates fan blades and air paths even when the device requests reduced motion. |
+| Auto – følg enheten | `auto` | Follows the device's `prefers-reduced-motion` setting. |
+| Av | `'off'` | Disables both animations. |
+
+Quote `'on'` and `'off'` when editing YAML, so they remain strings. Existing
+configurations without `animation` use `'on'`.
+
+Both cards default to `show_title: false`, including older saved configurations
+that still contain a title. To display a custom heading, enable **Vis overskrift**
+and enter **Overskrift** in the editor.
+
+### Updating existing cards from 1.0.0
+
+After replacing the resource and reloading the browser, the headings are hidden,
+the fixed footer is gone and animations default to on. Existing entity mappings
+are retained. To use the new class alarms, select their entities in the SVG editor:
+**A-alarm**, **B-alarm**, **C-alarm**. They are optional and are not silently added
+to an existing saved `entities:` mapping. Complete initial examples include the
+maintainer's mappings for these three roles.
+
 ## Meaning of the displayed values
 
 - **Airflow is estimated**, marked with `≈`. It is supplied by the integration;
   it is not a physical airflow measurement. In the reference VSR300 setup the
   integration derives it from fan output and a nominal capacity of 368 m³/h.
-- **Gjenvinningspådrag** is the reported heat-recovery control output. A value of
+- **Vekslerpådrag** is the reported heat-recovery control output. A value of
   100% is not a measured heat-recovery efficiency of 100%.
 - **Ettervarme** shows reported heater output in percent, alongside a separate
   active/inactive indication. No watt estimate is calculated.
@@ -157,6 +184,24 @@ individual filter-condition measurements.
 ![Filter alarm example, rendered with simulated values](images/filter-alarm-simulated.png)
 
 *Simulated alarm example with placeholder icons, not a live alarm report.*
+
+## Alarm lines
+
+Each active configured signal adds its own line below the SVG, in this order:
+**A-alarm, B-alarm, C-alarm, filter alarm, filter warning**. Filter symbols retain
+their alarm/warning priority independently of the list, so both a filter alarm
+and filter warning can have a line while the symbols are red.
+
+A/B/C are summary alarms; these entities do not identify the underlying fault.
+Signals may overlap and the rows must not be interpreted as a count of distinct
+faults. No alarm is acknowledged or reset from the card. Configured signals with
+unknown/unavailable states get a neutral status-unknown line, rather than being
+shown as active or treated as clear. Optional class-alarm fields left empty
+produce no line.
+
+![Several simultaneous alarm signals with simulated values](images/multiple-alarms-simulated.png)
+
+*All five inputs are active in this simulated example.*
 
 ## Controls
 

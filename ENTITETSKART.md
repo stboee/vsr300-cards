@@ -1,4 +1,4 @@
-# Entitetskart – custom cards 1.0.0
+# Entitetskart – custom cards 1.1.0
 
 Startkoblingene er hentet fra det gjennomgåtte HA-oppsettet. De er ikke universelle entitetsnavn. Mottakeren kan velge egne entiteter i den grafiske editoren.
 
@@ -22,6 +22,9 @@ Startkoblingene er hentet fra det gjennomgåtte HA-oppsettet. De er ikke univers
 | `countdown` | `sensor.systemair_save_countdown_mode_time` |
 | `filter_warning` | `binary_sensor.systemair_save_filtervarsel` |
 | `filter_alarm` | `binary_sensor.systemair_save_filteralarm` |
+| `alarm_a` | `binary_sensor.systemair_save_a_alarm` |
+| `alarm_b` | `binary_sensor.systemair_save_b_alarm` |
+| `alarm_c` | `binary_sensor.systemair_save_c_alarm` |
 | `outdoor_humidity` | `sensor.a4_c1_38_23_90_74_9074_humidity` |
 | `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
 | `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
@@ -53,6 +56,12 @@ Startkoblingene er hentet fra det gjennomgåtte HA-oppsettet. De er ikke univers
 
 SVG-kortets utendørs RF kommer fra en separat HA-føler. Alle øvrige datakilder og all betjening i disse to kortene kommer fra Howard-integrasjonen. Luftmengdene er likevel integrasjonens estimater.
 
-Valgfrie felt: `outdoor_humidity` og de fem `*_duration`-feltene i SVG; varighetsfeltene i Kontrollpanel. Resttidens kilde er `countdown`, ikke varighetsfeltene.
+Valgfrie felt: `outdoor_humidity`, `alarm_a`, `alarm_b`, `alarm_c` og de fem
+`*_duration`-feltene i SVG; varighetsfeltene i Kontrollpanel. Resttidens kilde er
+`countdown`, ikke varighetsfeltene.
+
+A/B/C er samlealarmer fra integrasjonen. Eksisterende lagrede oppsett beholder
+entitetsvalgene sine og får ikke nye alarmkoblinger automatisk. Velg dem i
+editoren, eller bruk de komplette eksempeloppsettene som grunnlag.
 
 Innstilte varigheter må velges med de enhetene editoren angir: min, timer og døgn.

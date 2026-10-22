@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.0.0 · 2026-10-21
+/* VSR300 custom cards · version 1.1.0 · 2026-10-22
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -20,13 +20,16 @@
     FIELD('extract_flow', 'Estimert avtrekksmengde', 'sensor', 'sensor.systemair_save_avkast_luftmengde'),
     FIELD('supply_rpm', 'Tilluftvifte – turtall', 'sensor', 'sensor.systemair_save_tilluftsvifte_hastighet_rpm'),
     FIELD('extract_rpm', 'Avtrekksvifte – turtall', 'sensor', 'sensor.systemair_save_avtrekksvifte_hastighet_rpm'),
-    FIELD('recovery_output', 'Gjenvinningspådrag (%)', 'sensor', 'sensor.systemair_save_varmegjenvinning'),
+    FIELD('recovery_output', 'Vekslerpådrag (%)', 'sensor', 'sensor.systemair_save_varmegjenvinning'),
     FIELD('heater_output', 'Ettervarmepådrag (%)', 'sensor', 'sensor.systemair_save_triac_after_manual_override'),
     FIELD('heater_active', 'Varmefunksjon aktiv', 'binary_sensor', 'binary_sensor.loft_systemair_save_ettervarme_aktiv'),
     FIELD('free_cooling_active', 'Frikjøling aktiv', 'binary_sensor', 'binary_sensor.systemair_save_frikjoling_aktiv'),
     FIELD('countdown', 'Gjenstående modustid (sekunder)', 'sensor', 'sensor.systemair_save_countdown_mode_time'),
     FIELD('filter_warning', 'Filtervarsel', 'binary_sensor', 'binary_sensor.systemair_save_filtervarsel'),
     FIELD('filter_alarm', 'Filteralarm', 'binary_sensor', 'binary_sensor.systemair_save_filteralarm'),
+    FIELD('alarm_a', 'A-alarm – samlealarm', 'binary_sensor', 'binary_sensor.systemair_save_a_alarm', { optional: true, group: 'Alarmer' }),
+    FIELD('alarm_b', 'B-alarm – samlealarm', 'binary_sensor', 'binary_sensor.systemair_save_b_alarm', { optional: true, group: 'Alarmer' }),
+    FIELD('alarm_c', 'C-alarm – samlealarm', 'binary_sensor', 'binary_sensor.systemair_save_c_alarm', { optional: true, group: 'Alarmer' }),
     FIELD('outdoor_humidity', 'Utendørs luftfuktighet – valgfri', 'sensor', 'sensor.a4_c1_38_23_90_74_9074_humidity', { optional: true, group: 'Valgfrie kilder' }),
     FIELD('fireplace_duration', 'Innstilt Ildsted-varighet (min)', 'sensor', 'sensor.systemair_save_fireplace_mode_duration', { optional: true, group: 'Varigheter for fremdriftslinjen' }),
     FIELD('boost_duration', 'Innstilt Boost-varighet (min)', 'number', 'number.systemair_save_oppfriskning_varighet', { optional: true, group: 'Varigheter for fremdriftslinjen' }),
@@ -66,7 +69,7 @@
   const MODE_NAMES = { auto: 'Auto', manual_stop: 'Manuell – Stopp', manual_low: 'Manuell – Lav', manual_normal: 'Manuell – Normal', manual_high: 'Manuell – Høy', manual_unknown: 'Manuell – Ukjent', party: 'Party', boost: 'Boost', fireplace: 'Ildsted', away: 'Borte', holiday: 'Ferie', cooker_hood: 'Kjøkkenhette', vacuum_cleaner: 'Støvsuger', cdi1: 'CDI1', cdi2: 'CDI2', cdi3: 'CDI3', pressure_guard: 'Trykkvakt' };
   const AUTO_NAMES = { week_schedule: 'Styres av ukeprogram', demand_control: 'Behovsstyring', external_control: 'Ekstern styring', configuration_fault: 'Konfigurasjonsfeil' };
   const TIMED = { fireplace: ['fireplace_duration', 60], boost: ['boost_duration', 60], party: ['party_duration', 3600], away: ['away_duration', 3600], holiday: ['holiday_duration', 86400] };
-  function normalize(config, fields, title) {
+  function normalize(config, fields, title, supportsAnimation) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Kortoppsettet må være et objekt.');
     if (config.entities != null && (typeof config.entities !== 'object' || Array.isArray(config.entities))) throw new Error('entities må inneholde entitetskoblingene.');
     // A saved mapping is authoritative; clearing an input must stay cleared.
@@ -77,7 +80,13 @@
       entities[f.key] = entities[f.key].trim();
       if (entities[f.key] && (!/^[a-z_]+\.[a-z0-9_]+$/.test(entities[f.key]) || !entities[f.key].startsWith(f.domain + '.'))) throw new Error(`Feil entitetstype for ${f.label}: forventer ${f.domain}.`);
     }
-    return { ...config, title: config.title === undefined ? title : String(config.title), entities };
+    if (config.show_title != null && typeof config.show_title !== 'boolean') throw new Error('Vis overskrift må være på eller av.');
+    const result = { ...config, title: config.title === undefined ? title : String(config.title ?? ''), show_title: config.show_title ?? false, entities };
+    if (supportsAnimation) {
+      result.animation = config.animation ?? 'on';
+      if (!['on', 'auto', 'off'].includes(result.animation)) throw new Error('Animasjoner må være on, auto eller off.');
+    }
+    return result;
   }
   const SHARED_STYLE = `
     :host{display:block;color:var(--primary-text-color,#e2e8f0);font-family:var(--paper-font-body1_-_font-family,Arial,sans-serif)}
@@ -86,7 +95,6 @@
     .svg-wrap{width:100%;border-radius:30px;overflow:hidden}.systemair-svg{width:100%;height:auto;display:block}
     .filter-status{font-size:14px;font-weight:700;line-height:1.4;text-align:center;padding:8px 12px;border-radius:12px;margin-top:6px}
     .filter-alarm{background:#7f1d1d;color:#fecaca}.filter-warning{background:#78350f;color:#fde68a}.filter-unknown{background:#334155;color:#e2e8f0}
-    .footnote{font-size:12px;opacity:.7;line-height:1.5;margin:6px 10px}
     .grid{display:grid;gap:8px;margin-bottom:16px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
     h3{font-size:16px;font-weight:600;margin:20px 8px 12px}
     button{font:inherit;min-width:0;min-height:92px;border:1px solid var(--divider-color,rgba(255,255,255,.16));border-radius:20px;background:rgba(127,127,127,.06);color:inherit;padding:12px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;box-sizing:border-box}
@@ -95,12 +103,13 @@
     button.active{border:2px solid var(--accent);background:linear-gradient(135deg,var(--tint),transparent)}
     button:focus-visible{outline:3px solid var(--primary-color,#03a9f4);outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}
     .error{background:rgba(239,68,68,.13);color:var(--error-color,#ef4444);font-size:14px;padding:12px;border-radius:12px;margin:8px 0}.error:empty{display:none}
-    @media(prefers-reduced-motion:reduce){.duct-flow,.fan-blade{animation:none!important}}
+    .svg-wrap[data-animation="off"] .duct-flow,.svg-wrap[data-animation="off"] .fan-blade{animation:none!important}
+    @media(prefers-reduced-motion:reduce){.svg-wrap[data-animation="auto"] .duct-flow,.svg-wrap[data-animation="auto"] .fan-blade{animation:none!important}}
   `;
   class BaseCard extends HTMLElement {
     constructor() { super(); this.attachShadow({ mode: 'open' }); this._previousStates = []; }
     setConfig(config) {
-      this._config = normalize(config, this.constructor.fields, this.constructor.defaultTitle);
+      this._config = normalize(config, this.constructor.fields, this.constructor.defaultTitle, this.constructor.supportsAnimation);
       this._previousStates = [];
       this._renderIfReady();
     }
@@ -117,7 +126,7 @@
       if (!this._config || !this._hass) return;
       this._render(); this._rendered = true;
     }
-    _heading() { return this._config.title ? `<h2>${escape(this._config.title)}</h2>` : ''; }
+    _heading() { return this._config.show_title && this._config.title ? `<h2>${escape(this._config.title)}</h2>` : ''; }
     _missing() {
       const states = this._hass.states || {};
       return this.constructor.fields.filter(f => !f.optional && (!this._config.entities[f.key] || !states[this._config.entities[f.key]]));
@@ -128,23 +137,28 @@
     }
     getCardSize() { return 8; }
     getGridOptions() { return { columns: 12, rows: 'auto', min_columns: 6 }; }
-    static getStubConfig() { return { title: this.defaultTitle, entities: defaults(this.fields) }; }
+    static getStubConfig() { return { title: this.defaultTitle, show_title: false, ...(this.supportsAnimation ? { animation: 'on' } : {}), entities: defaults(this.fields) }; }
     static getConfigForm() {
       const fields = this.fields;
       return {
         schema: [
+          { name: 'show_title', default: false, selector: { boolean: {} } },
           { name: 'title', selector: { text: {} } },
+          ...(this.supportsAnimation ? [{ name: 'animation', required: true, default: 'on', selector: { select: { mode: 'dropdown', options: [
+            { value: 'on', label: 'På' }, { value: 'auto', label: 'Auto – følg enheten' }, { value: 'off', label: 'Av' },
+          ] } } }] : []),
           { name: 'entities', type: 'expandable', title: 'Entitetskoblinger', schema: fields.map(f => ({ name: f.key, required: !f.optional, selector: { entity: { filter: { domain: f.domain } } } })) },
         ],
-        computeLabel: schema => schema.name === 'title' ? 'Overskrift' : fields.find(f => f.key === schema.name)?.label || schema.name,
-        computeHelper: schema => fields.find(f => f.key === schema.name)?.optional ? 'Valgfri kobling. Kan stå tom.' : undefined,
+        computeLabel: schema => ({ title: 'Overskrift', show_title: 'Vis overskrift', animation: 'Animasjoner' })[schema.name] || fields.find(f => f.key === schema.name)?.label || schema.name,
+        computeHelper: schema => schema.name === 'animation' ? 'På er standard. Auto følger enhetens valg for redusert bevegelse.' : schema.name === 'title' ? 'Vises bare når Vis overskrift er slått på.' : fields.find(f => f.key === schema.name)?.optional ? 'Valgfri kobling. Kan stå tom.' : undefined,
       };
     }
   }
 
   class Vsr300SvgCard extends BaseCard {
     static fields = SVG_FIELDS;
-    static defaultTitle = 'Systemair SVG';
+    static defaultTitle = '';
+    static supportsAnimation = true;
     getCardSize() { return 11; }
     _diagram() {
       const states = this._hass.states || {}, e = this._config.entities;
@@ -240,7 +254,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
   const exchangerOpacity = freeCoolingActive ? 0.18 : 1;
 
   return `
-    <div class="svg-wrap">
+    <div class="svg-wrap" data-animation="${this._config.animation}">
       <svg role="img" aria-label="Systemair prosessillustrasjon" class="systemair-svg" viewBox="0 -250 1300 1255" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="panelBg" x1="0" y1="0" x2="1" y2="1">
@@ -453,7 +467,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <line x1="705" y1="170" x2="555" y2="303" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
           <line x1="745" y1="215" x2="595" y2="348" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
 
-          <text x="650" y="225" text-anchor="middle" class="label" style="font-size:25px">GJENVINNINGS-</text>
+          <text x="650" y="225" text-anchor="middle" class="label" style="font-size:30px">VEKSLER</text>
           <text x="650" y="262" text-anchor="middle" class="label" style="font-size:30px">PÅDRAG</text>
           <text x="650" y="315" text-anchor="middle" class="value">${gjenv}</text>
         </g>
@@ -517,22 +531,33 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
     </div>
   `;
     }
+    _alarmLines(states, entities) {
+      const rows = [];
+      const add = (key, label, level) => rows.push(`<div class="filter-status filter-${level}" data-alarm="${key}" role="status">${escape(label)}</div>`);
+      for (const [key, label] of [['alarm_a', 'A-alarm'], ['alarm_b', 'B-alarm'], ['alarm_c', 'C-alarm']]) {
+        if (!entities[key]) continue;
+        const active = binary(states, entities[key]);
+        if (active === true) add(key, `⚠ ${label} aktiv – kontroller aggregatets alarmliste`, 'alarm');
+        else if (active === null) add(key, `? ${label} – status ukjent`, 'unknown');
+      }
+      const alarm = binary(states, entities.filter_alarm), warning = binary(states, entities.filter_warning);
+      if (alarm === true) add('filter_alarm', '⚠ Filteralarm – bytt filtre', 'alarm');
+      if (warning === true) add('filter_warning', '⚠ Filtervarsel – planlegg filterskift', 'warning');
+      if (alarm !== true && warning !== true && (alarm === null || warning === null)) add('filter_unknown', '? Filterstatus ukjent', 'unknown');
+      return rows.join('');
+    }
     _render() {
       const states = this._hass.states || {}, e = this._config.entities;
-      const alarm = binary(states, e.filter_alarm), warning = binary(states, e.filter_warning);
-      const filter = alarm === true ? 'alarm' : warning === true ? 'warning' : alarm === false && warning === false ? 'normal' : 'unknown';
-      const label = { alarm: '⚠ Bytt filtre – filteralarm', warning: '⚠ Filtervarsel – planlegg filterskift', unknown: '? Filterstatus ukjent' }[filter];
       const freeUnknown = binary(states, e.free_cooling_active) === null;
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}</style>${this._heading()}${this._missingNotice()}${this._diagram()}
-        ${label ? `<div class="filter-status filter-${filter}" role="status">${label}</div>` : ''}
-        ${freeUnknown ? '<div class="notice" role="status">Frikjølingsstatus ukjent.</div>' : ''}
-        <p class="footnote">≈ Estimert luftmengde. Animasjonene er skjematiske.</p>`;
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}</style>${this._heading()}${this._diagram()}
+        ${this._alarmLines(states, e)}${this._missingNotice()}
+        ${freeUnknown ? '<div class="notice" role="status">Frikjølingsstatus ukjent.</div>' : ''}`;
     }
   }
 
   class Vsr300ControlCard extends BaseCard {
     static fields = CONTROL_FIELDS;
-    static defaultTitle = 'Kontrollpanel';
+    static defaultTitle = '';
     constructor() {
       super();
       this.shadowRoot.addEventListener('click', event => {

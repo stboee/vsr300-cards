@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.0 — 2026-10-22
+
+- SVG animation selector: **På / Auto – følg enheten / Av**, with **På** as
+  default, including saved configurations without the new option.
+- On explicitly animates despite the device's reduced-motion preference; Auto
+  follows it; Off stops fan and air-path animations.
+- Both headings hidden by default, including legacy saved titles. Optional
+  custom headings can be enabled through the graphical editor.
+- Fixed SVG footer removed; estimated airflow retains the `≈` marker.
+- Recovery label shortened to **Vekslerpådrag**.
+- One line per active configured A/B/C summary alarm, filter alarm and filter
+  warning. Configured unknown signals stay unknown; optional empty alarms are
+  omitted. Existing saved entity mappings remain authoritative.
+- Examples, English/Norwegian guides, screenshots and verification notes updated.
+- Simulated browser checks cover all 32 alarm combinations, all six animation
+  and reduced-motion combinations, actual frame movement, legacy configurations,
+  mobile width and existing service-call behaviour. Actual Pixel/HA checks remain open.
+
 ## 1.0.0 — 2026-10-21
 
 First standalone frontend package, based on the project's reviewed Systemair

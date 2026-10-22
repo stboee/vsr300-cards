@@ -1,8 +1,9 @@
 # VSR300 – 02-Kontrollpanel.yaml
-# Kortpakke: 1.0.0
-# Endret: 2026-10-21
+# Kortpakke: 1.1.0
+# Endret: 2026-10-22
 type: custom:vsr300-control-card
-title: Kontrollpanel
+title: ''
+show_title: false
 entities:
   mode: sensor.systemair_save_modus
   auto_source: sensor.loft_systemair_save_auto_styrekilde

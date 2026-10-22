@@ -1,8 +1,10 @@
 # VSR300 – 01-SVG.yaml
-# Kortpakke: 1.0.0
-# Endret: 2026-10-21
+# Kortpakke: 1.1.0
+# Endret: 2026-10-22
 type: custom:vsr300-svg-card
-title: Systemair SVG
+title: ''
+show_title: false
+animation: 'on'
 entities:
   mode: sensor.systemair_save_modus
   outdoor_temperature: sensor.systemair_save_utetemperatur
@@ -20,6 +22,9 @@ entities:
   countdown: sensor.systemair_save_countdown_mode_time
   filter_warning: binary_sensor.systemair_save_filtervarsel
   filter_alarm: binary_sensor.systemair_save_filteralarm
+  alarm_a: binary_sensor.systemair_save_a_alarm
+  alarm_b: binary_sensor.systemair_save_b_alarm
+  alarm_c: binary_sensor.systemair_save_c_alarm
   outdoor_humidity: sensor.a4_c1_38_23_90_74_9074_humidity
   fireplace_duration: sensor.systemair_save_fireplace_mode_duration
   boost_duration: number.systemair_save_oppfriskning_varighet

@@ -1,6 +1,34 @@
-# Verifikasjon – 1.0.0 – 2026-10-21
+# Verifikasjon – 1.1.0 – 2026-10-22
 
-## Gjennomført lokalt
+## Gjennomført lokalt for 1.1.0
+
+Elleve kontrollgrupper er bestått i lokal headless Chromium med simulerte
+HA-tilstander. De omfatter følgende endringer og regresjonskontroller:
+
+- Begge overskrifter skjules som standard, også med gamle lagrede titler.
+  Egen overskrift vises bare etter uttrykkelig aktivering.
+- Den faste teksten under SVG-en er fjernet. Estimatmerket `≈` beholdes.
+- «Vekslerpådrag» vises i den opprinnelige vekslerillustrasjonen.
+- Animasjoner har standarden **På**, også når et gammelt oppsett mangler feltet.
+- Alle seks kombinasjoner av På/Auto/Av og redusert/vanlig bevegelse er kontrollert
+  gjennom beregnet CSS. Faktisk endring mellom to animasjonsbilder bekrefter både
+  vifte- og luftstrømsbevegelse med På mens redusert bevegelse er forespurt.
+- Alle 32 kombinasjoner av A/B/C, filteralarm og filtervarsel gir én linje per
+  aktivt signal i avtalt rekkefølge. Samlealarmer tolkes ikke som feilårsaker.
+- Ukjent status på en valgt alarm vises nøytralt, mens tom valgfri alarmkobling
+  utelates. Gamle lagrede entitetsvalg får ikke nye koblinger automatisk.
+- Filterfarger, ukjente verdier, countdown, Ferie over ett døgn og den opprinnelige
+  frikjølingsbanen er kontrollert på nytt.
+- Alle ti betjeningsvalg gir riktige simulerte HA-tjenestekall. Avbrutt bekreftelse,
+  tjenestefeil og utilgjengelige betjeningsentiteter er kontrollert.
+- Grafiske editorskjemaer, standardverdier og bevaring av valgte/tomme koblinger
+  er kontrollert. Selve HAs fullstendige editor er ikke kjørt.
+- Desktop og mobilbredde 412 px, inkludert flere samtidige alarmer, er kontrollert
+  for sidefeil og horisontal overflyt. Skjermbilder er gjennomgått visuelt.
+
+Dette er ikke en fysisk Pixel 8 Pro-test eller V-verifikasjon på aggregatet.
+
+## Historisk kontrollgrunnlag – 1.0.0, 2026-10-21
 
 Kontrollene gjelder kortkoden og er ikke V-verifikasjon på VSR300-aggregatet.
 
@@ -34,16 +62,15 @@ ble brukt bare i utviklingsmiljøet og inngår ikke i leveransen.
 
 ## Rapportert fra faktisk HA
 
-Prosjekteieren opplyste 2026-10-21 at distribusjonskortene var så vidt testet og
+Prosjekteieren opplyste 2026-10-21 at 1.0.0-distribusjonskortene var så vidt testet og
 at de innledningsvis fungerer. Det er en første praktisk tilbakemelding, uten
 spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-GitHub-pakken beholder funksjonskoden fra den manuelt leverte 1.0.0-versjonen.
-Bare lisenskommentarer er lagt til i JavaScript-filen. HACS-manifest, eksempler,
-dokumentasjonslenker og pakkens sjekksummer kontrolleres før publisering.
-MIT-lisensen fra repositoryet beholdes uendret.
+1.1.0 bygger på GitHub-pakkens 1.0.0 og endrer animasjonsvalg, alarmvisning og
+avtalt utseende. HACS-manifest, komplette eksempler, dokumentasjonslenker og
+pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og
 installasjon/oppdatering gjennom HACS gjenstår. Repositorystruktur og manifest
