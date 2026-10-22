@@ -23,7 +23,6 @@ part of this repository.
 | [Home Assistant card editor](https://contributors.home-assistant.io/frontend/custom-ui/card-editor/) | Public `getConfigForm` API and entity selectors. |
 | [HA core 2026.10.2 frontend manifest](https://github.com/home-assistant/core/blob/2026.10.2/homeassistant/components/frontend/manifest.json) | Reference frontend version 20260930.4 for API compatibility review. |
 | [Howard Systemair Modbus v1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus/tree/v1.3.0) | Source of the reference entities and their documented/code-derived meanings. |
-| [HACS dashboard requirements](https://www.hacs.dev/docs/publish/plugin/) | Repository layout and installation metadata. |
 | [Howard v1.3.0 binary sensors](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/binary_sensor.py) | A/B/C summary alarm, filter alarm and filter warning sources. |
 | [HA frontend schema types 20260930.4](https://github.com/home-assistant/frontend/blob/20260930.4/src/components/ha-form/types.ts) | Native editor field defaults, boolean and select selectors. |
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |

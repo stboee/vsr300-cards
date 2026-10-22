@@ -69,12 +69,12 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 ## Publiseringskontroll og gjenstående arbeid
 
 1.1.0 bygger på GitHub-pakkens 1.0.0 og endrer animasjonsvalg, alarmvisning og
-avtalt utseende. HACS-manifest, komplette eksempler, dokumentasjonslenker og
+avtalt utseende. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og
-installasjon/oppdatering gjennom HACS gjenstår. Repositorystruktur og manifest
-kan kontrolleres lokalt, men det erstatter ikke faktisk installasjon i HACS.
+manuell installasjon/oppdatering gjenstår. Repositorystruktur og eksempler
+kan kontrolleres lokalt, men det erstatter ikke faktisk installasjon i HA.
 Ingen praktisk test eller endring i brukerens HA startes av publiseringen.
 
 Native temperatur-, status- og utgangsregistre beholder tidligere dokumentert
