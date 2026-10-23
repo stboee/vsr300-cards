@@ -8,6 +8,9 @@ standalone custom elements. The functional 1.0.0 JavaScript was delivered on
 2026-10-21. Its initial GitHub packaging added license comments and documentation
 without changing the runtime logic. Version 1.1.0, 2026-10-22, adds explicit
 animation options, optional class-alarm lines and the agreed appearance changes.
+Version 1.1.1, 2026-10-23, restores a local display countdown between integration
+reports. The displayed remaining time is extrapolated from the last reported
+value and available HA timestamps; it is not a new register measurement.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
@@ -26,6 +29,8 @@ part of this repository.
 | [Howard v1.3.0 binary sensors](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/binary_sensor.py) | A/B/C summary alarm, filter alarm and filter warning sources. |
 | [HA frontend schema types 20260930.4](https://github.com/home-assistant/frontend/blob/20260930.4/src/components/ha-form/types.ts) | Native editor field defaults, boolean and select selectors. |
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |
+| [HA state objects](https://www.home-assistant.io/docs/configuration/state_object/) | Report/update timestamps used to anchor the local countdown display. |
+| [MDN setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval) | Local one-second visual updates and timer cleanup. |
 
 The distributed JavaScript has no imports, bundled third-party JavaScript
 libraries, fonts or icon assets. `ha-icon` is provided by Home Assistant at

@@ -1,6 +1,28 @@
-# Verifikasjon – 1.1.0 – 2026-10-22
+# Verifikasjon – 1.1.1 – 2026-10-23
 
-## Gjennomført lokalt for 1.1.0
+## Gjennomført lokalt for 1.1.1
+
+- 15 kontroller med styrt klokke dekker sekundvis lokal nedtelling, alder på
+  mottatt HA-verdi, tilgjengelige rapporterings-/oppdateringstidsstempler,
+  manglende/ugyldige tidsstempler og synkronisering av nye rapporter begge veier.
+- Oppdateringer av andre entiteter nullstiller ikke nedtellingen. Forlengelser
+  og nye rapporter med samme verdi, men nytt tidsstempel, behandles som nye data.
+- Forsinkede klokkeoppdateringer tar igjen faktisk forløpt tid og stopper på
+  null. Alle fem tidsstyrte moduser og deres enheter/formater er kontrollert.
+- Ukjent/utilgjengelig resttid blir ukjent, uten reserveberegning fra innstilt
+  varighet. Manglende valgfri varighet skjuler bare fremdriftsfyllingen.
+- Nettleseren bekrefter at tekst og fremdriftslinje endres uten nye HA-verdier.
+  SVG-elementet, viftenoden og dens løpende CSS-animasjon beholdes ved klokketikk.
+- Intervaller stoppes ved fjerning av kortet, utilgjengelig verdi og ikke-tidsstyrt
+  modus. Kortet tar igjen tiden og starter intervallet ved gjeninnsetting.
+- Tolv simulerte nettlesergrupper kontrollerer også tidligere funksjoner, blant
+  annet animasjonsvalg, 32 alarmkombinasjoner, entitetsvalg, tjenestekall og mobilbredde.
+
+Resttiden mellom rapporteringene er en lokal visningsberegning. Verken timeren
+eller nullpunktet endrer aggregatets rapporterte modus eller skriver til Modbus.
+Faktisk kontroll i brukerens HA og på Pixel 8 Pro gjenstår.
+
+## Historisk kontrollgrunnlag – 1.1.0, 2026-10-22
 
 Elleve kontrollgrupper er bestått i lokal headless Chromium med simulerte
 HA-tilstander. De omfatter følgende endringer og regresjonskontroller:
@@ -68,8 +90,8 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.0 bygger på GitHub-pakkens 1.0.0 og endrer animasjonsvalg, alarmvisning og
-avtalt utseende. Komplette eksempler, dokumentasjonslenker og
+1.1.1 viderefører tidligere kortfunksjoner og gjeninnfører lokal oppdatering av
+resttidsvisningen mellom rapporter. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og

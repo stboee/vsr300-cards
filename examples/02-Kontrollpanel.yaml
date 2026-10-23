@@ -1,6 +1,6 @@
 # VSR300 – 02-Kontrollpanel.yaml
-# Kortpakke: 1.1.0
-# Endret: 2026-10-22
+# Kortpakke: 1.1.1
+# Endret: 2026-10-23
 # VIKTIG: Kontroller alle entitets-ID-er under entities: og tilpass dem til din egen HA.
 # Navnene nedenfor er eksempler fra referanseoppsettet. Tøm valgfrie felt du ikke bruker.
 type: custom:vsr300-control-card

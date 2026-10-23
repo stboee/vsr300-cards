@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.1.0 · 2026-10-22
+/* VSR300 custom cards · version 1.1.1 · 2026-10-23
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.1.0';
+  const VERSION = '1.1.1';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -160,6 +160,59 @@
     static defaultTitle = '';
     static supportsAnimation = true;
     getCardSize() { return 11; }
+    connectedCallback() { this._updateCountdown(); }
+    disconnectedCallback() { this._stopCountdownTimer(); }
+    _stopCountdownTimer() {
+      if (this._countdownInterval !== undefined) clearInterval(this._countdownInterval);
+      this._countdownInterval = undefined;
+    }
+    _modeTiming() {
+      const states = this._hass?.states || {}, e = this._config?.entities || {};
+      const mode = state(states, e.mode), timed = Object.hasOwn(TIMED, mode) ? TIMED[mode] : undefined;
+      if (!timed) {
+        this._countdownSample = undefined;
+        const known = Object.hasOwn(MODE_NAMES, mode);
+        return { text: known ? 'Ikke tidsstyrt' : 'Modus ukjent', pct: known ? 100 : 0, running: false };
+      }
+      const raw = number(states, e.countdown), entity = states[e.countdown];
+      if (raw === null || raw < 0) {
+        this._countdownSample = undefined;
+        return { text: 'Resttid ukjent', pct: 0, running: false };
+      }
+      // A report anchors the local display clock; other entity updates do not.
+      // HA's last_reported may be absent from frontend states, so use last_updated.
+      const reported = [entity?.last_reported, entity?.last_updated, entity?.last_changed]
+        .map(value => ({ value, ms: typeof value === 'string' ? Date.parse(value) : NaN }))
+        .find(stamp => Number.isFinite(stamp.ms));
+      const signature = JSON.stringify([e.mode, e.countdown, mode, raw, reported?.value ?? null]);
+      const now = Date.now();
+      if (signature !== this._countdownSample?.signature) {
+        const observedAt = reported ? Math.min(now, reported.ms) : now;
+        this._countdownSample = { signature, deadline: observedAt + raw * 1000 };
+      }
+      // Use elapsed time, not a decrement per tick: background throttling must not drift.
+      const seconds = Math.max(0, Math.min(raw, (this._countdownSample.deadline - now) / 1000));
+      const remaining = Math.ceil(seconds);
+      const [durationRole, scale] = timed, duration = number(states, e[durationRole]);
+      const total = duration !== null && duration > 0 ? duration * scale : null;
+      const pct = total === null ? 0 : Math.max(0, Math.min(100, seconds / total * 100));
+      let text;
+      if (remaining >= 86400) text = `${Math.floor(remaining / 86400)}d ${Math.floor(remaining % 86400 / 3600)}t igjen`;
+      else if (remaining >= 3600) text = `${Math.floor(remaining / 3600)}t ${Math.floor(remaining % 3600 / 60)}m igjen`;
+      else text = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} igjen`;
+      return { text, pct, running: seconds > 0 };
+    }
+    _updateCountdown() {
+      if (!this._hass || !this._config) { this._stopCountdownTimer(); return; }
+      const timing = this._modeTiming();
+      const label = this.shadowRoot.querySelector('.mode-time');
+      const progress = this.shadowRoot.querySelector('.mode-progress');
+      if (label && label.textContent !== timing.text) label.textContent = timing.text;
+      if (progress) progress.setAttribute('width', String(Math.round(1110 * timing.pct / 100)));
+      if (this.isConnected && label && timing.running) {
+        if (this._countdownInterval === undefined) this._countdownInterval = setInterval(() => this._updateCountdown(), 1000);
+      } else this._stopCountdownTimer();
+    }
     _diagram() {
       const states = this._hass.states || {}, e = this._config.entities;
 const clean = v => v === undefined || v === null || String(v).trim() === '' || v === 'unknown' || v === 'unavailable' ? '-' : v;
@@ -222,22 +275,7 @@ let modeColor2 = '#94a3b8';
 const colors = { fireplace: ['#fb923c', '#facc15'], boost: ['#0ea5e9', '#22d3ee'], party: ['#a855f7', '#ec4899'], auto: ['#22c55e', '#84cc16'] };
 if (colors[modeRaw]) [modeColor1, modeColor2] = colors[modeRaw];
 else if (modeKnown && modeRaw.startsWith('manual_')) [modeColor1, modeColor2] = ['#38bdf8', '#0ea5e9'];
-let timeText = modeKnown ? 'Ikke tidsstyrt' : 'Modus ukjent';
-let pct = modeKnown ? 100 : 0;
-if (TIMED[modeRaw]) {
-  const seconds = number(states, e.countdown);
-  const [durationRole, scale] = TIMED[modeRaw];
-  const duration = number(states, e[durationRole]);
-  const total = duration !== null && duration > 0 ? duration * scale : null;
-  pct = seconds !== null && seconds >= 0 && total !== null ? Math.max(0, Math.min(100, seconds / total * 100)) : 0;
-  if (seconds === null || seconds < 0) timeText = 'Resttid ukjent';
-  else {
-    const remaining = Math.floor(seconds);
-    if (remaining >= 86400) timeText = `${Math.floor(remaining / 86400)}d ${Math.floor(remaining % 86400 / 3600)}t igjen`;
-    else if (remaining >= 3600) timeText = `${Math.floor(remaining / 3600)}t ${Math.floor(remaining % 3600 / 60)}m igjen`;
-    else timeText = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} igjen`;
-  }
-}
+const { text: timeText, pct } = this._modeTiming();
 const filterAlarm = binary(states, e.filter_alarm);
 const filterWarning = binary(states, e.filter_warning);
 const filterState = filterAlarm === true ? 'alarm' : filterWarning === true ? 'warning' : filterAlarm === false && filterWarning === false ? 'normal' : 'unknown';
@@ -526,7 +564,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
         <text x="92" y="900" class="mode-value">${driftText}</text>
         <text x="760" y="900" class="mode-time">${timeText}</text>
         <rect x="92" y="917" width="1110" height="16" rx="8" fill="rgba(255,255,255,0.18)" />
-        <rect x="92" y="917" width="${Math.round(1110 * pct / 100)}" height="16" rx="8" fill="url(#modeGrad)" />
+        <rect class="mode-progress" x="92" y="917" width="${Math.round(1110 * pct / 100)}" height="16" rx="8" fill="url(#modeGrad)" />
       </svg>
     </div>
   `;
@@ -552,6 +590,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
       this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}</style>${this._heading()}${this._diagram()}
         ${this._alarmLines(states, e)}${this._missingNotice()}
         ${freeUnknown ? '<div class="notice" role="status">Frikjølingsstatus ukjent.</div>' : ''}`;
+      this._updateCountdown();
     }
   }
 

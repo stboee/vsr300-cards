@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.1 — 2026-10-23
+
+- Restore a local one-second countdown and progress update between integration
+  reports, using the last reported remaining time as the reference.
+- Account for the HA sample timestamp when available and resynchronise whenever
+  a new report arrives, including extensions or restarts of a timed mode.
+- Update only the time label and progress bar on local ticks, preserving the
+  running fan and air-path animations.
+- Stop timers for disconnected cards, unavailable time values, untimed modes
+  and zero remaining time. Reattached cards account for elapsed time.
+- Keep the reported operating mode at zero; never infer a device mode change.
+- Countdown behaviour checked with 15 controlled-clock cases and 12 simulated
+  browser regression groups. Actual-HA acceptance remains open.
+
 ## Documentation — 2026-10-22
 
 - Shorten the English and Norwegian guides to manual installation and updates.

@@ -1,4 +1,4 @@
-# Entitetskart – custom cards 1.1.0
+# Entitetskart – custom cards 1.1.1
 
 Startkoblingene er eksempler fra referanseoppsettet. Brukeren må kontrollere alle
 koblinger i begge kort og endre dem til tilsvarende entiteter i sin egen
@@ -62,6 +62,11 @@ SVG-kortets utendørs RF kommer fra en separat HA-føler. Alle øvrige datakilde
 Valgfrie felt: `outdoor_humidity`, `alarm_a`, `alarm_b`, `alarm_c` og de fem
 `*_duration`-feltene i SVG; varighetsfeltene i Kontrollpanel. Resttidens kilde er
 `countdown`, ikke varighetsfeltene.
+
+Fra 1.1.1 brukes siste rapporterte resttid og tilgjengelig HA-tidsstempel som
+grunnlag for en lokal sekundvis nedtelling. Nye rapporter synkroniserer visningen.
+Visningen mellom rapportene er beregnet; den starter ikke ny modus når tiden når
+null. Ukjent/utilgjengelig resttid vises som ukjent, uten å gjette fra varigheten.
 
 A/B/C er samlealarmer fra integrasjonen. Eksisterende lagrede oppsett beholder
 entitetsvalgene sine og får ikke nye alarmkoblinger automatisk. Velg dem i
