@@ -11,6 +11,8 @@ animation options, optional class-alarm lines and the agreed appearance changes.
 Version 1.1.1, 2026-10-23, restores a local display countdown between integration
 reports. The displayed remaining time is extrapolated from the last reported
 value and available HA timestamps; it is not a new register measurement.
+Version 1.1.2, 2026-11-02, uses inherited Home Assistant theme variables for cockpit
+backgrounds and neutral text. Semantic air-port and alarm colours are retained.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
@@ -31,6 +33,7 @@ part of this repository.
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |
 | [HA state objects](https://www.home-assistant.io/docs/configuration/state_object/) | Report/update timestamps used to anchor the local countdown display. |
 | [MDN setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval) | Local one-second visual updates and timer cleanup. |
+| [HA theming and design tokens](https://contributors.home-assistant.io/frontend/architecture/theming/) | Inherited card/background/text/divider CSS variables for light, dark and custom themes. |
 
 The distributed JavaScript has no imports, bundled third-party JavaScript
 libraries, fonts or icon assets. `ha-icon` is provided by Home Assistant at

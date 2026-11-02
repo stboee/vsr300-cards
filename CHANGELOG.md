@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.2 — 2026-11-02
+
+- Replace fixed dark cockpit backgrounds and neutral text colours with inherited
+  Home Assistant theme variables. Canvas, unit panels, exchanger face, mode box,
+  neutral labels and progress track now follow the selected light/dark theme.
+- Keep semantic air-port and alarm colours with contrasting light foregrounds.
+- Theme changes apply through CSS without replacing the SVG or waiting for a
+  sensor update; the selected HA theme takes priority over the OS colour preference.
+- Thirteen simulated browser groups cover light/dark/custom palettes, live theme
+  changes, selected text/background contrast pairs and previous card behaviour.
+- Refresh screenshots and manual installation version examples. Actual-HA theme
+  acceptance remains open.
+
 ## 1.1.1 — 2026-10-23
 
 - Restore a local one-second countdown and progress update between integration

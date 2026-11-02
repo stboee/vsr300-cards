@@ -1,6 +1,23 @@
-# Verifikasjon – 1.1.1 – 2026-10-23
+# Verifikasjon – 1.1.2 – 2026-11-02
 
-## Gjennomført lokalt for 1.1.1
+## Gjennomført lokalt for 1.1.2
+
+- 13 simulerte nettlesergrupper er bestått. Temakontrollen omfatter lyst, mørkt
+  og en egendefinert palett, hver med både lyst og mørkt OS-fargevalg.
+- SVG-bakgrunn, aggregatpanel, modusfelt og nøytral tekst følger arvede HA-
+  variabler. Temabytte er kontrollert uten nye HA-tilstander, SVG-utskifting
+  eller sideoppdatering.
+- Utvalgte nøytrale tekst/bakgrunn-par og hvit tekst på de fire fargede
+  luftportene har minst 4,5:1 beregnet kontrast i testpalettene. Dette er en
+  kontroll av konkrete fargepar, ikke en full tilgjengelighetssertifisering.
+- Lys desktop- og mobilvisning samt mørk visning er gjennomgått visuelt.
+- Tidligere nettleserkontroller for lokal nedtelling, animasjoner, alarmer,
+  entitetsvalg og betjening er bestått på nytt.
+
+Kontrollene bruker simulerte HA-verdier og temavariabler. Faktisk temabytte i
+brukerens Home Assistant og på Pixel 8 Pro gjenstår å bekrefte.
+
+## Historisk kontrollgrunnlag – 1.1.1, 2026-10-23
 
 - 15 kontroller med styrt klokke dekker sekundvis lokal nedtelling, alder på
   mottatt HA-verdi, tilgjengelige rapporterings-/oppdateringstidsstempler,
@@ -90,8 +107,8 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.1 viderefører tidligere kortfunksjoner og gjeninnfører lokal oppdatering av
-resttidsvisningen mellom rapporter. Komplette eksempler, dokumentasjonslenker og
+1.1.2 viderefører tidligere kortfunksjoner og knytter cockpitens nøytrale farger
+til Home Assistant-temaet. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og

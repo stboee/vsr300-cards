@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.1.1 · 2026-10-23
+/* VSR300 custom cards · version 1.1.2 · 2026-11-02
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.1.1';
+  const VERSION = '1.1.2';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -296,13 +296,13 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
       <svg role="img" aria-label="Systemair prosessillustrasjon" class="systemair-svg" viewBox="0 -250 1300 1255" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="panelBg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#172033" />
-            <stop offset="100%" stop-color="#0b1120" />
+            <stop offset="0%" stop-color="var(--card-background-color, #ffffff)" />
+            <stop offset="100%" stop-color="var(--card-background-color, #ffffff)" />
           </linearGradient>
 
           <linearGradient id="unitBg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#334155" />
-            <stop offset="100%" stop-color="#111827" />
+            <stop offset="0%" stop-color="var(--secondary-background-color, #f5f5f5)" />
+            <stop offset="100%" stop-color="var(--card-background-color, #ffffff)" />
           </linearGradient>
 
           <linearGradient id="coldAir" x1="0" y1="0" x2="1" y2="0">
@@ -351,60 +351,62 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
               font-family: Arial, sans-serif;
               font-size: 44px;
               font-weight: 950;
-              fill: #ffffff;
+              fill: var(--primary-text-color, #212121);
               letter-spacing: 1px;
             }
             .small {
               font-family: Arial, sans-serif;
               font-size: 42px;
               font-weight: 900;
-              fill: #e2e8f0;
+              fill: var(--primary-text-color, #212121);
             }
             .value {
               font-family: Arial, sans-serif;
               font-size: 60px;
               font-weight: 950;
-              fill: #ffffff;
+              fill: var(--primary-text-color, #212121);
             }
             .tiny {
               font-family: Arial, sans-serif;
               font-size: 33px;
               font-weight: 900;
-              fill: #dbeafe;
+              fill: var(--primary-text-color, #212121);
             }
             .micro {
               font-family: Arial, sans-serif;
               font-size: 32px;
               font-weight: 900;
-              fill: #e2e8f0;
+              fill: var(--primary-text-color, #212121);
             }
             .heater-text {
               font-family: Arial, sans-serif;
               font-size: 31px;
               font-weight: 900;
-              fill: #ffffff;
+              fill: var(--primary-text-color, #212121);
             }
             .mode-title {
               font-family: Arial, sans-serif;
               font-size: 32px;
               font-weight: 900;
-              fill: #cbd5e1;
+              fill: var(--secondary-text-color, #727272);
             }
             .mode-value {
               font-family: Arial, sans-serif;
               font-size: 58px;
               font-weight: 950;
-              fill: #ffffff;
+              fill: var(--primary-text-color, #212121);
             }
             .mode-time {
               font-family: Arial, sans-serif;
               font-size: 38px;
               font-weight: 900;
-              fill: #e2e8f0;
+              fill: var(--primary-text-color, #212121);
             }
+            /* Semantic air-port colours retain a contrasting light foreground. */
+            .port-text { fill: #ffffff; }
             .duct-base {
               fill: none;
-              stroke: rgba(255,255,255,0.16);
+              stroke: var(--divider-color, #bdbdbd);
               stroke-width: 64;
               stroke-linecap: round;
               stroke-linejoin: round;
@@ -438,30 +440,30 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           </style>
         </defs>
 
-        <rect x="0" y="-250" width="1300" height="1255" rx="34" fill="url(#panelBg)" />
+        <rect class="canvas" x="0" y="-250" width="1300" height="1255" rx="34" fill="url(#panelBg)" />
 
-        <rect x="365" y="-200" width="570" height="875" rx="46" fill="url(#unitBg)" stroke="#64748b" stroke-width="4" />
-        <rect x="392" y="-170" width="516" height="815" rx="34" fill="rgba(15,23,42,0.64)" stroke="rgba(148,163,184,0.38)" stroke-width="2" />
+        <rect class="unit-shell" x="365" y="-200" width="570" height="875" rx="46" fill="url(#unitBg)" stroke="var(--secondary-text-color, #727272)" stroke-width="4" />
+        <rect class="unit-inner" x="392" y="-170" width="516" height="815" rx="34" fill="var(--card-background-color, #ffffff)" stroke="var(--divider-color, #bdbdbd)" stroke-width="2" />
 
         <rect x="28" y="-220" width="280" height="220" rx="28" fill="#1e40af" stroke="#93c5fd" stroke-width="4" />
-        <text x="168" y="-160" text-anchor="middle" class="label">INNTAK</text>
-        <text x="168" y="-85" text-anchor="middle" class="value">${uteT}</text>
-        <text x="168" y="-29" text-anchor="middle" class="small">${uteRh}</text>
+        <text x="168" y="-160" text-anchor="middle" class="label port-text">INNTAK</text>
+        <text x="168" y="-85" text-anchor="middle" class="value port-text">${uteT}</text>
+        <text x="168" y="-29" text-anchor="middle" class="small port-text">${uteRh}</text>
 
         <rect x="28" y="455" width="280" height="220" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
-        <text x="168" y="515" text-anchor="middle" class="label">TILLUFT</text>
-        <text x="168" y="590" text-anchor="middle" class="value">${tilluftT}</text>
-        <text x="168" y="646" text-anchor="middle" class="small">${tilluftFlow}</text>
+        <text x="168" y="515" text-anchor="middle" class="label port-text">TILLUFT</text>
+        <text x="168" y="590" text-anchor="middle" class="value port-text">${tilluftT}</text>
+        <text x="168" y="646" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
 
         <rect x="992" y="-220" width="280" height="220" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
-        <text x="1132" y="-165" text-anchor="middle" class="label">AVKAST</text>
-        <text x="1132" y="-85" text-anchor="middle" class="small">${avkastFlow}</text>
-        <text x="1132" y="-29" text-anchor="middle" class="micro">estimert</text>
+        <text x="1132" y="-165" text-anchor="middle" class="label port-text">AVKAST</text>
+        <text x="1132" y="-85" text-anchor="middle" class="small port-text">${avkastFlow}</text>
+        <text x="1132" y="-29" text-anchor="middle" class="micro port-text">estimert</text>
 
         <rect x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
-        <text x="1132" y="515" text-anchor="middle" class="label">AVTREKK</text>
-        <text x="1132" y="590" text-anchor="middle" class="value">${avtrekkT}</text>
-        <text x="1132" y="646" text-anchor="middle" class="small">${inneRh}</text>
+        <text x="1132" y="515" text-anchor="middle" class="label port-text">AVTREKK</text>
+        <text x="1132" y="590" text-anchor="middle" class="value port-text">${avtrekkT}</text>
+        <text x="1132" y="646" text-anchor="middle" class="small port-text">${inneRh}</text>
 
         <g opacity="${normalOpacity}">
           <path class="duct-base" d="M 295 -110 L 425 -110 L 530 160" />
@@ -493,9 +495,9 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
 
         <g opacity="${exchangerOpacity}">
           <polygon points="530,135 650,85 770,135 770,370 650,420 530,370"
-                   fill="rgba(88,28,135,0.56)" stroke="#d946ef" stroke-width="4" />
+                   fill="var(--secondary-background-color, #f5f5f5)" stroke="#d946ef" stroke-width="4" />
           <polygon points="560,165 650,125 740,165 740,345 650,385 560,345"
-                   fill="rgba(15,23,42,0.70)" stroke="rgba(255,255,255,0.30)" stroke-width="3" />
+                   fill="var(--card-background-color, #ffffff)" stroke="var(--divider-color, #bdbdbd)" stroke-width="3" />
 
           <line x1="575" y1="187" x2="725" y2="320" stroke="rgba(216,180,254,0.66)" stroke-width="10" stroke-linecap="round" />
           <line x1="595" y1="170" x2="745" y2="303" stroke="rgba(216,180,254,0.42)" stroke-width="7" stroke-linecap="round" />
@@ -512,9 +514,9 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
 
         <g opacity="${freeOpacity}">
           <rect x="510" y="150" width="280" height="205" rx="30" fill="rgba(12,74,110,0.88)" stroke="#38bdf8" stroke-width="5" />
-          <text x="650" y="223" text-anchor="middle" class="label">FRIKJØLING</text>
-          <text x="650" y="285" text-anchor="middle" class="small">utenom</text>
-          <text x="650" y="333" text-anchor="middle" class="small">veksler</text>
+          <text x="650" y="223" text-anchor="middle" class="label port-text">FRIKJØLING</text>
+          <text x="650" y="285" text-anchor="middle" class="small port-text">utenom</text>
+          <text x="650" y="333" text-anchor="middle" class="small port-text">veksler</text>
         </g>
 
         <rect x="392" y="-170" width="66" height="135" rx="14" class="supply-filter" data-status="${filterState}" fill="${fc ? fc[0] : '#1e3a8a'}" stroke="${fc ? fc[1] : '#93c5fd'}" stroke-width="${fc ? 7 : 4}" />
@@ -559,11 +561,11 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
         </g>
         <text x="875" y="35" text-anchor="middle" class="micro">${avtrekkRpm}</text>
 
-        <rect x="48" y="780" width="1204" height="165" rx="36" fill="#111827" stroke="url(#modeGrad)" stroke-width="4" />
+        <rect class="mode-box" x="48" y="780" width="1204" height="165" rx="36" fill="var(--card-background-color, #ffffff)" stroke="url(#modeGrad)" stroke-width="4" />
         <text x="92" y="837" class="mode-title">AKTIV MODUS</text>
         <text x="92" y="900" class="mode-value">${driftText}</text>
         <text x="760" y="900" class="mode-time">${timeText}</text>
-        <rect x="92" y="917" width="1110" height="16" rx="8" fill="rgba(255,255,255,0.18)" />
+        <rect x="92" y="917" width="1110" height="16" rx="8" fill="var(--divider-color, #bdbdbd)" />
         <rect class="mode-progress" x="92" y="917" width="${Math.round(1110 * pct / 100)}" height="16" rx="8" fill="url(#modeGrad)" />
       </svg>
     </div>
