@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.2.0 — 2026-11-03
+
+- Add optional Systemair Status og forklaringer as a third card in the same
+  JavaScript module and HACS release, based on the maintainer's full uploaded
+  YAML card. Preserve all eight status topics and explanations.
+- Keep explanation selection inside each card instance, with keyboard support
+  and a close button. No input_select helper or button-card is needed.
+- Calculate house load from integration temperatures and estimated supply
+  airflow. No local house-load entity, electrical meter or new HA entity is
+  involved in that calculation.
+- Add a native visual editor with entity bindings, optional source IDs and a
+  balance-indication threshold. Keep mapped and cleared fields authoritative.
+- Preserve optional local free-cooling diagnoses and electrical measurements;
+  label local interpretation separately from native integration reports.
+- Unknown values remain unknown. Support °C/°F, m³/h/l/s and W/kW where used in
+  calculations. The status grid adapts to card width, with two columns on mobile.
+- Keep existing SVG, control and shared code unchanged apart from package version.
+  Add a third YAML example, dependency/migration guide and simulated screenshots.
+
 ## 1.1.5 — 2026-11-02
 
 - Align Inntak and Avkast with the upper edge of the unit shell, moving each

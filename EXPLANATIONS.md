@@ -1,0 +1,96 @@
+# Status og forklaringer – 1.2.0
+
+Et valgfritt tredje kort i samme pakke som SVG og Kontrollpanel:
+
+```yaml
+type: custom:vsr300-explanations-card
+```
+
+Oppdater pakken gjennom HACS, last nettlesersiden helt på nytt og legg til
+**Systemair Status og forklaringer** fra kortvelgeren. De to andre kortene
+beholder eksisterende oppsett. Et komplett eksempel ligger i
+[03-Status-og-forklaringer.yaml](examples/03-Status-og-forklaringer.yaml).
+
+## Oppsett
+
+Åpne kortets grafiske editor og kontroller **Entitetskoblinger**. Startverdiene
+er eksempler fra referanseinstallasjonen, også for valgfrie lokale sensorer.
+Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
+
+- **Vis overskrift:** på som standard for dette kortet. Tittel kan endres.
+- **Vis entitets-ID-er i forklaringene:** valgfri kildevisning under verdiene.
+- **Grense for markering av estimert ubalanse:** 15 m³/h som standard. Grønn
+  markering betyr at differansen mellom luftmengdeestimatene er mindre enn
+  grensen; det er ikke en måling av fysisk balanse eller trykk.
+- Oppsettet tilpasses kortets bredde: tre kolonner når det er god plass, to
+  kolonner på mobil og én ved svært smale kort.
+
+## Hva kortet gjør selv
+
+De åtte feltene er Balanse, Frikjøling, ECO, Hette, Ettervarme, Elektrisk,
+Huslast og Auto-styring. Trykk på et felt for å lese forklaringen og se relevante
+verdier. **Lukk** skjuler forklaringen. Menyvalget gjelder hvert kort for seg,
+beholdes ved vanlige HA-oppdateringer og starter skjult ved ny sideinnlasting.
+Valget sender ingen kommando til HA eller aggregatet.
+
+Kortet beregner følgende fra de valgte integrasjonsentitetene:
+
+| Visning | Datagrunnlag | Betydning |
+|---|---|---|
+| Balanse | Estimert tilluftmengde minus estimert avtrekksmengde | Differanse mellom estimater, ikke målt balanse |
+| Huslast | `0,335 × tilluft m³/h × (avtrekk °C − tilluft °C)` | Termisk effektestimat i W |
+
+Positiv Huslast merkes **tap** når frikjøling rapporteres inaktiv, og **kjøl**
+når den rapporteres aktiv. Negativ verdi merkes **varme**. Ved ukjent
+frikjølingsstatus vises positivt effektestimat uten å anta hensikten.
+Manglende beregningsgrunnlag vises som ukjent. Elektrisk effekt brukes ikke i
+disse beregningene. °F konverteres til °C og l/s til m³/h når slike enheter er
+oppgitt. Verdiene i HA er siste tilgjengelige avlesninger, ikke nødvendigvis
+ett samtidig Modbus-uttak.
+
+Det opprettes ingen HA-sensorer, historikk eller automasjoner for beregningene.
+De finnes som visning i kortet. Ettervarme vises som rapportert prosent og
+uavhengig varmestatus, uten wattberegning. Auto-styring viser rapportert
+styrekilde, uten å oversette den til Lav/Normal/Høy.
+
+## Valgfrie kilder
+
+| Kilde | Bruk og begrensning |
+|---|---|
+| Målt elektrisk effekt | Egen HA-effektsensor, for eksempel fra Shelly. W og kW støttes. Uten måler vises Elektrisk som ikke tilgjengelig; en prosentverdi erstatter ikke målingen. |
+| Målt energi | Vises blant de relevante verdiene når en energisensor er valgt. Kortet beregner ikke energi fra et øyeblikksbilde av effekt. |
+| Frikjøling – rapportert tilstand | Valgfri native diagnostikk fra integrasjonen, blant annet Dagfase og Temperaturer usikre. |
+| Frikjøling – temperaturer pålitelige | Separat rapportert diagnostikk. Ukjent verdi behandles ikke som av. |
+| Frikjøling – lokal HA-diagnose | Bevarer de tidligere Kandidat, Venter tid, Dag ikke OK, For varmt, For kaldt og Rom kaldt fra en eksisterende sensor. Feltet merkes **Lokal HA-diagnose**. |
+| Utetemperatur – maks siste 24t | Eksisterende historikkbasert sensor, hvis ønskelig. Kortet lager ikke døgnmaksimum fra en enkelt avlesning. |
+
+Rapportert frikjølingsaktivitet har prioritet i statusfeltet. Deretter brukes
+kjente native diagnoser, og deretter en eventuell lokal diagnose. De enkelte
+verdiene kan ses hver for seg i forklaringen. Lokal diagnose er en tolkning,
+ikke en avlest begrunnelse fra firmware. Tømmes de lokale feltene, fungerer
+grunnstatusen fortsatt fra integrasjonens aktivitet og tillatelse.
+
+## Overgang fra det gamle YAML-kortet
+
+1. Legg til det nye kortet og kontroller entitetskoblingene og visningen.
+2. Erstatt det gamle Status og forklaringer-kortet når oppsettet er bekreftet.
+3. Det nye kortet bruker ikke `input_select.systemair_valgt_forklaring`,
+   `sensor.systemair_ventilasjonslast_hus` eller `custom:button-card`.
+   Disse kan fortsatt ha andre brukere i HA; kontroller øvrige referanser før
+   eventuell opprydding. Pakken sletter eller endrer ingen HA-konfigurasjon.
+
+Den valgfrie lokale frikjølingsdiagnosen er fortsatt en egen HA-kilde dersom
+den velges. Den er ikke erstattet av en ny regulator eller en ny beregning av
+alle startvilkår. Behold den hvis dens mer detaljerte lokale diagnose ønskes,
+eller tøm feltet for å bruke bare rapporterte integrasjonsverdier.
+
+## English quick guide
+
+Add **Systemair Status og forklaringer** after updating the existing HACS
+package. Configure every entity you use in the native visual editor; clear
+unused optional fields. The eight topics, explanations and source readouts
+are retained from the maintainer's supplied card. Selection is local to each
+card, and house load is calculated from native integration values. No helper,
+button-card dependency or local house-load entity is required. Optional local
+free-cooling diagnoses and measured electrical power remain external HA inputs.
+Check other consumers before removing any old helpers or templates.

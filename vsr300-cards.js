@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.1.5 · 2026-11-02
+/* VSR300 custom cards · version 1.2.0 · 2026-11-03
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.1.5';
+  const VERSION = '1.2.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -672,13 +672,309 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
     }
   }
 
+  const explanationField = (key, extra = {}) => ({ ...[...SVG_FIELDS, ...CONTROL_FIELDS].find(f => f.key === key), ...extra });
+  const EXPLANATION_FIELDS = [
+    ...['supply_flow', 'extract_flow', 'supply_temperature', 'extract_temperature', 'free_cooling_active', 'heater_active', 'heater_output', 'mode', 'auto_source'].map(key => explanationField(key)),
+    FIELD('free_cooling_enabled', 'Frikjøling – tillatt', 'switch', 'switch.systemair_save_frikjoling'),
+    FIELD('eco_enabled', 'ECO – aktivert', 'switch', 'switch.systemair_save_eco_modus'),
+    FIELD('eco_active', 'ECO – rapportert aktiv', 'binary_sensor', 'binary_sensor.loft_systemair_save_eco_aktiv'),
+    FIELD('cooker_hood_active', 'Kjøkkenhette – rapportert aktiv', 'binary_sensor', 'binary_sensor.systemair_save_kjokkenhette_aktiv'),
+    ...['supply_rpm', 'extract_rpm', 'outdoor_temperature'].map(key => explanationField(key, { optional: true })),
+    FIELD('free_cooling_state', 'Frikjøling – rapportert tilstand (valgfri)', 'sensor', '', { optional: true }),
+    FIELD('free_cooling_reliable', 'Frikjøling – temperaturer pålitelige (valgfri)', 'binary_sensor', 'binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige', { optional: true }),
+    FIELD('free_cooling_diagnosis', 'Frikjøling – lokal HA-diagnose (valgfri)', 'sensor', 'sensor.systemair_frikjoling_kandidat', { optional: true }),
+    FIELD('outdoor_max_24h', 'Utetemperatur – maks siste 24t (valgfri)', 'sensor', 'sensor.systemair_ute_max_siste_24t', { optional: true }),
+    FIELD('free_cooling_day_min', 'Frikjøling – daggrense (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_dag_min_temperatur', { optional: true }),
+    FIELD('free_cooling_night_high', 'Frikjøling – natt høy (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_natt_hoy_grense', { optional: true }),
+    FIELD('free_cooling_night_low', 'Frikjøling – natt lav (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_natt_lav_grense', { optional: true }),
+    FIELD('free_cooling_room_cancel', 'Frikjøling – rom avbryt (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_rom_avbryt_temperatur', { optional: true }),
+    FIELD('electric_power', 'Målt elektrisk effekt (W/kW, valgfri)', 'sensor', 'sensor.vsr300_power', { optional: true }),
+    FIELD('electric_energy', 'Målt energi (valgfri)', 'sensor', 'sensor.vsr300_energy', { optional: true }),
+    FIELD('supply_setpoint', 'Tilluftsettpunkt (valgfri)', 'number', 'number.systemair_save_tilluft_setpunkt_degc', { optional: true }),
+    FIELD('eco_offset', 'ECO – varmeoffset (valgfri)', 'number', 'number.systemair_save_oko_varmeoffset', { optional: true }),
+    FIELD('overheat_temperature', 'Overheat-temperatur (valgfri)', 'sensor', 'sensor.systemair_save_overheat_temperature', { optional: true }),
+    FIELD('air_quality', 'Rapportert luftkvalitetsnivå (valgfri)', 'sensor', 'sensor.systemair_save_luftkvalitet', { optional: true }),
+  ];
+  const EXPLANATION_TOPICS = [
+  {
+    "key": "balance",
+    "name": "Balanse",
+    "title": "Balanse",
+    "icon": "mdi:scale-balance",
+    "text": "**Balanse** sammenligner integrasjonens estimerte tilluft- og avtrekksmengde.\n\nLuftmengdene beregnes fra vifteoutput og nominell modellkapasitet (368 m³/h for referansemodellen VSR300). De er **ikke fysisk målte luftmengder**.\n\n**Positiv verdi** betyr at estimert tilluftmengde er større enn estimert avtrekksmengde.\n\n**Negativ verdi** betyr at estimert avtrekksmengde er større enn estimert tilluftmengde.\n\n**Nær null** betyr at estimatene er like. Det bekrefter ikke fysisk balansert ventilasjon eller et bestemt trykk i huset.\n\nVifteinnstillinger og aktiv modus påvirker vifteoutput og dermed disse estimatene. Filtermotstand, kanaltrykk og lekkasjer kan påvirke faktisk luftmengde uten at estimatene beskriver dette.",
+    "roles": [
+      "supply_flow",
+      "extract_flow",
+      "supply_rpm",
+      "extract_rpm"
+    ]
+  },
+  {
+    "key": "free_cooling",
+    "name": "Frikjøling",
+    "title": "Frikjøling",
+    "icon": "mdi:snowflake",
+    "text": "**Frikjøling** bruker kaldere uteluft til å kjøle boligen uten mekanisk kjøling.\n\nKjøleeffekt vises gjennom **Huslast**. Når frikjøling rapporteres aktiv og Huslast er positiv, viser Huslast-knappen verdien som **W kjøl**. Verdien er et lokalt effektestimat basert på estimert luftmengde.\n\nStatusknappen kan vise flere tilstander:\n\n**Av**  \nFrikjøling er ikke aktivert/tillatt i aggregatet.\n\n**På**  \nFrikjøling er tillatt, men HA-diagnosen matcher ikke en mer spesifikk tilstand akkurat nå.\n\n**Aktiv**  \nIntegrasjonen rapporterer frikjøling aktiv nå. Da er det normalt at tillufttemperaturen blir lavere enn valgt tilluftssettpunkt, fordi hensikten er å kjøle huset.\n\n**Kandidat**  \nDe eksponerte verdiene i HA tyder på at frikjøling kan starte eller burde kunne kjøre nå. Dette er en HA-diagnose, ikke nødvendigvis Systemair sin interne beslutning.\n\n**Venter tid**  \nTemperaturvilkårene ser ut til å kunne være OK, men nåværende tidspunkt er utenfor start-/sluttvinduet for frikjøling.\n\n**Dag ikke OK**  \nMaks utetemperatur siste 24 timer er lavere enn `Frikjøling – dag min. temperatur`. Aggregatet skal normalt bare nattkjøle hvis dagen har vært varm nok.\n\n**For varmt**  \nAktuell utetemperatur er over `Frikjøling – natt høy grense`. Natteluften er da ikke kjølig nok til nyttig frikjøling.\n\n**For kaldt**  \nAktuell utetemperatur er under `Frikjøling – natt lav grense`. Aggregatet bør da stoppe/blokkere frikjøling for å unngå for kald tilluft/overkjøling.\n\n**Rom kaldt**  \nAvtrekk-/romtemperaturen er på eller under `Frikjøling – rom avbryt temperatur`. Huset er da kaldt nok, og frikjøling skal ikke fortsette.\n\n**Rapportert diagnostikk** kan vise Dagfase eller Temperaturer usikre når tilsvarende integrasjonsentiteter er valgt. Dette vises separat fra en valgfri lokal HA-diagnose.\n\n**Lokal HA-diagnose** er kilden til Kandidat, Venter tid og de lokale temperaturvurderingene. Disse brukes bare når en slik sensor er valgt og har en kjent verdi. De er ikke avleste begrunnelser fra firmware. Uten diagnosen vises fortsatt rapportert aktivitet og tillatelse.\n\nEn maksimumstemperatur over siste døgn krever historikk. Kortet utleder ikke denne fra en enkelt temperaturavlesning og oppretter ingen historikksensor.",
+    "roles": [
+      "free_cooling_active",
+      "free_cooling_enabled",
+      "free_cooling_state",
+      "free_cooling_reliable",
+      "free_cooling_diagnosis",
+      "outdoor_temperature",
+      "outdoor_max_24h",
+      "free_cooling_day_min",
+      "free_cooling_night_high",
+      "free_cooling_night_low",
+      "free_cooling_room_cancel"
+    ]
+  },
+  {
+    "key": "eco",
+    "name": "ECO",
+    "title": "ECO",
+    "icon": "mdi:leaf",
+    "text": "**ECO** vises med to uavhengige avlesninger fra aggregatet.\n\n- **På / Av** er ECO-valget fra bryteren: om funksjonen er aktivert.\n- **Aktiv / Inaktiv** er aggregatets rapporterte ECO-status (IR2521).\n- **Valg ukjent / Status ukjent** betyr at den aktuelle avlesningen mangler\n  eller er utilgjengelig.\n\n**På · Inaktiv** betyr at ECO er aktivert, mens aggregatet rapporterer\nfunksjonen inaktiv ved avlesningen. **På · Aktiv** betyr at begge er på.\nHvis valget og statusen avviker, vises de hver for seg uten å korrigere verdiene.\n\nGrønn kant markerer rapportert aktiv ECO-status. Grå kant betyr\nrapportert inaktiv status. Gul kant betyr ukjent aktiv-status.\n\nAktiv-statusen er en firmwarebeslutning. Den dokumenterer ikke alene hvor\nmange watt som spares, eller at TRIAC-pådraget begrenses i dette øyeblikket.\nKortet utleder heller ingen egen ECO-status fra frikjølingssignalet.\n\nDet eldre signalet IR2506 kan vurderes som separat diagnostikk. Det brukes ikke til å beregne denne statusvisningen.",
+    "roles": [
+      "eco_enabled",
+      "eco_active",
+      "eco_offset",
+      "heater_output",
+      "supply_setpoint"
+    ]
+  },
+  {
+    "key": "hood",
+    "name": "Hette",
+    "title": "Hette",
+    "icon": "mdi:chef-hat",
+    "text": "**Hette** viser om kjøkkenhettefunksjonen i aggregatet er aktiv.\n\n**Av** betyr at kjøkkenhetteinngangen ikke påvirker ventilasjonen akkurat nå.  \n**Aktiv** betyr at aggregatet har registrert kjøkkenhettefunksjon/ekstern inngang og kan kompensere med endret luftmengde.\n\nTypiske effekter:\n- endret tilluft-/avtrekksbalanse\n- høyere viftehastighet\n- midlertidig overstyring av normal drift\n- mulig avvik mellom valgt og rapportert driftsmodus",
+    "roles": [
+      "cooker_hood_active",
+      "supply_flow",
+      "extract_flow",
+      "supply_rpm",
+      "extract_rpm"
+    ]
+  },
+  {
+    "key": "heater",
+    "name": "Ettervarme",
+    "title": "Ettervarme",
+    "icon": "mdi:heat-wave",
+    "text": "**Ettervarme** er det elektriske varmeelementet på tilluftssiden.\n\nVarmestatus og pådrag vises separat:\n\n- **Aktiv farge** betyr at aggregatet rapporterer varmefunksjonen aktiv.\n- **Inaktiv farge** betyr at aggregatet rapporterer varmefunksjonen inaktiv.\n- **Gul markering / Ukjent** betyr at varmestatusen mangler eller er utilgjengelig.\n- **Prosenttallet** er rapportert TRIAC-pådrag. Manglende pådrag vises som ukjent.\n\n**0 %** betyr null rapportert TRIAC-pådrag ved avlesningen. Prosenttallet\nbrukes ikke alene til å avgjøre om varmefunksjonen er aktiv. Et pådrag over\nnull er et utgangssignal, ikke en måling av elektrisk effekt i W.\n\nStatusknappens farge kommer fra `{{heater_active}}`\n(IR3103). Prosenttallet kommer fra `{{heater_output}}`\n(IR2149). Hvis signalene avviker, vises de hver for seg.\n\nEttervarme bestemmes ikke av én enkelt sensor. Den styres av aggregatets\ntemperaturregulering og kan påvirkes av tilluftstemperatur, tilluftssettpunkt,\nutetemperatur, avtrekk-/romtemperatur, reguleringsmodus, aktiv sesong, ECO,\nfrikjøling og spesialmoduser.",
+    "roles": [
+      "heater_active",
+      "heater_output",
+      "overheat_temperature",
+      "supply_temperature",
+      "supply_setpoint",
+      "electric_power",
+      "eco_active"
+    ]
+  },
+  {
+    "key": "electric",
+    "name": "Elektrisk",
+    "title": "Elektrisk forbruk",
+    "icon": "mdi:flash",
+    "text": "**Elektrisk** er målt elektrisk effekt fra en valgfri effektmåler på aggregatet, for eksempel Shelly.\n\nDette inkluderer:\n- vifter\n- styringselektronikk\n- eventuell elektrisk ettervarme\n\nTolkning:\n- Lav effekt: vanlig viftedrift uten ettervarme.\n- Moderat/høyere effekt: høyere viftehastighet, for eksempel frikjøling, boost eller kjøkkenhette.\n- Tydelig høy effekt: ofte ettervarme.",
+    "roles": [
+      "electric_power",
+      "electric_energy",
+      "heater_output",
+      "supply_rpm",
+      "extract_rpm"
+    ]
+  },
+  {
+    "key": "house_load",
+    "name": "Huslast",
+    "title": "Huslast",
+    "icon": "mdi:home-thermometer-outline",
+    "text": "**Huslast** er et estimat beregnet i kortet av termisk effekt fra temperaturforskjellen mellom avtrekk og tilluft og estimert tilluftmengde.\n\nFormelen er:\n\n`0,335 × tilluft m³/h × (avtrekkstemperatur − tilluftstemperatur)`\n\nLuftmengden er beregnet av integrasjonen, ikke fysisk målt. Resultatet er derfor et effektestimat i W. Det inkluderer ikke ekstra varmebehov fra eventuell infiltrasjon ved ubalanse.\n\n**Positiv verdi** betyr at tilluften er kaldere enn avtrekk/rom.  \nI normal drift betyr det varmebehov/ventilasjonsvarmetap.  \nVed frikjøling betyr det ønsket kjøleeffekt mot huset.\n\n**Negativ verdi** betyr at tilluften er varmere enn avtrekk/rom.  \nDa tilfører ventilasjonen varme til huset.\n\nKortet beregner denne verdien fra integrasjonens luftmengde og temperaturer. Det opprettes ingen HA-sensor, og beregningen bruker ikke den elektriske effektmåleren.",
+    "roles": [
+      "supply_flow",
+      "supply_temperature",
+      "extract_temperature",
+      "free_cooling_active"
+    ]
+  },
+  {
+    "key": "auto",
+    "name": "Auto-styring",
+    "title": "Auto-styring",
+    "icon": "mdi:fan-auto",
+    "text": "**Auto-styring** viser aggregatets rapporterte styrekilde når rapportert\ndriftsmodus er Auto. Kilden kommer fra IR1062.\n\n- **Styres av ukeprogram**: aggregatet rapporterer ukeprogram som styrekilde.\n- **Behovsstyring**: aggregatet rapporterer behovsstyring som styrekilde.\n- **Ekstern styring**: aggregatet rapporterer ekstern styring som styrekilde.\n- **Konfigurasjonsfeil**: aggregatet rapporterer denne statusen som Auto-kilde.\n- **Styrekilde ukjent**: driftsmodusen er Auto, men kildeverdien mangler,\n  er utilgjengelig eller ikke gjenkjennes.\n- **Ikke aktiv**: aggregatet rapporterer en annen driftsmodus enn Auto.\n- **Modus ukjent**: avlesningen av driftsmodus mangler eller er utilgjengelig.\n\nStyrekilden beskriver hvem som styrer Auto. Den er ingen avlesning av aktivt\nviftenivå eller fysisk luftmengde. Luftkvalitetsnivået Economy/Good/Improve\noversettes derfor ikke til Lav/Normal/Høy. Kortet beregner heller ikke\nviftenivå fra luftmengdegrenser.\n\nRapportert driftsmodus, manuelle innstillinger, vifteoutput og RPM må\nvurderes som forskjellige signaler. Integrasjonens luftmengder er estimater\nbasert på vifteoutput og modellkapasitet.",
+    "roles": [
+      "auto_source",
+      "mode",
+      "air_quality",
+      "supply_rpm",
+      "extract_rpm",
+      "supply_flow",
+      "extract_flow"
+    ]
+  }
+];
+  const EXPLANATION_STYLE = `
+    :host{container-type:inline-size}
+    ha-card{display:block;background:var(--card-background-color,#1c1c1c);color:var(--primary-text-color,#e2e8f0);border-radius:20px;padding:16px}
+    .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .status-button{min-height:112px;padding:10px 6px;gap:6px;border-radius:18px;border-color:var(--accent);background:var(--tile-tint);overflow-wrap:anywhere}
+    .status-button[aria-expanded=true]{outline:2px solid var(--accent);outline-offset:2px}
+    .status-button strong{font-size:14px}.status-button .reading{font-size:16px;font-weight:850;line-height:1.3}.status-button .kind{font-size:12px;line-height:1.3;color:var(--secondary-text-color,#9b9b9b)}
+    .status-button ha-icon{--mdc-icon-size:28px}.explanation-panel{margin-top:20px;border-top:1px solid var(--divider-color,#636363);padding-top:16px;font-size:15px;line-height:1.55}
+    .explanation-panel[hidden]{display:none}.explanation-panel h3{margin:0 0 8px;font-size:20px}.summary{font-weight:700;margin:0 0 12px}.explanation-panel p{margin:0 0 14px}.explanation-panel ul{padding-left:22px;margin:0 0 14px}
+    code{font-size:.9em;overflow-wrap:anywhere}.values{width:100%;border-collapse:collapse;table-layout:fixed;margin:12px 0 16px}.values td{padding:7px 4px;border-bottom:1px solid var(--divider-color,#636363);vertical-align:top;overflow-wrap:anywhere}.values td:first-child{width:58%}.values .source{display:block;font-weight:400;font-size:12px;color:var(--secondary-text-color,#9b9b9b)}
+    .close-row{display:flex;justify-content:flex-end}.close-button{min-height:44px;flex-direction:row;padding:8px 16px;gap:8px;border-radius:12px}.close-button ha-icon{--mdc-icon-size:20px}
+    @media(max-width:380px){ha-card{padding:12px}.status-grid{gap:6px}.status-button{padding:8px 4px}}
+    @container(max-width:440px){.status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @container(max-width:280px){.status-grid{grid-template-columns:minmax(0,1fr)}}
+  `;
+  // This deliberately supports only the static paragraphs, lists, bold and code
+  // used by the reviewed source card. Escape first; never execute source YAML/JS.
+  function explanationHtml(text) {
+    const inline = value => escape(value).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    const result = []; let paragraph = [], items = [];
+    const flush = () => {
+      if (paragraph.length) result.push(`<p>${inline(paragraph.join(' '))}</p>`);
+      if (items.length) result.push(`<ul>${items.map(item => `<li>${inline(item)}</li>`).join('')}</ul>`);
+      paragraph = []; items = [];
+    };
+    for (const raw of text.split('\n')) {
+      const line = raw.trim();
+      if (!line) { flush(); continue; }
+      if (line.startsWith('- ')) {
+        if (paragraph.length) { result.push(`<p>${inline(paragraph.join(' '))}</p>`); paragraph = []; }
+        items.push(line.slice(2));
+      } else if (items.length) items[items.length - 1] += ' ' + line;
+      else paragraph.push(line);
+    }
+    flush(); return result.join('');
+  }
+
+  class Vsr300ExplanationsCard extends BaseCard {
+    static fields = EXPLANATION_FIELDS;
+    static defaultTitle = 'Status og forklaringer';
+    constructor() {
+      super(); this._selected = null;
+      this.shadowRoot.addEventListener('click', event => {
+        const button = event.composedPath().find(el => el instanceof HTMLElement && el.matches('button[data-topic],button[data-close]'));
+        if (!button) return;
+        const closing = button.hasAttribute('data-close'), previous = this._selected;
+        if (closing) this._selected = null;
+        else if (EXPLANATION_TOPICS.some(topic => topic.key === button.dataset.topic)) this._selected = button.dataset.topic;
+        this._renderIfReady();
+        if (closing && previous) this.shadowRoot.querySelector(`button[data-topic="${previous}"]`)?.focus({ preventScroll: true });
+      });
+    }
+    setConfig(config) {
+      if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Kortoppsettet må være et objekt.');
+      if (config?.show_sources != null && typeof config.show_sources !== 'boolean') throw new Error('Vis datakilder må være på eller av.');
+      const tolerance = config?.balance_tolerance ?? 15;
+      if (typeof tolerance !== 'number' || !Number.isFinite(tolerance) || tolerance < 0) throw new Error('Balansegrensen må være et tall fra 0 og oppover.');
+      super.setConfig({ ...config, show_title: config?.show_title ?? true, show_sources: config?.show_sources ?? false, balance_tolerance: tolerance });
+    }
+    static getStubConfig() { return { ...super.getStubConfig(), show_title: true, show_sources: false, balance_tolerance: 15 }; }
+    static getConfigForm() {
+      const form = super.getConfigForm(), helper = form.computeHelper, label = form.computeLabel;
+      form.schema.find(field => field.name === 'show_title').default = true;
+      form.schema.splice(2, 0, { name: 'show_sources', default: false, selector: { boolean: {} } }, { name: 'balance_tolerance', default: 15, selector: { number: { min: 0, mode: 'box', unit_of_measurement: 'm³/h' } } });
+      form.computeLabel = field => ({ show_sources: 'Vis entitets-ID-er i forklaringene', balance_tolerance: 'Grense for markering av estimert ubalanse' })[field.name] || label(field);
+      form.computeHelper = field => field.name === 'free_cooling_diagnosis' ? 'Valgfri lokal tolkning fra eksisterende HA-sensor. Bevarer Kandidat/Venter tid og temperaturdiagnoser; er ikke en firmwarestatus.' : field.name === 'outdoor_max_24h' ? 'Valgfri historikkbasert HA-verdi. Kortet oppretter ingen døgnsensor.' : field.name === 'electric_power' ? 'Valgfri faktisk måling, for eksempel Shelly. Brukes ikke i Huslast-beregningen.' : helper(field);
+      return form;
+    }
+    getCardSize() { return this._selected ? 16 : 8; }
+    _raw(role) {
+      const value = state(this._hass.states, this._config.entities[role]);
+      return value == null || String(value).trim() === '' || ['unknown', 'unavailable'].includes(value) ? undefined : String(value);
+    }
+    _quantity(role, kind) {
+      const id = this._config.entities[role], value = number(this._hass.states, id);
+      if (value === null) return null;
+      const unit = this._hass.states[id]?.attributes?.unit_of_measurement;
+      if (kind === 'flow') {
+        if (value < 0) return null;
+        return !unit || ['m³/h', 'm3/h'].includes(unit) ? value : unit === 'l/s' ? value * 3.6 : null;
+      }
+      if (kind === 'temperature') return !unit || unit === '°C' ? value : unit === '°F' ? (value - 32) * 5 / 9 : null;
+      if (kind === 'power') return !unit || unit === 'W' ? value : unit === 'kW' ? value * 1000 : null;
+      return value;
+    }
+    _freeCooling() {
+      const e = this._config.entities, s = this._hass.states;
+      const active = binary(s, e.free_cooling_active), enabled = binary(s, e.free_cooling_enabled);
+      if (active === true) return { label: 'Aktiv', color: '#38bdf8', kind: 'Rapportert' };
+      if (enabled === false) return { label: active === null ? 'Av · status ukjent' : 'Av', color: active === null ? '#facc15' : '#64748b', kind: 'Rapportert' };
+      if (active === null) return { label: 'Status ukjent', color: '#facc15', kind: 'Mangler avlesning' };
+      if (enabled === null) return { label: 'Valg ukjent', color: '#facc15', kind: 'Mangler avlesning' };
+      const diagnostic = this._raw('free_cooling_state');
+      if (['disabled', '0'].includes(diagnostic)) return { label: 'Tilstand: av', color: '#64748b', kind: 'Rapportert diagnostikk' };
+      if (['daytime', '2'].includes(diagnostic)) return { label: 'Dagfase', color: '#38bdf8', kind: 'Rapportert diagnostikk' };
+      if (['temperatures_not_reliable', '3'].includes(diagnostic) || binary(s, e.free_cooling_reliable) === false) return { label: 'Temperaturer usikre', color: '#facc15', kind: 'Rapportert diagnostikk' };
+      const local = this._raw('free_cooling_diagnosis');
+      for (const [fragment, label] of [['Kandidat nå', 'Kandidat'], ['utenfor', 'Venter tid'], ['Dagvilkår', 'Dag ikke OK'], ['For varmt', 'For varmt'], ['For kaldt', 'For kaldt'], ['Rom kaldt', 'Rom kaldt']]) {
+        if (local?.includes(fragment)) return { label, color: '#38bdf8', kind: 'Lokal HA-diagnose' };
+      }
+      return { label: 'På', color: '#38bdf8', kind: 'Rapportert · inaktiv' };
+    }
+    _statuses() {
+      const e = this._config.entities, s = this._hass.states;
+      const supply = this._quantity('supply_flow', 'flow'), extract = this._quantity('extract_flow', 'flow');
+      const supplyT = this._quantity('supply_temperature', 'temperature'), extractT = this._quantity('extract_temperature', 'temperature');
+      const difference = supply === null || extract === null ? null : Math.round(supply - extract);
+      const load = supply === null || supplyT === null || extractT === null ? null : 0.335 * supply * (extractT - supplyT);
+      const cooling = binary(s, e.free_cooling_active), eco = binary(s, e.eco_active), enabled = binary(s, e.eco_enabled), hood = binary(s, e.cooker_hood_active), heat = binary(s, e.heater_active);
+      const heater = number(s, e.heater_output), power = this._quantity('electric_power', 'power');
+      const mode = this._raw('mode'), source = this._raw('auto_source');
+      const loadLabel = load === null ? 'Ukjent' : Math.round(Math.abs(load)) === 0 ? '≈ 0 W' : load < 0 ? `≈ ${Math.abs(load).toFixed(0)} W varme` : `≈ ${load.toFixed(0)} W${cooling === true ? ' kjøl' : cooling === false ? ' tap' : ''}`;
+      return {
+        balance: { label: difference === null ? 'Ukjent' : `≈ ${difference > 0 ? '+' : ''}${difference} m³/h`, color: difference === null ? '#facc15' : Math.abs(difference) < this._config.balance_tolerance ? '#4ade80' : '#fb923c', kind: 'Estimat' },
+        free_cooling: this._freeCooling(),
+        eco: { label: `${enabled === null ? 'Valg ukjent' : enabled ? 'På' : 'Av'} · ${eco === null ? 'status ukjent' : eco ? 'Aktiv' : 'Inaktiv'}`, color: eco === null ? '#facc15' : eco ? '#a3e635' : '#64748b', kind: 'Rapportert' },
+        hood: { label: hood === null ? 'Ukjent' : hood ? 'Aktiv' : 'Av', color: hood === null ? '#facc15' : '#fb923c', kind: 'Rapportert' },
+        heater: { label: heater === null ? 'Pådrag ukjent' : `${heat === null ? 'Ukjent · ' : ''}${heater.toFixed(0)} %`, color: heat === null ? '#facc15' : heat ? '#f87171' : '#fb923c', kind: heat === null ? 'Varmestatus ukjent' : heat ? 'Varmefunksjon aktiv' : 'Varmefunksjon inaktiv' },
+        electric: { label: power === null ? 'Ikke tilgjengelig' : `${power.toFixed(0)} W`, color: power === null ? '#94a3b8' : '#38bdf8', kind: 'Valgfri måling' },
+        house_load: { label: loadLabel, color: load === null ? '#facc15' : cooling === true ? '#38bdf8' : '#fb923c', kind: 'Beregnet i kortet' },
+        auto: { label: !Object.hasOwn(MODE_NAMES, mode) ? 'Modus ukjent' : mode !== 'auto' ? 'Ikke aktiv' : AUTO_NAMES[source] || 'Styrekilde ukjent', color: !Object.hasOwn(MODE_NAMES, mode) || mode === 'auto' && (!Object.hasOwn(AUTO_NAMES, source) || source === 'configuration_fault') ? '#facc15' : '#84cc16', kind: 'Rapportert styrekilde' },
+      };
+    }
+    _value(role) {
+      const id = this._config.entities[role], entity = this._hass.states[id];
+      if (!this._raw(role)) return 'Ukjent';
+      if (entity.state === 'on') return 'På';
+      if (entity.state === 'off') return 'Av';
+      if (this._hass.formatEntityState) return this._hass.formatEntityState(entity);
+      return `${entity.state}${entity.attributes?.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''}`;
+    }
+    _details(topic, status) {
+      const text = topic.text.replace(/\{\{([a-z0-9_]+)\}\}/g, (_, role) => EXPLANATION_FIELDS.find(field => field.key === role)?.label || 'Beregnet i kortet');
+      const rows = topic.roles.filter(role => this._config.entities[role]).map(role => {
+        const field = EXPLANATION_FIELDS.find(item => item.key === role), id = this._config.entities[role];
+        return `<tr><td>${escape(field.label)}${this._config.show_sources ? `<code class="source">${escape(id)}</code>` : ''}</td><td>${escape(this._value(role))}</td></tr>`;
+      }).join('');
+      return `<h3 id="explanation-title">${escape(topic.title)}</h3><p class="summary">${escape(status.label)} · ${escape(status.kind)}</p>${explanationHtml(text)}${rows ? `<table class="values" aria-label="Relevante verdier"><tbody>${rows}</tbody></table>` : ''}<div class="close-row"><button class="close-button" data-close type="button"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div>`;
+    }
+    _render() {
+      const focus = this.shadowRoot.activeElement?.dataset.topic, statuses = this._statuses();
+      const topic = EXPLANATION_TOPICS.find(item => item.key === this._selected);
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${EXPLANATION_TOPICS.map(item => {
+        const status = statuses[item.key];
+        return `<button class="status-button" type="button" data-topic="${item.key}" aria-expanded="${this._selected === item.key}" aria-controls="explanation-panel" style="--accent:${status.color};--tile-tint:${status.color}12"><ha-icon icon="${item.icon}" aria-hidden="true"></ha-icon><strong>${escape(item.name)}</strong><span class="reading">${escape(status.label)}</span><span class="kind">${escape(status.kind)}</span></button>`;
+      }).join('')}</div><section id="explanation-panel" class="explanation-panel" aria-labelledby="explanation-title" ${topic ? '' : 'hidden'}>${topic ? this._details(topic, statuses[topic.key]) : ''}</section></ha-card>`;
+      if (focus) this.shadowRoot.querySelector(`button[data-topic="${focus}"]`)?.focus({ preventScroll: true });
+    }
+  }
+
   // Home Assistant renders native graphical editors from getConfigForm().
-  for (const [name, constructor] of [['vsr300-svg-card', Vsr300SvgCard], ['vsr300-control-card', Vsr300ControlCard]]) {
+  for (const [name, constructor] of [['vsr300-svg-card', Vsr300SvgCard], ['vsr300-control-card', Vsr300ControlCard], ['vsr300-explanations-card', Vsr300ExplanationsCard]]) {
     if (!customElements.get(name)) customElements.define(name, constructor);
   }
   window.customCards = window.customCards || [];
   for (const [type, name, description] of [
     ['vsr300-svg-card', 'Systemair SVG', 'Prosessillustrasjon med temperaturer, pådrag, filterstatus og rapportert resttid.'],
     ['vsr300-control-card', 'Systemair Kontrollpanel', 'Modusknapper med betjening gjennom Systemair-integrasjonen.'],
+    ['vsr300-explanations-card', 'Systemair Status og forklaringer', 'Åtte statusfelt og forklaringer med lokalt menyvalg og beregnet Huslast.'],
   ]) if (!window.customCards.some(card => card.type === type)) window.customCards.push({ type, name, description, preview: true });
 })();

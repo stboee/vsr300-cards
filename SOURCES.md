@@ -22,12 +22,17 @@ shell and documents HACS as a custom-repository installation route following
 the maintainer's report that HACS installation and updates work.
 Version 1.1.5, 2026-11-02, aligns Inntak and Avkast with the unit's top edge
 without changing their dimensions, font sizes or data bindings.
+Version 1.2.0, 2026-11-03, adds the optional Status og forklaringer card from the
+maintainer's complete YAML attachment supplied that day. All eight topics are
+retained, with native entity selectors, internal explanation selection and a
+card-local house-load calculation. Optional local diagnoses remain labelled
+as local, rather than being presented as firmware observations.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
 integration entity IDs. Screenshots use simulated states and placeholder icons.
-The HA configuration export, register PDF and local Forklaringer card are not
-part of this repository.
+The HA configuration export, register PDF and original local YAML card are not
+part of this repository. The converted explanations card is included from 1.2.0.
 
 ## External software and documentation
 

@@ -1,6 +1,30 @@
-# Verifikasjon – 1.1.5 – 2026-11-02
+# Verifikasjon – 1.2.0 – 2026-11-03
 
-## Gjennomført lokalt for 1.1.5
+## Gjennomført lokalt for 1.2.0
+
+- 23 lokale kontrollgrupper er bestått: 14 tidligere nettlesergrupper og
+  9 grupper for det nye kortet. Lyst/mørkt tema og bredder 360/412/900 px
+  er kontrollert. Nye mobil- og desktopbilder er gjennomgått visuelt.
+- Baseline for det nye kortet er hele Status og forklaringer-YAML-en som
+  prosjekteieren la ved 2026-11-03. Alle åtte emner videreføres.
+  Kilde-SHA256: `17b838abdbdc70721dce6bbc5c396f4edc605d1363fbc600369559a15c5cc6e7`.
+- Eksisterende SVG-, Kontrollpanel- og felleskode er sammenlignet med 1.1.5 og
+  er uendret bortsett fra pakkeversjonen. De 14 tidligere nettlesergruppene består.
+- Nye nettleserkontroller dekker statusberegninger, samtlige forklaringer,
+  lokalt og uavhengig menyvalg i to kort, lukking, tastatur/fokus, oppdaterte
+  HA-verdier og at ny sideinnlasting starter med skjulte forklaringer.
+- Manglende/tomme/ukjente verdier blir ikke null eller inaktiv. Reelle nullverdier
+  beholdes. Huslast, fortegn, frikjølingstolkning og enhetskonvertering er kontrollert.
+- De seks tidligere lokale frikjølingsdiagnosene kan brukes som valgfri kilde.
+  Native diagnostikkverdier og rapportert aktivitet holdes atskilt fra disse.
+- Entitetsbytte, tomme valgfrie felt, editorskjema, escaping av HA-tekst og
+  simulerte mobile bredder er kontrollert. Menyvalg sender ingen HA-tjenestekall.
+
+Kontrollene er lokale simuleringer, ikke installasjon i brukerens HA eller
+V-verifikasjon på aggregatet. HAs faktiske editor og visning må bekreftes etter
+oppdatering og valg av riktige entiteter.
+
+## Historisk kontrollgrunnlag – 1.1.5, 2026-11-02
 
 - 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
   desktopvisning er gjennomgått visuelt.
@@ -166,8 +190,8 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.5 toppjusterer Inntak og Avkast. Bunnjusteringen, HACS-veiledningen,
-tidligere kortfunksjoner og entitetskoblinger videreføres. Komplette eksempler, dokumentasjonslenker og
+1.2.0 legger til et tredje, valgfritt status- og forklaringskort. Tidligere
+kort, HACS-veiledning og eksisterende entitetskoblinger videreføres. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte og modusbetjening

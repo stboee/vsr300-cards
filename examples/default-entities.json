@@ -53,5 +53,43 @@
       "away_duration": "number.systemair_save_borte_varighet",
       "holiday_duration": "number.systemair_save_ferietid_varighet"
     }
+  },
+  "explanations": {
+    "title": "Status og forklaringer",
+    "show_title": true,
+    "entities": {
+      "supply_flow": "sensor.systemair_save_tilluft_luftmengde",
+      "extract_flow": "sensor.systemair_save_avkast_luftmengde",
+      "supply_temperature": "sensor.systemair_save_tilluftstemperatur",
+      "extract_temperature": "sensor.systemair_save_avtrekkstemperatur",
+      "free_cooling_active": "binary_sensor.systemair_save_frikjoling_aktiv",
+      "heater_active": "binary_sensor.loft_systemair_save_ettervarme_aktiv",
+      "heater_output": "sensor.systemair_save_triac_after_manual_override",
+      "mode": "sensor.systemair_save_modus",
+      "auto_source": "sensor.loft_systemair_save_auto_styrekilde",
+      "free_cooling_enabled": "switch.systemair_save_frikjoling",
+      "eco_enabled": "switch.systemair_save_eco_modus",
+      "eco_active": "binary_sensor.loft_systemair_save_eco_aktiv",
+      "cooker_hood_active": "binary_sensor.systemair_save_kjokkenhette_aktiv",
+      "supply_rpm": "sensor.systemair_save_tilluftsvifte_hastighet_rpm",
+      "extract_rpm": "sensor.systemair_save_avtrekksvifte_hastighet_rpm",
+      "outdoor_temperature": "sensor.systemair_save_utetemperatur",
+      "free_cooling_state": "",
+      "free_cooling_reliable": "binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige",
+      "free_cooling_diagnosis": "sensor.systemair_frikjoling_kandidat",
+      "outdoor_max_24h": "sensor.systemair_ute_max_siste_24t",
+      "free_cooling_day_min": "number.systemair_save_frikjoling_dag_min_temperatur",
+      "free_cooling_night_high": "number.systemair_save_frikjoling_natt_hoy_grense",
+      "free_cooling_night_low": "number.systemair_save_frikjoling_natt_lav_grense",
+      "free_cooling_room_cancel": "number.systemair_save_frikjoling_rom_avbryt_temperatur",
+      "electric_power": "sensor.vsr300_power",
+      "electric_energy": "sensor.vsr300_energy",
+      "supply_setpoint": "number.systemair_save_tilluft_setpunkt_degc",
+      "eco_offset": "number.systemair_save_oko_varmeoffset",
+      "overheat_temperature": "sensor.systemair_save_overheat_temperature",
+      "air_quality": "sensor.systemair_save_luftkvalitet"
+    },
+    "show_sources": false,
+    "balance_tolerance": 15
   }
 }
