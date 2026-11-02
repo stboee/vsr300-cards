@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.5 — 2026-11-02
+
+- Align Inntak and Avkast with the upper edge of the unit shell, moving each
+  panel and its labels together. Keep panel sizes, fonts and line spacing.
+- Preserve the bottom alignment of Tilluft, Avtrekk and the unit, the existing
+  airflow paths and all card behaviour. Refresh the simulated screenshots.
+
 ## 1.1.4 — 2026-11-02
 
 - Raise the Tilluft information box to align its bottom edge with Avtrekk and

@@ -1,6 +1,17 @@
-# Verifikasjon – 1.1.4 – 2026-11-02
+# Verifikasjon – 1.1.5 – 2026-11-02
 
-## Gjennomført lokalt for 1.1.4
+## Gjennomført lokalt for 1.1.5
+
+- 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
+  desktopvisning er gjennomgått visuelt.
+- Toppjustering av Inntak, Avkast og aggregatets ytterramme er kontrollert i
+  rendret SVG ved 360, 412 og 900 px. Bunnjusteringen fra 1.1.4 videreføres.
+- Boksene og deres tekst flyttes samlet. Høyder, bredder, tekststørrelser,
+  linjeavstand, luftveier, entitetskoblinger og betjening beholdes.
+- Endringen gjelder bare presentasjon. Ingen installasjon, tjenestekall eller
+  Modbus-trafikk foretas mot brukerens miljø.
+
+## Historisk kontrollgrunnlag – 1.1.4, 2026-11-02
 
 - 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
   desktopvisning er gjennomgått visuelt.
@@ -155,8 +166,8 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.4 bunnjusterer Tilluft-boksen og dokumenterer HACS-ruten som prosjekteieren
-har tatt i bruk. Tidligere kortfunksjoner og entitetskoblinger videreføres. Komplette eksempler, dokumentasjonslenker og
+1.1.5 toppjusterer Inntak og Avkast. Bunnjusteringen, HACS-veiledningen,
+tidligere kortfunksjoner og entitetskoblinger videreføres. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte og modusbetjening

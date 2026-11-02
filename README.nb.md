@@ -1,7 +1,7 @@
 # VSR300 Cards – installasjon
 
 To Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG** og
-**Systemair Kontrollpanel**, med grafisk valg av entiteter. Kortversjon: **1.1.4**.
+**Systemair Kontrollpanel**, med grafisk valg av entiteter. Kortversjon: **1.1.5**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -21,7 +21,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.1.4`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.1.5`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til **Systemair SVG** og **Systemair Kontrollpanel** fra kortvelgeren.
 
 ## Oppsett av begge kort
@@ -54,7 +54,7 @@ Ved oppdatering fra 1.0.0 velger du de valgfrie **A-alarm**, **B-alarm** og
 ## Valg og verdier
 
 - Bakgrunnen rundt aggregatet og modusfeltet følger det aktive HA-temaet. Aggregat og veksler har mørke flater med lys tekst i både lyst og mørkt tema. Luftportenes og alarmenes farger beholder betydningen.
-- Viftenes rpm står i høyere informasjonsbokser for Tilluft og Avkast. Tilluft, Avtrekk og aggregatet har felles underkant. Ettervarmeprosenten er større, og Vekslerpådrag står på én linje. Filtersymboler og varselmerker beholdes uten separate FILTER-tekster.
+- Viftenes rpm står i høyere informasjonsbokser for Tilluft og Avkast. Inntak og Avkast flukter med aggregatets overkant; Tilluft, Avtrekk og aggregatet har felles underkant. Ettervarmeprosenten er større, og Vekslerpådrag står på én linje. Filtersymboler og varselmerker beholdes uten separate FILTER-tekster.
 - Animasjoner: **På** (standard), **Auto – følg enheten** eller **Av**. På animerer også når enheten ber om redusert bevegelse; Auto følger enhetens valg.
 - Overskrifter er skjult som standard. **Vis overskrift** aktiverer egen overskrift.
 - Resttid telles ned lokalt hvert sekund mellom integrasjonens rapporteringer og synkroniseres med nye rapporter. Dette er en beregnet visning; aktiv modus kommer fortsatt fra integrasjonen.

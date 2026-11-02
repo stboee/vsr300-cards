@@ -20,6 +20,8 @@ fit its single-line title; the airflow paths and data bindings are unchanged.
 Version 1.1.4, 2026-11-02, aligns the lower information panels with the unit
 shell and documents HACS as a custom-repository installation route following
 the maintainer's report that HACS installation and updates work.
+Version 1.1.5, 2026-11-02, aligns Inntak and Avkast with the unit's top edge
+without changing their dimensions, font sizes or data bindings.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
