@@ -2,7 +2,7 @@
 
 Two Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG** and
 **Systemair Kontrollpanel**, with graphical entity selection. Current card
-version: **1.1.2**. Reference setup: HA 2026.10.2 and
+version: **1.1.3**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -11,7 +11,7 @@ version: **1.1.2**. Reference setup: HA 2026.10.2 and
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.1.2`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.1.3`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add **Systemair SVG** and **Systemair Kontrollpanel** from the card picker.
 5. **Adapt the entity bindings in both cards.** Open **Entitetskoblinger**, check every field and replace the example IDs with the matching entities from your own Home Assistant installation. Clear optional fields you do not use.
 
@@ -32,7 +32,8 @@ When upgrading from 1.0.0, select the optional **A-alarm**, **B-alarm** and
 
 ## Options and displayed values
 
-- The cockpit background, neutral panels and text follow the active Home Assistant theme, including light/dark changes. Air-port and alarm colours retain their meaning and contrasting text.
+- The outer cockpit background and mode panel follow the active Home Assistant theme. The unit and heat exchanger retain a dark appearance with light text in both light and dark themes. Air-port and alarm colours retain their meaning.
+- Fan RPM is shown in the taller Tilluft and Avkast information boxes. Heater percentage is enlarged; Vekslerpådrag appears on one line. Filter symbols and warning badges remain visible without separate FILTER captions.
 - Animations: **På** (default), **Auto – følg enheten**, or **Av**. On animates even when the device requests reduced motion; Auto follows that preference.
 - Headings are hidden by default. Enable **Vis overskrift** to show a custom heading.
 - Remaining mode time counts down locally each second between integration reports and resynchronises with new reports. This is a display estimate; the active mode continues to come from the integration.

@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.1.2 · 2026-11-02
+/* VSR300 custom cards · version 1.1.3 · 2026-11-02
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.1.2';
+  const VERSION = '1.1.3';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -301,8 +301,8 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           </linearGradient>
 
           <linearGradient id="unitBg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="var(--secondary-background-color, #f5f5f5)" />
-            <stop offset="100%" stop-color="var(--card-background-color, #ffffff)" />
+            <stop offset="0%" stop-color="#334155" />
+            <stop offset="100%" stop-color="#111827" />
           </linearGradient>
 
           <linearGradient id="coldAir" x1="0" y1="0" x2="1" y2="0">
@@ -384,6 +384,9 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
               font-weight: 900;
               fill: var(--primary-text-color, #212121);
             }
+            .heater-value { font-size: 56px; font-weight: 950; }
+            .heater-value-unknown { font-size: 36px; }
+            .recovery-title { font-size: 32px; letter-spacing: 0; }
             .mode-title {
               font-family: Arial, sans-serif;
               font-size: 32px;
@@ -404,6 +407,8 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
             }
             /* Semantic air-port colours retain a contrasting light foreground. */
             .port-text { fill: #ffffff; }
+            /* Equipment stays dark inside the theme-aware cockpit canvas. */
+            .unit-text { fill: #f8fafc; }
             .duct-base {
               fill: none;
               stroke: var(--divider-color, #bdbdbd);
@@ -442,28 +447,8 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
 
         <rect class="canvas" x="0" y="-250" width="1300" height="1255" rx="34" fill="url(#panelBg)" />
 
-        <rect class="unit-shell" x="365" y="-200" width="570" height="875" rx="46" fill="url(#unitBg)" stroke="var(--secondary-text-color, #727272)" stroke-width="4" />
-        <rect class="unit-inner" x="392" y="-170" width="516" height="815" rx="34" fill="var(--card-background-color, #ffffff)" stroke="var(--divider-color, #bdbdbd)" stroke-width="2" />
-
-        <rect x="28" y="-220" width="280" height="220" rx="28" fill="#1e40af" stroke="#93c5fd" stroke-width="4" />
-        <text x="168" y="-160" text-anchor="middle" class="label port-text">INNTAK</text>
-        <text x="168" y="-85" text-anchor="middle" class="value port-text">${uteT}</text>
-        <text x="168" y="-29" text-anchor="middle" class="small port-text">${uteRh}</text>
-
-        <rect x="28" y="455" width="280" height="220" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
-        <text x="168" y="515" text-anchor="middle" class="label port-text">TILLUFT</text>
-        <text x="168" y="590" text-anchor="middle" class="value port-text">${tilluftT}</text>
-        <text x="168" y="646" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
-
-        <rect x="992" y="-220" width="280" height="220" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
-        <text x="1132" y="-165" text-anchor="middle" class="label port-text">AVKAST</text>
-        <text x="1132" y="-85" text-anchor="middle" class="small port-text">${avkastFlow}</text>
-        <text x="1132" y="-29" text-anchor="middle" class="micro port-text">estimert</text>
-
-        <rect x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
-        <text x="1132" y="515" text-anchor="middle" class="label port-text">AVTREKK</text>
-        <text x="1132" y="590" text-anchor="middle" class="value port-text">${avtrekkT}</text>
-        <text x="1132" y="646" text-anchor="middle" class="small port-text">${inneRh}</text>
+        <rect class="unit-shell" x="365" y="-200" width="570" height="875" rx="46" fill="url(#unitBg)" stroke="#64748b" stroke-width="4" />
+        <rect class="unit-inner" x="392" y="-170" width="516" height="815" rx="34" fill="rgba(15,23,42,0.64)" stroke="rgba(148,163,184,0.38)" stroke-width="2" />
 
         <g opacity="${normalOpacity}">
           <path class="duct-base" d="M 295 -110 L 425 -110 L 530 160" />
@@ -493,11 +478,36 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <path class="duct-flow" d="M 1005 565 L 875 565 L 875 -110 L 1005 -110" stroke="url(#warmAir)" />
         </g>
 
+        <!-- Paint port panels over duct ends so values stay unobscured. -->
+        <g class="air-info">
+          <rect x="28" y="-220" width="280" height="220" rx="28" fill="#1e40af" stroke="#93c5fd" stroke-width="4" />
+          <text x="168" y="-160" text-anchor="middle" class="label port-text">INNTAK</text>
+          <text x="168" y="-85" text-anchor="middle" class="value port-text">${uteT}</text>
+          <text x="168" y="-29" text-anchor="middle" class="small port-text">${uteRh}</text>
+
+          <rect class="supply-info" x="28" y="455" width="280" height="300" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
+          <text x="168" y="515" text-anchor="middle" class="label port-text">TILLUFT</text>
+          <text x="168" y="592" text-anchor="middle" class="value port-text">${tilluftT}</text>
+          <text x="168" y="660" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
+          <text x="168" y="725" text-anchor="middle" class="small port-text supply-rpm">${tilluftRpm}</text>
+
+          <rect class="exhaust-info" x="992" y="-220" width="280" height="300" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
+          <text x="1132" y="-165" text-anchor="middle" class="label port-text">AVKAST</text>
+          <text x="1132" y="-85" text-anchor="middle" class="small port-text">${avkastFlow}</text>
+          <text x="1132" y="-29" text-anchor="middle" class="micro port-text">estimert</text>
+          <text x="1132" y="46" text-anchor="middle" class="small port-text extract-rpm">${avtrekkRpm}</text>
+
+          <rect x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
+          <text x="1132" y="515" text-anchor="middle" class="label port-text">AVTREKK</text>
+          <text x="1132" y="590" text-anchor="middle" class="value port-text">${avtrekkT}</text>
+          <text x="1132" y="646" text-anchor="middle" class="small port-text">${inneRh}</text>
+        </g>
+
         <g opacity="${exchangerOpacity}">
-          <polygon points="530,135 650,85 770,135 770,370 650,420 530,370"
-                   fill="var(--secondary-background-color, #f5f5f5)" stroke="#d946ef" stroke-width="4" />
-          <polygon points="560,165 650,125 740,165 740,345 650,385 560,345"
-                   fill="var(--card-background-color, #ffffff)" stroke="var(--divider-color, #bdbdbd)" stroke-width="3" />
+          <polygon class="exchanger-shell" points="490,135 650,85 810,135 810,370 650,420 490,370"
+                   fill="rgba(88,28,135,0.56)" stroke="#d946ef" stroke-width="4" />
+          <polygon class="exchanger-inner" points="505,165 650,125 795,165 795,345 650,385 505,345"
+                   fill="rgba(15,23,42,0.70)" stroke="rgba(255,255,255,0.30)" stroke-width="3" />
 
           <line x1="575" y1="187" x2="725" y2="320" stroke="rgba(216,180,254,0.66)" stroke-width="10" stroke-linecap="round" />
           <line x1="595" y1="170" x2="745" y2="303" stroke="rgba(216,180,254,0.42)" stroke-width="7" stroke-linecap="round" />
@@ -507,9 +517,8 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <line x1="705" y1="170" x2="555" y2="303" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
           <line x1="745" y1="215" x2="595" y2="348" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
 
-          <text x="650" y="225" text-anchor="middle" class="label" style="font-size:30px">VEKSLER</text>
-          <text x="650" y="262" text-anchor="middle" class="label" style="font-size:30px">PÅDRAG</text>
-          <text x="650" y="315" text-anchor="middle" class="value">${gjenv}</text>
+          <text x="650" y="235" text-anchor="middle" class="label unit-text recovery-title">Vekslerpådrag</text>
+          <text x="650" y="315" text-anchor="middle" class="value unit-text">${gjenv}</text>
         </g>
 
         <g opacity="${freeOpacity}">
@@ -524,21 +533,19 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
         <line x1="443" y1="-145" x2="407" y2="-60" stroke="#bfdbfe" stroke-width="6" />
         <line x1="425" y1="-150" x2="425" y2="-55" stroke="rgba(255,255,255,0.42)" stroke-width="4" />
         ${filterBadge(458, -165)}
-        <text x="425" y="0" text-anchor="middle" class="micro">FILTER</text>
 
         <rect x="842" y="500" width="66" height="135" rx="14" class="extract-filter" data-status="${filterState}" fill="${fc ? fc[0] : '#7c2d12'}" stroke="${fc ? fc[1] : '#fdba74'}" stroke-width="${fc ? 7 : 4}" />
         <line x1="857" y1="525" x2="893" y2="610" stroke="#fed7aa" stroke-width="6" />
         <line x1="893" y1="525" x2="857" y2="610" stroke="#fed7aa" stroke-width="6" />
         <line x1="875" y1="520" x2="875" y2="615" stroke="rgba(255,255,255,0.42)" stroke-width="4" />
         ${filterBadge(908, 505)}
-        <text x="875" y="670" text-anchor="middle" class="micro">FILTER</text>
 
         <g filter="${heaterGlow}">
           <rect x="603" y="395" width="94" height="86" rx="18" fill="${heaterFill}" stroke="${heaterStroke}" stroke-width="4" />
           <path d="M621 429 C636 409, 656 449, 674 427" fill="none" stroke="${heaterWave}" stroke-width="7" stroke-linecap="round" />
           <path d="M621 457 C636 437, 656 477, 674 455" fill="none" stroke="${heaterWave}" stroke-width="7" stroke-linecap="round" />
-          <text x="650" y="525" text-anchor="middle" class="heater-text">${heaterTitle}</text>
-          <text x="650" y="564" text-anchor="middle" class="heater-text">${ettervarmeSub}</text>
+          <text x="650" y="525" text-anchor="middle" class="heater-text unit-text">${heaterTitle}</text>
+          <text x="650" y="600" text-anchor="middle" class="heater-text heater-value unit-text${Number.isFinite(triacNum) ? '' : ' heater-value-unknown'}">${ettervarmeSub}</text>
         </g>
 
         <circle cx="405" cy="565" r="60" fill="#064e3b" stroke="#86efac" stroke-width="5" />
@@ -549,7 +556,6 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <path d="M405 565 L405 612 Q379 596 392 565 Z" fill="#86efac" opacity="0.93" />
           <path d="M405 565 L358 565 Q374 539 405 552 Z" fill="#86efac" opacity="0.93" />
         </g>
-        <text x="405" y="710" text-anchor="middle" class="micro">${tilluftRpm}</text>
 
         <circle cx="875" cy="-110" r="60" fill="#334155" stroke="#e2e8f0" stroke-width="5" />
         <circle cx="875" cy="-110" r="14" fill="#f8fafc" opacity="0.9" />
@@ -559,7 +565,6 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <path d="M875 -110 L875 -63 Q849 -79 862 -110 Z" fill="#e2e8f0" opacity="0.93" />
           <path d="M875 -110 L828 -110 Q844 -136 875 -123 Z" fill="#e2e8f0" opacity="0.93" />
         </g>
-        <text x="875" y="35" text-anchor="middle" class="micro">${avtrekkRpm}</text>
 
         <rect class="mode-box" x="48" y="780" width="1204" height="165" rx="36" fill="var(--card-background-color, #ffffff)" stroke="url(#modeGrad)" stroke-width="4" />
         <text x="92" y="837" class="mode-title">AKTIV MODUS</text>

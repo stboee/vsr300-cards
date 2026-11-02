@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.3 — 2026-11-02
+
+- Move supply fan RPM into the Tilluft information box and extract fan RPM into
+  Avkast. Increase those box heights and line spacing without reducing existing
+  temperature/airflow fonts or enlarging the SVG viewBox.
+- Paint the information panels over the duct ends so airflow graphics do not
+  cover temperatures, airflow estimates or RPM text.
+- Remove the two FILTER captions at the unit edges. Keep both filter symbols,
+  their warning/alarm badges and the alarm rows below the illustration.
+- Restore the dark unit and exchanger colours from 1.1.1 with light equipment
+  text. The surrounding canvas and mode panel continue to follow the HA theme.
+- Show Vekslerpådrag on one line in a slightly wider exchanger face, preserving
+  the original airflow paths. Enlarge numeric heater output from 31 to 56 SVG
+  units and give the unknown-output label its own readable style.
+- Fourteen simulated browser groups pass, including text bounds at 360/412/900px,
+  HA themes, alarm combinations, local countdown and existing controls.
+- Keep entity bindings, controls, animations and local countdown unchanged.
+  Auto Low/Normal/High classification is outside this change.
+
 ## 1.1.2 — 2026-11-02
 
 - Replace fixed dark cockpit backgrounds and neutral text colours with inherited

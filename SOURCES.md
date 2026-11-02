@@ -13,6 +13,10 @@ reports. The displayed remaining time is extrapolated from the last reported
 value and available HA timestamps; it is not a new register measurement.
 Version 1.1.2, 2026-11-02, uses inherited Home Assistant theme variables for cockpit
 backgrounds and neutral text. Semantic air-port and alarm colours are retained.
+Version 1.1.3, 2026-11-02, restores the reviewed 1.1.1 equipment colours inside
+the theme-aware canvas, moves fan RPM to taller air-port boxes, and improves
+equipment labels and heater percentage size. The exchanger face is wider to
+fit its single-line title; the airflow paths and data bindings are unchanged.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal

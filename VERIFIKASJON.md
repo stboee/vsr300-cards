@@ -1,6 +1,33 @@
-# Verifikasjon – 1.1.2 – 2026-11-02
+# Verifikasjon – 1.1.3 – 2026-11-02
 
-## Gjennomført lokalt for 1.1.2
+## Gjennomført lokalt for 1.1.3
+
+- 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
+  desktopvisning er gjennomgått visuelt etter siste endring.
+- Layoutkontroll i simulerte nettlesere ved 360, 412 og 900 px bredde omfatter
+  firesifret rpm, luftmengde opp til modellkapasiteten og ettervarmeverdiene
+  0 %, 2 %, 100 % og ukjent. Tekstgrenser og linjeavstand måles i rendret SVG.
+- Informasjonsboksene tegnes over kanalendene, slik at kanalene ikke dekker
+  tallene i boksene.
+- Rpm står i egne linjer i Tilluft- og Avkast-boksene. Temperatur- og
+  luftmengdeteksten har beholdt størrelsen; boksene er blitt høyere.
+- SVG-ens viewBox er uendret. Hele illustrasjonen skaleres dermed ikke ekstra
+  ned for å få plass til endringene. De 28 opprinnelige path-formene beholdes.
+- Ettervarmeprosentens skriftstørrelse er økt fra 31 til 56 SVG-enheter.
+  Ukjent pådrag vises fortsatt som ukjent, med egen lesbar tekststørrelse.
+- Vekslerpådrag står på én linje i en noe bredere vekslerflate. De separate
+  FILTER-tekstene er fjernet; filtersymbolene og alarmvisningen beholdes.
+- Aggregatets og vekslerens mørke farger er hentet fra 1.1.1. Lys tekst på
+  aggregatet beholdes gjennom bytte av HA-tema, mens bakgrunn og modusfelt
+  fortsatt følger lyse, mørke og egendefinerte HA-paletter.
+- Tidligere kontroller for lokal nedtelling, animasjoner, 32 alarmkombinasjoner,
+  entitetsvalg og simulerte betjeningskall er bestått på nytt.
+
+Dette er lokale kontroller med simulerte verdier, ikke en ny verifikasjon på
+VSR300-aggregatet. Faktisk lesbarhet i brukerens HA og på Pixel 8 Pro må bekreftes
+etter manuell oppdatering. Auto-nivåklassifisering er ikke lagt til.
+
+## Historisk kontrollgrunnlag – 1.1.2, 2026-11-02
 
 - 13 simulerte nettlesergrupper er bestått. Temakontrollen omfatter lyst, mørkt
   og en egendefinert palett, hver med både lyst og mørkt OS-fargevalg.
@@ -107,8 +134,8 @@ spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.2 viderefører tidligere kortfunksjoner og knytter cockpitens nøytrale farger
-til Home Assistant-temaet. Komplette eksempler, dokumentasjonslenker og
+1.1.3 viderefører tidligere kortfunksjoner, forbedrer tekstplasseringen og
+beholder temaavhengig bakgrunn rundt et mørkt aggregat og en mørk veksler. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
 Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og
