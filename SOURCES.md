@@ -17,6 +17,9 @@ Version 1.1.3, 2026-11-02, restores the reviewed 1.1.1 equipment colours inside
 the theme-aware canvas, moves fan RPM to taller air-port boxes, and improves
 equipment labels and heater percentage size. The exchanger face is wider to
 fit its single-line title; the airflow paths and data bindings are unchanged.
+Version 1.1.4, 2026-11-02, aligns the lower information panels with the unit
+shell and documents HACS as a custom-repository installation route following
+the maintainer's report that HACS installation and updates work.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
@@ -37,6 +40,9 @@ part of this repository.
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |
 | [HA state objects](https://www.home-assistant.io/docs/configuration/state_object/) | Report/update timestamps used to anchor the local countdown display. |
 | [MDN setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval) | Local one-second visual updates and timer cleanup. |
+| [HACS custom repositories](https://www.hacs.dev/docs/faq/custom_repositories/) | Add this GitHub repository manually in HACS. |
+| [HACS dashboard elements](https://hacs.dev/docs/use/repositories/type/dashboard/) | Dashboard type, downloaded frontend files and the `/hacsfiles/` resource endpoint. |
+| [HACS repository dashboard](https://github.com/hacs/documentation/blob/main/source/docs/use/repositories/dashboard.md) | Download releases, update repository information and keep metadata refresh distinct from downloading an update. |
 | [HA theming and design tokens](https://contributors.home-assistant.io/frontend/architecture/theming/) | Inherited card/background/text/divider CSS variables for light, dark and custom themes. |
 
 The distributed JavaScript has no imports, bundled third-party JavaScript

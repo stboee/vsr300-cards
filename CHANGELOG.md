@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.4 — 2026-11-02
+
+- Raise the Tilluft information box to align its bottom edge with Avtrekk and
+  the unit shell. Keep the taller box, line spacing and all font sizes.
+- Document HACS custom-repository installation and updates in English and
+  Norwegian, including the Dashboard category, HACS resource path, migration
+  from the old manual resource and entity binding in both cards.
+- Keep manual installation as an alternative. Record the maintainer's report
+  that HACS custom-repository updates work in the reference installation.
+- Keep the dark equipment, theme-aware canvas, bindings and controls unchanged.
+
 ## 1.1.3 — 2026-11-02
 
 - Move supply fan RPM into the Tilluft information box and extract fan RPM into

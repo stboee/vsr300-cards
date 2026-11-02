@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.1.3 · 2026-11-02
+/* VSR300 custom cards · version 1.1.4 · 2026-11-02
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.1.3';
+  const VERSION = '1.1.4';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -485,11 +485,11 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <text x="168" y="-85" text-anchor="middle" class="value port-text">${uteT}</text>
           <text x="168" y="-29" text-anchor="middle" class="small port-text">${uteRh}</text>
 
-          <rect class="supply-info" x="28" y="455" width="280" height="300" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
-          <text x="168" y="515" text-anchor="middle" class="label port-text">TILLUFT</text>
-          <text x="168" y="592" text-anchor="middle" class="value port-text">${tilluftT}</text>
-          <text x="168" y="660" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
-          <text x="168" y="725" text-anchor="middle" class="small port-text supply-rpm">${tilluftRpm}</text>
+          <rect class="supply-info" x="28" y="375" width="280" height="300" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
+          <text x="168" y="435" text-anchor="middle" class="label port-text">TILLUFT</text>
+          <text x="168" y="512" text-anchor="middle" class="value port-text">${tilluftT}</text>
+          <text x="168" y="580" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
+          <text x="168" y="645" text-anchor="middle" class="small port-text supply-rpm">${tilluftRpm}</text>
 
           <rect class="exhaust-info" x="992" y="-220" width="280" height="300" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
           <text x="1132" y="-165" text-anchor="middle" class="label port-text">AVKAST</text>
@@ -497,7 +497,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <text x="1132" y="-29" text-anchor="middle" class="micro port-text">estimert</text>
           <text x="1132" y="46" text-anchor="middle" class="small port-text extract-rpm">${avtrekkRpm}</text>
 
-          <rect x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
+          <rect class="extract-info" x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
           <text x="1132" y="515" text-anchor="middle" class="label port-text">AVTREKK</text>
           <text x="1132" y="590" text-anchor="middle" class="value port-text">${avtrekkT}</text>
           <text x="1132" y="646" text-anchor="middle" class="small port-text">${inneRh}</text>

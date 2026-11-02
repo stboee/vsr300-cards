@@ -1,6 +1,22 @@
-# Verifikasjon – 1.1.3 – 2026-11-02
+# Verifikasjon – 1.1.4 – 2026-11-02
 
-## Gjennomført lokalt for 1.1.3
+## Gjennomført lokalt for 1.1.4
+
+- 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
+  desktopvisning er gjennomgått visuelt.
+- Bunnjustering er kontrollert i rendret SVG ved 360, 412 og 900 px. Tilluft,
+  Avtrekk og aggregatets ytterramme har samme underkant.
+- Tilluft-boksen er flyttet opp uten endringer i høyde, tekststørrelser eller
+  linjeavstand. Vifteverdier, estimatmerker, mørke komponenter og modusfelt
+  videreføres fra 1.1.3.
+- Dokumentasjonen beskriver HACS som egendefinert repository med type Dashboard,
+  ressurs via `/hacsfiles/`, oppdatering og overgang fra manuell ressurs. Oppsett
+  av entiteter i begge kort gjelder fortsatt for begge installasjonsmetoder.
+- HACS-fremgangsmåten er kontrollert mot HACS' offisielle dokumentasjon; faktisk
+  bruk er rapportert av prosjekteieren, se nedenfor. Agenten installerer eller
+  oppdaterer ikke i brukerens HA.
+
+## Historisk kontrollgrunnlag – 1.1.3, 2026-11-02
 
 - 14 simulerte nettlesergrupper er bestått. Lys mobilvisning og mørk
   desktopvisning er gjennomgått visuelt etter siste endring.
@@ -128,18 +144,24 @@ ble brukt bare i utviklingsmiljøet og inngår ikke i leveransen.
 
 ## Rapportert fra faktisk HA
 
+Prosjekteieren opplyste 2026-11-02 at repositoriet er lagt til i HACS som et
+custom repository, og at oppdatering fungerer godt uten manuell endring av
+ressurslenken. Dette er brukerens praktiske tilbakemelding fra egen installasjon.
+
+
 Prosjekteieren opplyste 2026-10-21 at 1.0.0-distribusjonskortene var så vidt testet og
 at de innledningsvis fungerer. Det er en første praktisk tilbakemelding, uten
 spesifisert dekning av alle kontroller, editorvalg eller signalkombinasjoner.
 
 ## Publiseringskontroll og gjenstående arbeid
 
-1.1.3 viderefører tidligere kortfunksjoner, forbedrer tekstplasseringen og
-beholder temaavhengig bakgrunn rundt et mørkt aggregat og en mørk veksler. Komplette eksempler, dokumentasjonslenker og
+1.1.4 bunnjusterer Tilluft-boksen og dokumenterer HACS-ruten som prosjekteieren
+har tatt i bruk. Tidligere kortfunksjoner og entitetskoblinger videreføres. Komplette eksempler, dokumentasjonslenker og
 pakkens sjekksummer kontrolleres før publisering. MIT-lisensen beholdes uendret.
 
-Full gjennomgang av HAs grafiske editor, entitetsbytte, modusbetjening og
-manuell installasjon/oppdatering gjenstår. Repositorystruktur og eksempler
+Full gjennomgang av HAs grafiske editor, entitetsbytte og modusbetjening
+gjenstår. HACS er praktisk rapportert i referanseinstallasjonen; full
+installasjons- og oppdateringskontroll i andre oppsett gjenstår. Repositorystruktur og eksempler
 kan kontrolleres lokalt, men det erstatter ikke faktisk installasjon i HA.
 Ingen praktisk test eller endring i brukerens HA startes av publiseringen.
 
