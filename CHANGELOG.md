@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.2 — 2026-11-03
+
+- SVG values now open their mapped HA entity using native more-info actions:
+  individual temperature/humidity/estimated-flow/RPM rows, both fans,
+  recovery/free cooling, heater active status and percentage, mode/countdown,
+  filters and individual alarm rows.
+- Side boxes are taller with larger, separate row targets. Existing top/bottom
+  alignment, font sizes, overall SVG canvas, dark equipment and airflow paths
+  are retained.
+- Keyboard activation, accessible labels, visible focus and focus retention
+  across HA updates. Hidden components and missing bindings have no action;
+  existing unavailable entities remain inspectable.
+- Existing entity mappings are reused. No helpers, new entities, control
+  commands, history collection or extra Modbus traffic are added.
+- Control and explanations cards retain the behaviour from 1.2.1.
+
 ## 1.2.1 — 2026-11-03
 
 - Tapping an open status tile closes its explanation. Tapping a different tile

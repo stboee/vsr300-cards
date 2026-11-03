@@ -1,4 +1,4 @@
-# Entitetskart – custom cards 1.2.1
+# Entitetskart – custom cards 1.2.2
 
 Startkoblingene er eksempler fra referanseoppsettet. Brukeren må kontrollere alle
 koblinger i kortene som brukes og endre dem til tilsvarende entiteter i sin egen
@@ -6,6 +6,12 @@ HA-installasjon. Dette gjøres i editorens **Entitetskoblinger**, eller under
 `entities:` i kortets YAML. Tøm valgfrie felt som ikke skal brukes.
 
 ## SVG
+
+Trykk på en verdi eller tilhørende symbol åpner entiteten som er valgt for
+rollen nedenfor. Prosentpådrag og aktiv/inaktiv-status er separate roller.
+Filtrene velger aktiv filteralarm foran filtervarsel; alarmradene åpner hver
+sin kilde. Resttid åpner den rapporterte entiteten, ikke en ny historikk for
+kortets lokale nedtelling. Se [klikk og historikk](README.nb.md#klikk-på-verdier-i-svg-kortet).
 
 | Rolle | Startentitet |
 |---|---|

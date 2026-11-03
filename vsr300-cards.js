@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.2.1 · 2026-11-03
+/* VSR300 custom cards · version 1.2.2 · 2026-11-03
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.2.1';
+  const VERSION = '1.2.2';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -155,10 +155,42 @@
     }
   }
 
+  const SVG_ACTION_STYLE = `
+    .entity-hit{fill:transparent;stroke:transparent;stroke-width:3;pointer-events:none}
+    [data-entity-role]{cursor:pointer;touch-action:manipulation}
+    [data-entity-role]>.entity-hit{pointer-events:all}
+    .systemair-svg [data-entity-role]:focus{outline:none}
+    [data-entity-role]:focus-visible{outline:none}
+    [data-entity-role]:focus-visible>.entity-hit{stroke:#fde047;stroke-width:5}
+    @media(hover:hover){[data-entity-role]:hover>.entity-hit{fill:rgba(255,255,255,.08)}}
+    .filter-status[data-entity-role]:focus-visible{outline:3px solid var(--primary-color,#03a9f4);outline-offset:2px}
+  `;
   class Vsr300SvgCard extends BaseCard {
     static fields = SVG_FIELDS;
     static defaultTitle = '';
     static supportsAnimation = true;
+    constructor() {
+      super();
+      const activate = event => {
+        const target = event.composedPath().find(el => el instanceof Element && el.hasAttribute('data-entity-role'));
+        if (!target || event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
+        if (event.type === 'keydown') { event.preventDefault(); if (event.repeat) return; }
+        const id = this._config?.entities[target.dataset.entityRole];
+        if (!id || !this._hass?.states?.[id]) return;
+        this.dispatchEvent(new CustomEvent('hass-action', {
+          bubbles: true, composed: true,
+          detail: { config: { entity: id, tap_action: { action: 'more-info' } }, action: 'tap' },
+        }));
+      };
+      this.shadowRoot.addEventListener('click', activate);
+      this.shadowRoot.addEventListener('keydown', activate);
+    }
+    _entityActionAttributes(role) {
+      const id = this._config?.entities[role];
+      if (!id || !this._hass?.states?.[id]) return '';
+      const label = SVG_FIELDS.find(field => field.key === role)?.label || role;
+      return `data-entity-role="${escape(role)}" role="button" tabindex="0" aria-label="${escape('Vis detaljer og historikk: ' + label)}"`;
+    }
     getCardSize() { return 11; }
     connectedCallback() { this._updateCountdown(); }
     disconnectedCallback() { this._stopCountdownTimer(); }
@@ -278,6 +310,7 @@ else if (modeKnown && modeRaw.startsWith('manual_')) [modeColor1, modeColor2] = 
 const { text: timeText, pct } = this._modeTiming();
 const filterAlarm = binary(states, e.filter_alarm);
 const filterWarning = binary(states, e.filter_warning);
+const filterRole = filterAlarm === true ? 'filter_alarm' : filterWarning === true ? 'filter_warning' : filterAlarm === null ? 'filter_alarm' : filterWarning === null ? 'filter_warning' : 'filter_alarm';
 const filterState = filterAlarm === true ? 'alarm' : filterWarning === true ? 'warning' : filterAlarm === false && filterWarning === false ? 'normal' : 'unknown';
 const filterColors = { alarm: ['#7f1d1d', '#ef4444', '#fecaca'], warning: ['#78350f', '#f59e0b', '#fde68a'], unknown: ['#334155', '#94a3b8', '#e2e8f0'] };
 const fc = filterColors[filterState];
@@ -290,10 +323,12 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
   const normalOpacity = freeCoolingActive ? 0 : 1;
   const freeOpacity = freeCoolingActive ? 1 : 0;
   const exchangerOpacity = freeCoolingActive ? 0.18 : 1;
+const action = role => this._entityActionAttributes(role);
+const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class="entity-hit" x="${x}" y="${y}" width="260" height="${height}" rx="16"/>${content}</g>`;
 
   return `
     <div class="svg-wrap" data-animation="${this._config.animation}">
-      <svg role="img" aria-label="Systemair prosessillustrasjon" class="systemair-svg" viewBox="0 -250 1300 1255" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+      <svg role="group" aria-label="Systemair prosessillustrasjon med klikkbare verdier" class="systemair-svg" viewBox="0 -250 1300 1255" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="panelBg" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="var(--card-background-color, #ffffff)" />
@@ -480,30 +515,29 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
 
         <!-- Paint port panels over duct ends so values stay unobscured. -->
         <g class="air-info">
-          <rect class="intake-info" x="28" y="-200" width="280" height="220" rx="28" fill="#1e40af" stroke="#93c5fd" stroke-width="4" />
+          <rect class="intake-info" x="28" y="-200" width="280" height="330" rx="28" fill="#1e40af" stroke="#93c5fd" stroke-width="4" />
           <text x="168" y="-140" text-anchor="middle" class="label port-text">INNTAK</text>
-          <text x="168" y="-65" text-anchor="middle" class="value port-text">${uteT}</text>
-          <text x="168" y="-9" text-anchor="middle" class="small port-text">${uteRh}</text>
+          ${portRow('outdoor_temperature', 38, -112, 112, `<text x="168" y="-45" text-anchor="middle" class="value port-text">${uteT}</text>`)}
+          ${portRow('outdoor_humidity', 38, 0, 112, `<text x="168" y="70" text-anchor="middle" class="small port-text">${uteRh}</text>`)}
 
-          <rect class="supply-info" x="28" y="375" width="280" height="300" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
-          <text x="168" y="435" text-anchor="middle" class="label port-text">TILLUFT</text>
-          <text x="168" y="512" text-anchor="middle" class="value port-text">${tilluftT}</text>
-          <text x="168" y="580" text-anchor="middle" class="small port-text">${tilluftFlow}</text>
-          <text x="168" y="645" text-anchor="middle" class="small port-text supply-rpm">${tilluftRpm}</text>
+          <rect class="supply-info" x="28" y="255" width="280" height="420" rx="28" fill="#166534" stroke="#86efac" stroke-width="4" />
+          <text x="168" y="315" text-anchor="middle" class="label port-text">TILLUFT</text>
+          ${portRow('supply_temperature', 38, 332, 112, `<text x="168" y="405" text-anchor="middle" class="value port-text">${tilluftT}</text>`)}
+          ${portRow('supply_flow', 38, 444, 112, `<text x="168" y="515" text-anchor="middle" class="small port-text">${tilluftFlow}</text>`)}
+          ${portRow('supply_rpm', 38, 556, 112, `<text x="168" y="625" text-anchor="middle" class="small port-text supply-rpm">${tilluftRpm}</text>`)}
 
-          <rect class="exhaust-info" x="992" y="-200" width="280" height="300" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
-          <text x="1132" y="-145" text-anchor="middle" class="label port-text">AVKAST</text>
-          <text x="1132" y="-65" text-anchor="middle" class="small port-text">${avkastFlow}</text>
-          <text x="1132" y="-9" text-anchor="middle" class="micro port-text">estimert</text>
-          <text x="1132" y="66" text-anchor="middle" class="small port-text extract-rpm">${avtrekkRpm}</text>
+          <rect class="exhaust-info" x="992" y="-200" width="280" height="420" rx="28" fill="#334155" stroke="#cbd5e1" stroke-width="4" />
+          <text x="1132" y="-140" text-anchor="middle" class="label port-text">AVKAST</text>
+          ${portRow('extract_flow', 1002, -90, 150, `<text x="1132" y="-20" text-anchor="middle" class="small port-text">${avkastFlow}</text><text x="1132" y="27" text-anchor="middle" class="micro port-text">estimert</text>`)}
+          ${portRow('extract_rpm', 1002, 85, 120, `<text x="1132" y="155" text-anchor="middle" class="small port-text extract-rpm">${avtrekkRpm}</text>`)}
 
-          <rect class="extract-info" x="992" y="455" width="280" height="220" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
-          <text x="1132" y="515" text-anchor="middle" class="label port-text">AVTREKK</text>
-          <text x="1132" y="590" text-anchor="middle" class="value port-text">${avtrekkT}</text>
-          <text x="1132" y="646" text-anchor="middle" class="small port-text">${inneRh}</text>
+          <rect class="extract-info" x="992" y="345" width="280" height="330" rx="28" fill="#9a3412" stroke="#fdba74" stroke-width="4" />
+          <text x="1132" y="405" text-anchor="middle" class="label port-text">AVTREKK</text>
+          ${portRow('extract_temperature', 1002, 430, 112, `<text x="1132" y="500" text-anchor="middle" class="value port-text">${avtrekkT}</text>`)}
+          ${portRow('extract_humidity', 1002, 542, 112, `<text x="1132" y="615" text-anchor="middle" class="small port-text">${inneRh}</text>`)}
         </g>
 
-        <g opacity="${exchangerOpacity}">
+        <g opacity="${exchangerOpacity}" pointer-events="${freeCoolingActive ? 'none' : 'auto'}" ${freeCoolingActive ? '' : action('recovery_output')}>
           <polygon class="exchanger-shell" points="490,135 650,85 810,135 810,370 650,420 490,370"
                    fill="rgba(88,28,135,0.56)" stroke="#d946ef" stroke-width="4" />
           <polygon class="exchanger-inner" points="505,165 650,125 795,165 795,345 650,385 505,345"
@@ -517,37 +551,52 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <line x1="705" y1="170" x2="555" y2="303" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
           <line x1="745" y1="215" x2="595" y2="348" stroke="rgba(125,211,252,0.42)" stroke-width="7" stroke-linecap="round" />
 
+          <rect class="entity-hit" x="490" y="110" width="320" height="280" rx="24"/>
           <text x="650" y="235" text-anchor="middle" class="label unit-text recovery-title">Vekslerpådrag</text>
           <text x="650" y="315" text-anchor="middle" class="value unit-text">${gjenv}</text>
         </g>
 
-        <g opacity="${freeOpacity}">
+        <g opacity="${freeOpacity}" pointer-events="${freeCoolingActive ? 'auto' : 'none'}" ${freeCoolingActive ? action('free_cooling_active') : ''}>
           <rect x="510" y="150" width="280" height="205" rx="30" fill="rgba(12,74,110,0.88)" stroke="#38bdf8" stroke-width="5" />
           <text x="650" y="223" text-anchor="middle" class="label port-text">FRIKJØLING</text>
           <text x="650" y="285" text-anchor="middle" class="small port-text">utenom</text>
           <text x="650" y="333" text-anchor="middle" class="small port-text">veksler</text>
+          <rect class="entity-hit" x="510" y="150" width="280" height="205" rx="30"/>
         </g>
 
+        <g ${action(filterRole)}>
         <rect x="392" y="-170" width="66" height="135" rx="14" class="supply-filter" data-status="${filterState}" fill="${fc ? fc[0] : '#1e3a8a'}" stroke="${fc ? fc[1] : '#93c5fd'}" stroke-width="${fc ? 7 : 4}" />
         <line x1="407" y1="-145" x2="443" y2="-60" stroke="#bfdbfe" stroke-width="6" />
         <line x1="443" y1="-145" x2="407" y2="-60" stroke="#bfdbfe" stroke-width="6" />
         <line x1="425" y1="-150" x2="425" y2="-55" stroke="rgba(255,255,255,0.42)" stroke-width="4" />
         ${filterBadge(458, -165)}
+        <rect class="entity-hit" x="380" y="-188" width="100" height="165" rx="16"/>
+        </g>
 
+        <g ${action(filterRole)}>
         <rect x="842" y="500" width="66" height="135" rx="14" class="extract-filter" data-status="${filterState}" fill="${fc ? fc[0] : '#7c2d12'}" stroke="${fc ? fc[1] : '#fdba74'}" stroke-width="${fc ? 7 : 4}" />
         <line x1="857" y1="525" x2="893" y2="610" stroke="#fed7aa" stroke-width="6" />
         <line x1="893" y1="525" x2="857" y2="610" stroke="#fed7aa" stroke-width="6" />
         <line x1="875" y1="520" x2="875" y2="615" stroke="rgba(255,255,255,0.42)" stroke-width="4" />
         ${filterBadge(908, 505)}
+        <rect class="entity-hit" x="830" y="485" width="100" height="160" rx="16"/>
+        </g>
 
         <g filter="${heaterGlow}">
+          <g ${action('heater_active')}>
           <rect x="603" y="395" width="94" height="86" rx="18" fill="${heaterFill}" stroke="${heaterStroke}" stroke-width="4" />
           <path d="M621 429 C636 409, 656 449, 674 427" fill="none" stroke="${heaterWave}" stroke-width="7" stroke-linecap="round" />
           <path d="M621 457 C636 437, 656 477, 674 455" fill="none" stroke="${heaterWave}" stroke-width="7" stroke-linecap="round" />
           <text x="650" y="525" text-anchor="middle" class="heater-text unit-text">${heaterTitle}</text>
+          <rect class="entity-hit" x="550" y="385" width="200" height="150" rx="18"/>
+          </g>
+          <g ${action('heater_output')}>
           <text x="650" y="600" text-anchor="middle" class="heater-text heater-value unit-text${Number.isFinite(triacNum) ? '' : ' heater-value-unknown'}">${ettervarmeSub}</text>
+          <rect class="entity-hit" x="550" y="540" width="200" height="100" rx="18"/>
+          </g>
         </g>
 
+        <g ${action('supply_rpm')}>
         <circle cx="405" cy="565" r="60" fill="#064e3b" stroke="#86efac" stroke-width="5" />
         <circle cx="405" cy="565" r="14" fill="#dcfce7" opacity="0.9" />
         <g class="fan-blade" style="transform-origin: 405px 565px;">
@@ -556,7 +605,10 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <path d="M405 565 L405 612 Q379 596 392 565 Z" fill="#86efac" opacity="0.93" />
           <path d="M405 565 L358 565 Q374 539 405 552 Z" fill="#86efac" opacity="0.93" />
         </g>
+        <rect class="entity-hit" x="335" y="495" width="140" height="140" rx="60"/>
+        </g>
 
+        <g ${action('extract_rpm')}>
         <circle cx="875" cy="-110" r="60" fill="#334155" stroke="#e2e8f0" stroke-width="5" />
         <circle cx="875" cy="-110" r="14" fill="#f8fafc" opacity="0.9" />
         <g class="fan-blade" style="transform-origin: 875px -110px;">
@@ -565,11 +617,19 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
           <path d="M875 -110 L875 -63 Q849 -79 862 -110 Z" fill="#e2e8f0" opacity="0.93" />
           <path d="M875 -110 L828 -110 Q844 -136 875 -123 Z" fill="#e2e8f0" opacity="0.93" />
         </g>
+        <rect class="entity-hit" x="805" y="-180" width="140" height="140" rx="60"/>
+        </g>
 
         <rect class="mode-box" x="48" y="780" width="1204" height="165" rx="36" fill="var(--card-background-color, #ffffff)" stroke="url(#modeGrad)" stroke-width="4" />
+        <g ${action('mode')}>
+        <rect class="entity-hit" x="70" y="800" width="660" height="112" rx="18"/>
         <text x="92" y="837" class="mode-title">AKTIV MODUS</text>
         <text x="92" y="900" class="mode-value">${driftText}</text>
+        </g>
+        <g ${action('countdown')}>
+        <rect class="entity-hit" x="740" y="800" width="490" height="112" rx="18"/>
         <text x="760" y="900" class="mode-time">${timeText}</text>
+        </g>
         <rect x="92" y="917" width="1110" height="16" rx="8" fill="var(--divider-color, #bdbdbd)" />
         <rect class="mode-progress" x="92" y="917" width="${Math.round(1110 * pct / 100)}" height="16" rx="8" fill="url(#modeGrad)" />
       </svg>
@@ -578,7 +638,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
     }
     _alarmLines(states, entities) {
       const rows = [];
-      const add = (key, label, level) => rows.push(`<div class="filter-status filter-${level}" data-alarm="${key}" role="status">${escape(label)}</div>`);
+      const add = (key, label, level) => rows.push(`<div class="filter-status filter-${level}" data-alarm="${key}" ${this._entityActionAttributes(key) || 'role="status"'}><span role="status">${escape(label)}</span></div>`);
       for (const [key, label] of [['alarm_a', 'A-alarm'], ['alarm_b', 'B-alarm'], ['alarm_c', 'C-alarm']]) {
         if (!entities[key]) continue;
         const active = binary(states, entities[key]);
@@ -594,10 +654,13 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
     _render() {
       const states = this._hass.states || {}, e = this._config.entities;
       const freeUnknown = binary(states, e.free_cooling_active) === null;
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}</style>${this._heading()}${this._diagram()}
+      const focused = this.shadowRoot.activeElement, role = focused?.dataset.entityRole;
+      const focusIndex = role ? Array.from(this.shadowRoot.querySelectorAll('[data-entity-role]')).filter(el => el.dataset.entityRole === role).indexOf(focused) : -1;
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${SVG_ACTION_STYLE}</style>${this._heading()}${this._diagram()}
         ${this._alarmLines(states, e)}${this._missingNotice()}
         ${freeUnknown ? '<div class="notice" role="status">Frikjølingsstatus ukjent.</div>' : ''}`;
       this._updateCountdown();
+      if (focusIndex >= 0) Array.from(this.shadowRoot.querySelectorAll('[data-entity-role]')).filter(el => el.dataset.entityRole === role)[focusIndex]?.focus({ preventScroll: true });
     }
   }
 

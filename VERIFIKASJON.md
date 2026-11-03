@@ -1,6 +1,36 @@
-# Verifikasjon – 1.2.1 – 2026-11-03
+# Verifikasjon – 1.2.2 – 2026-11-03
 
-## Gjennomført lokalt for 1.2.1
+## Gjennomført lokalt for 1.2.2
+
+- 30 lokale nettleserkontrollgrupper består: 14 tidligere kontroller, ni for
+  Status og forklaringer og sju for nye SVG-handlinger.
+- Alle ni verdirader i sideboksene, veksler/frikjøling, ettervarmens status og
+  prosent, begge vifter og filtre, modus/resttid og fem alarmrader åpner rett
+  konfigurert entitet med én `hass-action` / `more-info` per aktivering.
+- Reelle pekertreff i den simulerte nettleseren og berøringshendelser på
+  naborader er kontrollert. Ingen feilaktig treff på skjult frikjøling/veksler.
+  De ni radfeltene overlapper ikke og er minst 24 CSS-piksler høye i
+  kontrolloppsettet ved 320/360/412/900 px vindusbredde. En ekstra smal
+  dashboardkolonne kan gi mindre felt fordi SVG-en skaleres med kortbredden.
+- Enter/mellomrom, tilgjengelige etiketter, synlig tastaturfokus og bevart fokus
+  ved HA-oppdatering er kontrollert. Berøring gir ingen ekstra nettleserramme.
+- Byttede entitetsnavn følger oppsettet. Eksisterende utilgjengelige entiteter
+  kan åpnes; manglende og tomme koblinger får ingen klikkhandling.
+- Sideboksene er høyere, med topp-/bunnjustering, samme viewBox, bredde og
+  tekststørrelser. Tekstplass ved store tall og ukjent ettervarme er kontrollert.
+  Lyse og mørke mobil-/desktopbilder er gjennomgått visuelt.
+- Alle tidligere tegnede luftveier er identiske med 1.2.1. Kontrollpanel og
+  Status og forklaringer har identisk kode; felleskode er bare versjonsendret.
+- SVG-klikk sender ingen HA-tjenestekall, henter ikke egen historikk og gjør
+  ingen eksterne forespørsler. Modbus-eierskap og HA-konfigurasjon er uendret.
+
+Kontrollene bruker simulerte HA-tilstander og registrerer den utsendte
+HA-handlingen. De er ikke en test av HAs faktiske dialog, recorder-data eller
+Pixel-nettleseren. Dialogåpning og treffopplevelse i faktisk HA må bekreftes
+etter oppdatering. Ettervarmeprosent, aktivitet, estimerte luftmengder og lokal
+nedtelling har samme datagrunnlag og begrensninger som før.
+
+## Historisk kontrollgrunnlag – 1.2.1, 2026-11-03
 
 - Ni nettleserkontrollgrupper for Status og forklaringer er bestått.
 - Et nytt trykk på det åpne statusfeltet lukker teksten. Enter og mellomrom

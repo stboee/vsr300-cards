@@ -3,7 +3,7 @@
 Three Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, and optional **Systemair Status og forklaringer**,
 with graphical entity selection. Current card
-version: **1.2.1**. Reference setup: HA 2026.10.2 and
+version: **1.2.2**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -24,7 +24,7 @@ same cards are loaded only once. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.2.1`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.2.2`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -68,6 +68,30 @@ Check its entity bindings. Your initial presets are examples, including optional
 local diagnosis and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
+
+## Tap values in the SVG card
+
+Tap a value row to open its mapped entity in Home Assistant's standard more-info
+dialog, with whatever history HA has recorded. The whole row is a target, using
+the existing entity mappings in the visual editor. No helpers or additional
+configuration are required.
+
+- Each temperature, humidity, estimated airflow and RPM row opens separately.
+- Fan symbols open their RPM sensor. The exchanger opens recovery output;
+  when free cooling is displayed, that component opens reported cooling status.
+- The heater symbol/label opens the active-status binary sensor; the percentage
+  opens the output sensor. These remain distinct signals.
+- Filters open the active alarm ahead of warning, or the alarm entity when both
+  are inactive. Each alarm row opens its own entity.
+- Mode and remaining time open separately. Countdown history contains integration
+  reports, while the visible card ticks locally between reports.
+
+The side boxes are taller with more row spacing, preserving top/bottom alignment,
+overall SVG width and font sizes. Tab, Enter and Space are supported. An existing
+unavailable entity still opens; empty or nonexistent mappings have no action.
+These actions only open entity details; they do not control the unit. Airflows
+remain estimates, recovery output remains a reported control output rather than
+thermal efficiency, and no new history is created by the card.
 
 ## Options and displayed values
 

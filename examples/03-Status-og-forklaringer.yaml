@@ -1,5 +1,5 @@
 # VSR300 – valgfritt Status og forklaringer-kort
-# Kortpakke: 1.2.1
+# Kortpakke: 1.2.2
 # Kontroller entitetskoblingene. Valgfrie felt kan tømmes.
 type: custom:vsr300-explanations-card
 title: Status og forklaringer

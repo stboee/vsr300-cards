@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.2.1
+# Status og forklaringer – 1.2.2
 
 Et valgfritt tredje kort i samme pakke som SVG og Kontrollpanel:
 

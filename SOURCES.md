@@ -27,6 +27,12 @@ maintainer's complete YAML attachment supplied that day. All eight topics are
 retained, with native entity selectors, internal explanation selection and a
 card-local house-load calculation. Optional local diagnoses remain labelled
 as local, rather than being presented as firmware observations.
+Version 1.2.1, 2026-11-03, makes repeated taps close the selected explanation
+and keeps three status columns on mobile.
+Version 1.2.2, 2026-11-03, adds native HA more-info actions to individual SVG
+values, symbols and alarm lines using their existing entity mappings. The side
+boxes gain vertical space without changing the SVG canvas or text sizes.
+The UI action opens entity details; it does not write a Modbus register.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal
@@ -40,6 +46,7 @@ part of this repository. The converted explanations card is included from 1.2.0.
 | --- | --- |
 | [Home Assistant custom cards](https://contributors.home-assistant.io/frontend/custom-ui/card/) | Public custom-card API: `hass`, custom elements and card registration. |
 | [Home Assistant card editor](https://contributors.home-assistant.io/frontend/custom-ui/card-editor/) | Public `getConfigForm` API and entity selectors. |
+| [HA action event for custom cards](https://contributors.home-assistant.io/blog/2023/07/07/action-event-custom-cards/) | Native `hass-action` with `tap_action: more-info`, using the configured entity. |
 | [HA core 2026.10.2 frontend manifest](https://github.com/home-assistant/core/blob/2026.10.2/homeassistant/components/frontend/manifest.json) | Reference frontend version 20260930.4 for API compatibility review. |
 | [Howard Systemair Modbus v1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus/tree/v1.3.0) | Source of the reference entities and their documented/code-derived meanings. |
 | [Howard v1.3.0 binary sensors](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/binary_sensor.py) | A/B/C summary alarm, filter alarm and filter warning sources. |

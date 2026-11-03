@@ -2,7 +2,7 @@
 
 Tre Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel** og det valgfrie **Systemair Status og forklaringer**,
-med grafisk valg av entiteter. Kortversjon: **1.2.1**.
+med grafisk valg av entiteter. Kortversjon: **1.2.2**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -22,7 +22,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.2.1`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.2.2`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -66,6 +66,35 @@ Kontroller entitetskoblingene. Startverdiene er eksempler, også for de valgfrie
 lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
+
+## Klikk på verdier i SVG-kortet
+
+Trykk på en verdirad for å åpne den valgte entitetens vanlige HA-vindu med
+tilgjengelig historikk. Hele raden er et trykkfelt. Entitetskoblingene i kortets
+grafiske editor brukes også her; det kreves ingen nye helpers eller oppsett.
+
+| Område | Separate trykkfelt |
+|---|---|
+| Inntak | Utetemperatur og eventuell utendørs luftfuktighet |
+| Tilluft | Temperatur, estimert luftmengde og RPM |
+| Avkast | Estimert luftmengde og RPM |
+| Avtrekk | Temperatur og luftfuktighet |
+| Veksler / aktiv frikjøling | Vekslerpådrag eller rapportert frikjølingsstatus |
+| Ettervarme | Symbol/tekst åpner aktiv-status; prosentverdien åpner pådrag |
+| Viftesymboler | RPM for den tilhørende viften |
+| Filtre | Aktiv filteralarm har prioritet foran filtervarsel; ved normal status åpnes filteralarmen |
+| Modusfelt | Rapportert modus og rapportert resttid åpnes separat |
+| Alarmrader | Hver rad åpner sin tilhørende alarm- eller varselentitet |
+
+Historikken kommer fra HA og avhenger av hva som er lagret der. Luftmengden er
+fortsatt estimert, og vekslerpådrag er ikke virkningsgrad. Resttidens HA-historikk
+viser integrasjonens rapporteringer, mens kortet teller jevnt ned lokalt mellom
+rapportene. En utilgjengelig entitet kan åpnes dersom den finnes i HA; en tom
+eller manglende entitetskobling får ingen klikkhandling. Tab, Enter og mellomrom
+kan også brukes. Trykkfeltene sender ingen styringskommando til aggregatet.
+
+Sideboksene er høyere, med mer avstand mellom verdiene. Topp-/bunnjustering,
+SVG-ens totale bredde og skriftstørrelser er beholdt.
 
 ## Valg og verdier
 
