@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.2.2 · 2026-11-03
+/* VSR300 custom cards · version 1.2.3 · 2026-11-03
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.2.2';
+  const VERSION = '1.2.3';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -889,7 +889,10 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     .status-button strong{font-size:14px}.status-button .reading{font-size:16px;font-weight:850;line-height:1.3}.status-button .kind{font-size:12px;line-height:1.3;color:var(--secondary-text-color,#9b9b9b)}
     .status-button ha-icon{--mdc-icon-size:28px}.explanation-panel{margin-top:20px;border-top:1px solid var(--divider-color,#636363);padding-top:16px;font-size:15px;line-height:1.55}
     .explanation-panel[hidden]{display:none}.explanation-panel h3{margin:0 0 8px;font-size:20px}.summary{font-weight:700;margin:0 0 12px}.explanation-panel p{margin:0 0 14px}.explanation-panel ul{padding-left:22px;margin:0 0 14px}
-    code{font-size:.9em;overflow-wrap:anywhere}.values{width:100%;border-collapse:collapse;table-layout:fixed;margin:12px 0 16px}.values td{padding:7px 4px;border-bottom:1px solid var(--divider-color,#636363);vertical-align:top;overflow-wrap:anywhere}.values td:first-child{width:58%}.values .source{display:block;font-weight:400;font-size:12px;color:var(--secondary-text-color,#9b9b9b)}
+    code{font-size:.9em;overflow-wrap:anywhere}.values{width:100%;border-collapse:collapse;table-layout:fixed;margin:12px 0 16px}.values td{padding:0;border-bottom:1px solid var(--divider-color,#636363);vertical-align:top;overflow-wrap:anywhere}.values .source{display:block;font-weight:400;font-size:12px;color:var(--secondary-text-color,#9b9b9b)}
+    .entity-row{display:grid;grid-template-columns:minmax(0,58fr) minmax(0,42fr);align-items:start;gap:8px;width:100%;min-height:44px;box-sizing:border-box;margin:0;padding:8px 4px;border:0;border-radius:6px;background:transparent;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:default}
+    .entity-row>span{min-width:0;overflow-wrap:anywhere}button.entity-row{cursor:pointer;touch-action:manipulation}button.entity-row:focus-visible{outline:3px solid var(--primary-color,#03a9f4);outline-offset:-3px}
+    @media(hover:hover){button.entity-row:hover{background:rgba(127,127,127,.10)}}
     .close-row{display:flex;justify-content:flex-end}.close-button{min-height:44px;flex-direction:row;padding:8px 16px;gap:8px;border-radius:12px}.close-button ha-icon{--mdc-icon-size:20px}
     @media(max-width:380px){ha-card{padding:12px}.status-grid{gap:6px}.status-button{padding:8px 4px}}
   `;
@@ -921,8 +924,18 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     constructor() {
       super(); this._selected = null;
       this.shadowRoot.addEventListener('click', event => {
-        const button = event.composedPath().find(el => el instanceof HTMLElement && el.matches('button[data-topic],button[data-close]'));
+        const button = event.composedPath().find(el => el instanceof HTMLElement && el.matches('button[data-topic],button[data-close],button[data-entity-role]'));
         if (!button) return;
+        if (button.dataset.entityRole) {
+          const role = button.dataset.entityRole, id = this._config?.entities[role];
+          if (EXPLANATION_FIELDS.some(field => field.key === role) && id && this._hass?.states?.[id]) {
+            this.dispatchEvent(new CustomEvent('hass-action', {
+              bubbles: true, composed: true,
+              detail: { config: { entity: id, tap_action: { action: 'more-info' } }, action: 'tap' },
+            }));
+          }
+          return;
+        }
         const closing = button.hasAttribute('data-close'), previous = this._selected;
         if (closing) this._selected = null;
         else if (EXPLANATION_TOPICS.some(topic => topic.key === button.dataset.topic)) this._selected = previous === button.dataset.topic ? null : button.dataset.topic;
@@ -1013,18 +1026,25 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const text = topic.text.replace(/\{\{([a-z0-9_]+)\}\}/g, (_, role) => EXPLANATION_FIELDS.find(field => field.key === role)?.label || 'Beregnet i kortet');
       const rows = topic.roles.filter(role => this._config.entities[role]).map(role => {
         const field = EXPLANATION_FIELDS.find(item => item.key === role), id = this._config.entities[role];
-        return `<tr><td>${escape(field.label)}${this._config.show_sources ? `<code class="source">${escape(id)}</code>` : ''}</td><td>${escape(this._value(role))}</td></tr>`;
+        const content = `<span class="entity-label">${escape(field.label)}${this._config.show_sources ? `<code class="source">${escape(id)}</code>` : ''}</span><span class="entity-value">${escape(this._value(role))}</span>`;
+        const row = this._hass.states[id]
+          ? `<button class="entity-row" type="button" data-entity-role="${escape(role)}" aria-label="${escape('Vis detaljer og historikk: ' + field.label)}">${content}</button>`
+          : `<div class="entity-row">${content}</div>`;
+        return `<tr><td colspan="2">${row}</td></tr>`;
       }).join('');
       return `<h3 id="explanation-title">${escape(topic.title)}</h3><p class="summary">${escape(status.label)} · ${escape(status.kind)}</p>${explanationHtml(text)}${rows ? `<table class="values" aria-label="Relevante verdier"><tbody>${rows}</tbody></table>` : ''}<div class="close-row"><button class="close-button" data-close type="button"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div>`;
     }
     _render() {
-      const focus = this.shadowRoot.activeElement?.dataset.topic, statuses = this._statuses();
+      const focused = this.shadowRoot.activeElement, focus = focused?.dataset.topic, focusRole = focused?.dataset.entityRole;
+      const focusClose = focused?.hasAttribute('data-close'), statuses = this._statuses();
       const topic = EXPLANATION_TOPICS.find(item => item.key === this._selected);
       this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${EXPLANATION_TOPICS.map(item => {
         const status = statuses[item.key];
         return `<button class="status-button" type="button" data-topic="${item.key}" aria-expanded="${this._selected === item.key}" aria-controls="explanation-panel" style="--accent:${status.color};--tile-tint:${status.color}12"><ha-icon icon="${item.icon}" aria-hidden="true"></ha-icon><strong>${escape(item.name)}</strong><span class="reading">${escape(status.label)}</span><span class="kind">${escape(status.kind)}</span></button>`;
       }).join('')}</div><section id="explanation-panel" class="explanation-panel" aria-labelledby="explanation-title" ${topic ? '' : 'hidden'}>${topic ? this._details(topic, statuses[topic.key]) : ''}</section></ha-card>`;
       if (focus) this.shadowRoot.querySelector(`button[data-topic="${focus}"]`)?.focus({ preventScroll: true });
+      else if (focusRole) this.shadowRoot.querySelector(`button[data-entity-role="${focusRole}"]`)?.focus({ preventScroll: true });
+      else if (focusClose) this.shadowRoot.querySelector('button[data-close]')?.focus({ preventScroll: true });
     }
   }
 

@@ -2,7 +2,7 @@
 
 Tre Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel** og det valgfrie **Systemair Status og forklaringer**,
-med grafisk valg av entiteter. Kortversjon: **1.2.2**.
+med grafisk valg av entiteter. Kortversjon: **1.2.3**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -22,7 +22,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.2.2`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.2.3`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -106,7 +106,7 @@ SVG-ens totale bredde og skriftstørrelser er beholdt.
 - `≈` markerer integrasjonens estimerte luftmengde. **Vekslerpådrag** er et pådrag, ikke målt virkningsgrad. Ettervarme vises i prosent, uten wattestimat.
 - Hvert aktivt tilkoblet alarmsignal får egen rad. A/B/C er samlealarmer og kan overlappe andre indikasjoner.
 - Luftveiene og animasjonene er skjematiske.
-- **Status og forklaringer** har åtte statusfelt med forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Lokal frikjølingsdiagnose og døgnmaksimum er valgfrie eksisterende HA-kilder som skilles fra integrasjonens rapportering. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
+- **Status og forklaringer** har åtte statusfelt med forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Lokal frikjølingsdiagnose og døgnmaksimum er valgfrie eksisterende HA-kilder som skilles fra integrasjonens rapportering. Trykk på verdiradene i forklaringene for å åpne tilhørende HA-entitet og tilgjengelig historikk. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
 
 [Entitetskart](ENTITETSKART.md) · [Endringslogg](CHANGELOG.md) ·
 [Verifikasjon og begrensninger](VERIFIKASJON.md) · [Kilder](SOURCES.md) · [MIT-lisens](LICENSE)

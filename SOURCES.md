@@ -33,6 +33,9 @@ Version 1.2.2, 2026-11-03, adds native HA more-info actions to individual SVG
 values, symbols and alarm lines using their existing entity mappings. The side
 boxes gain vertical space without changing the SVG canvas or text sizes.
 The UI action opens entity details; it does not write a Modbus register.
+Version 1.2.3, 2026-11-03, reuses the same native more-info action for the entity
+rows inside explanations. Topic selection and card-local calculations remain
+independent of those entity-history actions.
 
 The initial entity names are configuration presets from the maintainer's HA
 installation. They are not credentials, recorded operating data or universal

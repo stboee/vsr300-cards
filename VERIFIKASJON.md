@@ -1,6 +1,32 @@
-# Verifikasjon – 1.2.2 – 2026-11-03
+# Verifikasjon – 1.2.3 – 2026-11-03
 
-## Gjennomført lokalt for 1.2.2
+## Gjennomført lokalt for 1.2.3
+
+- 14 kontrollgrupper for Status og forklaringer består, med tidligere
+  beregninger, ukjente verdier, lokale kilder, remapping og menyoppførsel.
+- Verdiradene i alle åtte emner åpner forventet entitet med én native
+  `hass-action` / `more-info` ved trykk på navn eller verdi. Valgfri synlig
+  entitets-ID følger samme handling og respekterer endrede koblinger.
+- Native HTML-knapper støtter Enter/mellomrom uten doble hendelser. Fokus
+  beholdes ved HA-oppdatering. Valgt forklaring forblir åpen etter entitetsklikk.
+- Ukjente/utilgjengelige eksisterende entiteter kan åpnes. Manglende entiteter
+  vises som ukjent uten knapp; tomme koblinger utelates.
+- Alle emner og verdirader er kontrollert ved 320/360/412/900 px i lyst og
+  mørkt tema. Radene er minst 44 CSS-piksler høye og har ingen horisontal
+  overflyt i kontrolloppsettet. Berøringshendelser åpner riktig kilde.
+- Tre menyfelt i bredden, gjentatt trykk for lukking og Lukk nederst består.
+  Mobil-/desktopbilder er gjennomgått visuelt.
+- SVG, Kontrollpanel, felleskode, entitetskart og opprinnelige forklaringstekster
+  er sammenlignet med 1.2.2 og er identiske bortsett fra pakkeversjonen.
+- Forklaringskortet sender ingen HA-tjenestekall eller eksterne forespørsler.
+  Det lager ingen nye entiteter eller egen historikk for beregnet Huslast.
+
+Prosjekteieren har rapportert at Cockpit-klikkene fra 1.2.2 fungerer i faktisk
+HA. De nye forklaringsradene er kontrollert med simulerte HA-tilstander og
+registrerte mer-info-hendelser; faktisk visning og dialogåpning bekreftes etter
+oppdatering. Dette er ingen ny Modbus- eller aggregatverifikasjon.
+
+## Historisk kontrollgrunnlag – 1.2.2, 2026-11-03
 
 - 30 lokale nettleserkontrollgrupper består: 14 tidligere kontroller, ni for
   Status og forklaringer og sju for nye SVG-handlinger.

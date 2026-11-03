@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.2.2
+# Status og forklaringer – 1.2.3
 
 Et valgfritt tredje kort i samme pakke som SVG og Kontrollpanel:
 
@@ -34,6 +34,24 @@ felt for å bytte forklaring. **Lukk** nederst skjuler også forklaringen.
 Menyvalget gjelder hvert kort for seg,
 beholdes ved vanlige HA-oppdateringer og starter skjult ved ny sideinnlasting.
 Valget sender ingen kommando til HA eller aggregatet.
+
+### Klikk på entiteter i forklaringen
+
+Trykk på en rad i tabellen **Relevante verdier** for å åpne den valgte
+entitetens vanlige HA-vindu med tilgjengelig historikk. Navn, verdi og eventuell
+synlig entitets-ID tilhører samme trykkfelt. Enter og mellomrom fungerer også.
+Forklaringen beholdes åpen, og entitetskoblingene i editoren brukes videre.
+
+Dette gjelder integrasjonsentiteter og eventuelle valgte lokale eller målte
+kilder. En eksisterende entitet med ukjent/utilgjengelig verdi kan fortsatt
+åpnes; en entitet som ikke finnes vises som ukjent uten klikkhandling.
+Tømte valgfrie koblinger utelates som før. Historikken avhenger av hva HA har
+lagret. Kortet henter ikke egen historikk eller oppretter nye entiteter.
+
+Huslast beregnes i kortet og har ingen egen historikk. Radene i forklaringen
+åpner temperaturene, luftmengden og frikjølingsstatusen som ligger til grunn.
+Menyfeltene øverst fortsetter å åpne/lukke forklaringer, og **Lukk** nederst
+beholdes. Et trykk på en entitetsrad sender bare en mer-info-handling.
 
 Kortet beregner følgende fra de valgte integrasjonsentitetene:
 
@@ -94,6 +112,11 @@ unused optional fields. The eight topics, explanations and source readouts
 are retained from the maintainer's supplied card. Selection is local to each
 card: tap the selected tile again to close it, or use Close below the text.
 The tiles keep three columns on mobile without smaller font sizes.
+Tap any entity row in an explanation to open its mapped HA entity and available
+history. The label, value and optional source ID share one native button,
+including keyboard support. The explanation stays open. Missing entities have
+no action; existing unavailable entities remain inspectable. Card-local house
+load has no separate history; its underlying source rows can be opened.
 House load is calculated from native integration values. No helper,
 button-card dependency or local house-load entity is required. Optional local
 free-cooling diagnoses and measured electrical power remain external HA inputs.

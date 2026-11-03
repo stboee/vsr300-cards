@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.3 — 2026-11-03
+
+- Entity rows in Status og forklaringer open their mapped HA entity through
+  native more-info actions. Labels, values and optional source IDs share a
+  full-width target, with keyboard activation and focus retained on HA updates.
+- Existing unavailable entities remain inspectable. Missing entities show an
+  unknown value without a misleading action; cleared bindings stay omitted.
+- Topic selection, repeated-tap closing, three mobile columns and the bottom
+  Close button are retained. Existing mappings and calculations are reused.
+- SVG and control card code are unchanged apart from the package version.
+
 ## 1.2.2 — 2026-11-03
 
 - SVG values now open their mapped HA entity using native more-info actions:
