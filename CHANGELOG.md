@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.1 — 2026-11-03
+
+- Tapping an open status tile closes its explanation. Tapping a different tile
+  switches topics; the Close button below the explanation remains available.
+- Status tiles keep three columns on mobile, with unchanged font sizes and
+  wrapping text.
+- SVG, controls, entity mappings and calculations are unchanged.
+
 ## 1.2.0 — 2026-11-03
 
 - Add optional Systemair Status og forklaringer as a third card in the same

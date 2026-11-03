@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.2.0
+# Status og forklaringer – 1.2.1
 
 Et valgfritt tredje kort i samme pakke som SVG og Kontrollpanel:
 
@@ -22,14 +22,16 @@ Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
 - **Grense for markering av estimert ubalanse:** 15 m³/h som standard. Grønn
   markering betyr at differansen mellom luftmengdeestimatene er mindre enn
   grensen; det er ikke en måling av fysisk balanse eller trykk.
-- Oppsettet tilpasses kortets bredde: tre kolonner når det er god plass, to
-  kolonner på mobil og én ved svært smale kort.
+- Statusfeltene vises i tre kolonner, også på mobil. Teksten kan brytes over
+  flere linjer og beholder samme skriftstørrelse.
 
 ## Hva kortet gjør selv
 
 De åtte feltene er Balanse, Frikjøling, ECO, Hette, Ettervarme, Elektrisk,
 Huslast og Auto-styring. Trykk på et felt for å lese forklaringen og se relevante
-verdier. **Lukk** skjuler forklaringen. Menyvalget gjelder hvert kort for seg,
+verdier. Trykk på det samme feltet igjen for å lukke teksten, eller på et annet
+felt for å bytte forklaring. **Lukk** nederst skjuler også forklaringen.
+Menyvalget gjelder hvert kort for seg,
 beholdes ved vanlige HA-oppdateringer og starter skjult ved ny sideinnlasting.
 Valget sender ingen kommando til HA eller aggregatet.
 
@@ -90,7 +92,9 @@ Add **Systemair Status og forklaringer** after updating the existing HACS
 package. Configure every entity you use in the native visual editor; clear
 unused optional fields. The eight topics, explanations and source readouts
 are retained from the maintainer's supplied card. Selection is local to each
-card, and house load is calculated from native integration values. No helper,
+card: tap the selected tile again to close it, or use Close below the text.
+The tiles keep three columns on mobile without smaller font sizes.
+House load is calculated from native integration values. No helper,
 button-card dependency or local house-load entity is required. Optional local
 free-cooling diagnoses and measured electrical power remain external HA inputs.
 Check other consumers before removing any old helpers or templates.

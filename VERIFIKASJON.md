@@ -1,6 +1,24 @@
-# Verifikasjon – 1.2.0 – 2026-11-03
+# Verifikasjon – 1.2.1 – 2026-11-03
 
-## Gjennomført lokalt for 1.2.0
+## Gjennomført lokalt for 1.2.1
+
+- Ni nettleserkontrollgrupper for Status og forklaringer er bestått.
+- Et nytt trykk på det åpne statusfeltet lukker teksten. Enter og mellomrom
+  virker på samme måte. Bytte til et annet felt og Lukk-knappen nederst virker
+  fortsatt, med fokus bevart på statusfeltet etter lukking.
+- Alle åtte feltene bruker tre kolonner ved 320/360/412/900 px vindusbredde.
+  Teksten beholder skriftstørrelsen og er kontrollert for horisontal overflyt
+  i lyse og mørke farger. Nye skjermbilder er kontrollert visuelt.
+- SVG-, Kontrollpanel- og felleskode er uendret bortsett fra pakkeversjonen.
+  Dette er kontrollert ved sammenligning med det tidligere kontrollgrunnlaget.
+- Statusberegninger, entitetskoblinger, ukjente verdier og uavhengige kortvalg
+  består de eksisterende kontrollene. Ingen eksterne forespørsler eller
+  HA-tjenestekall foretas av forklaringskortet.
+
+Kontrollene er lokale simuleringer; faktisk mobilvisning i brukerens HA må
+bekreftes etter oppdatering. SVG-elementer har ikke fått nye klikkhandlinger.
+
+## Historisk kontrollgrunnlag – 1.2.0, 2026-11-03
 
 - 23 lokale kontrollgrupper er bestått: 14 tidligere nettlesergrupper og
   9 grupper for det nye kortet. Lyst/mørkt tema og bredder 360/412/900 px

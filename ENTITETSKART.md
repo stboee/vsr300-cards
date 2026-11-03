@@ -1,4 +1,4 @@
-# Entitetskart – custom cards 1.2.0
+# Entitetskart – custom cards 1.2.1
 
 Startkoblingene er eksempler fra referanseoppsettet. Brukeren må kontrollere alle
 koblinger i kortene som brukes og endre dem til tilsvarende entiteter i sin egen

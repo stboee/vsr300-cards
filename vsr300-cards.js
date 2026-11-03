@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.2.0 · 2026-11-03
+/* VSR300 custom cards · version 1.2.1 · 2026-11-03
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.2.0';
+  const VERSION = '1.2.1';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -829,8 +829,6 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
     code{font-size:.9em;overflow-wrap:anywhere}.values{width:100%;border-collapse:collapse;table-layout:fixed;margin:12px 0 16px}.values td{padding:7px 4px;border-bottom:1px solid var(--divider-color,#636363);vertical-align:top;overflow-wrap:anywhere}.values td:first-child{width:58%}.values .source{display:block;font-weight:400;font-size:12px;color:var(--secondary-text-color,#9b9b9b)}
     .close-row{display:flex;justify-content:flex-end}.close-button{min-height:44px;flex-direction:row;padding:8px 16px;gap:8px;border-radius:12px}.close-button ha-icon{--mdc-icon-size:20px}
     @media(max-width:380px){ha-card{padding:12px}.status-grid{gap:6px}.status-button{padding:8px 4px}}
-    @container(max-width:440px){.status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @container(max-width:280px){.status-grid{grid-template-columns:minmax(0,1fr)}}
   `;
   // This deliberately supports only the static paragraphs, lists, bold and code
   // used by the reviewed source card. Escape first; never execute source YAML/JS.
@@ -864,7 +862,7 @@ const heaterFill = !ettervarmeKnown ? '#854d0e' : ettervarmeActive ? '#991b1b' :
         if (!button) return;
         const closing = button.hasAttribute('data-close'), previous = this._selected;
         if (closing) this._selected = null;
-        else if (EXPLANATION_TOPICS.some(topic => topic.key === button.dataset.topic)) this._selected = button.dataset.topic;
+        else if (EXPLANATION_TOPICS.some(topic => topic.key === button.dataset.topic)) this._selected = previous === button.dataset.topic ? null : button.dataset.topic;
         this._renderIfReady();
         if (closing && previous) this.shadowRoot.querySelector(`button[data-topic="${previous}"]`)?.focus({ preventScroll: true });
       });
