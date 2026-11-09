@@ -51,10 +51,18 @@ come from live HA metadata; no second Modbus client or regulator is introduced.
 Pressure guard and vacuum functions are separately optional; old raw signals
 stay in technical explanation details.
 
+Version 1.4.0, 2026-11-09, relocates native mode-duration editing to the control
+card and removes filter controls and repeated temperature readings from settings.
+The explanations distinguish temperature regulation, demand-control season and
+ECO heater-threshold reduction. These are documented functions, not new real-unit
+verification. The numeric ECO example is illustrative, not a calculated live limit.
+
 ## External software and documentation
 
 | Source | Use in this package |
 | --- | --- |
+| [Systemair SAVE VSR 300/500 service manual](https://shop.systemair.com/upload/assets/SAVE_VSR_300_500_SERVICE_AND_ACCESSORIES_EN_V01_1_12_0.PDF) | Temperature-control choices, ECO heater offset and filter-period reset behavior; documented behavior, not a new local test. |
+| [Systemair SAVE Modbus reference](https://shopng.systemair.com/upload/assets/SAVE_MODBUS_VARIABLE_LIST_20210301_REV36.PDF?58f78dfe=) | Demand-control season and separate RH summer/winter setpoints. This online reference is older than the project handover register PDF; it is not presented as a reread of that attachment. |
 | [Home Assistant custom cards](https://contributors.home-assistant.io/frontend/custom-ui/card/) | Public custom-card API: `hass`, custom elements and card registration. |
 | [Home Assistant card editor](https://contributors.home-assistant.io/frontend/custom-ui/card-editor/) | Public `getConfigForm` API and entity selectors. |
 | [HA action event for custom cards](https://contributors.home-assistant.io/blog/2023/07/07/action-event-custom-cards/) | Native `hass-action` with `tap_action: more-info`, using the configured entity. |

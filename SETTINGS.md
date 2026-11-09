@@ -1,4 +1,4 @@
-# Innstillinger – kortpakke 1.3.1
+# Innstillinger – kortpakke 1.4.0
 
 Et valgfritt fjerde kort i samme JavaScript-pakke. Oppdater gjennom HACS,
 last dashboardet på nytt og legg til **Systemair Innstillinger** fra kortvelgeren:
@@ -11,14 +11,13 @@ Et komplett eksempel finnes i [04-Innstillinger.yaml](examples/04-Innstillinger.
 Kontroller entitetskoblingene i grafisk editor. Startverdiene er eksempler fra
 referanseoppsettet, ikke universelle navn. Tøm valgfrie felt som ikke brukes.
 
-## Fire temaer
+## Tre temaer
 
 | Tema | Innhold |
 |---|---|
-| Temperatur og ECO | Temperatursettpunkt, ECO-valg, ECO-offset og avlesninger av reguleringstype, aktiv sesong og temperaturer. |
+| Temperatur og ECO | Temperatursettpunkt, ECO-valg, senking av ettervarmegrensen og kort avlesning av reguleringsmåte. |
 | Frikjøling | Tillatelse, separat aktiv-status, start/slutt, temperaturgrenser og minste tilluft-/avtrekksnivå. |
-| Filter og vedlikehold | Rapportert varsel/alarm, neste filterskift og filterintervall i måneder. Ingen filterkvitteringsknapp. |
-| System | Kortversjon, integrasjonsversjoner fra valgt HA update-entitet, eventuell HA-versjon, modusvarigheter og dette kortets entitetskilder. |
+| System | Kortversjon, integrasjonsversjoner fra valgt HA update-entitet, eventuell HA-versjon og dette kortets entitetskilder. |
 
 Trykk på et temafelt for å åpne det, og på samme felt igjen for å lukke.
 Lukk nederst beholder fokus på temafeltet. Temaene kan skjules enkeltvis i
@@ -55,11 +54,18 @@ ingen sensorer, automasjoner eller bakgrunnsstyring.
 
 Temperatursettpunktet er integrasjonens number-entitet for tilluftsettpunkt.
 Rapportert reguleringstype vises separat; verdien gjøres ikke om til et eget
-romsettpunkt. Filteropplysninger er rapporterte varsler og tid, ikke målt
-filtermotstand eller en beregnet prosentvis filterhelse.
+romsettpunkt. Målte tillufts-/avtrekkstemperaturer finnes i Cockpit.
+Sesong for behovsstyring forklares under Auto i Status og forklaringer.
+ECO-senkingen forklares under ECO; eksemplet er ikke en beregnet regulatorgrense.
 
-Ildsted-varigheten er en sensor i referanseintegrasjonen og vises derfor uten
-redigering. Boost, Party, Borte og Ferie kan redigeres via native number-entiteter.
+Modusvarigheter finnes i Kontrollpanel bak **Varigheter**, ved siden av Ferie.
+Ildsted er en sensor i referanseintegrasjonen og vises derfor uten redigering.
+Boost, Party, Borte og Ferie kan redigeres via native number-entiteter.
+Endring av varighet starter ingen modus. Valgene bruker utkast og **Bruk**.
+
+Filterskift registreres og filterperioden endres på aggregatets betjeningspanel.
+Innstillinger har ingen filterbetjening. Cockpit beholder filtervarsler, og
+Filter-forklaringen beholder rapportert intervall og tidsopplysninger.
 Det legges ikke inn Stopp- eller Filter byttet-knapper.
 
 Integrasjonsversjonen leses bare fra attributtene `installed_version` og
@@ -84,7 +90,12 @@ eller lokale HA-filene endres ikke av pakken.
    deretter fra dashboardet hvis det er erstattet. Entiteter slettes separat
    først etter kontroll av andre brukere.
 
-Cockpit og Kontrollpanel har uendret kode og oppsett bortsett fra pakkeversjonen.
+Cockpit er uendret bortsett fra pakkeversjonen. Kontrollpanelets tidligere
+modusbetjening og entitetskart beholdes, med Varigheter som nytt felt.
+Kontroller varighetskoblingene i Kontrollpanelet: egne navn fra Innstillinger
+flyttes ikke automatisk mellom kort. Gamle fjernede Innstillinger-koblinger
+kan bli liggende i lagret YAML, men vises ikke og kan ikke skrives fra kortet.
+De kan ryddes manuelt uten å slette HA-entitetene.
 Tidligere lokale termiske estimater blir ikke gjeninnført bare fordi de fantes
 i Service-kortet. Huslast beregnes fortsatt i forklaringskortet uten egen historikk.
 
@@ -92,15 +103,15 @@ i Service-kortet. Huslast beregnes fortsatt i forklaringskortet uten egen histor
 
 | Tidligere gruppe | Plass i kortpakken |
 |---|---|
-| Alarmer og filter | Cockpit-varsler; Filter-forklaring; intervall i Innstillinger. |
-| Drift og modus | Uendret Cockpit/Kontrollpanel; regulering/sesong i forklaringer. |
+| Alarmer og filter | Cockpit-varsler og Filter-forklaring; registrering/intervall på aggregatets panel. |
+| Drift og modus | Cockpit/Kontrollpanel; regulering i Temperatur, behovssesong i Auto-forklaring. |
 | Temperatur og fukt | Cockpit og relevante forklaringer; settpunkt i Innstillinger. |
 | Luftmengde og RPM | Uendret Cockpit og forklaringer med kildehistorikk. |
 | Frikjøling | Aktivitet og diagnose i forklaringen; native innstillinger i Innstillinger. |
 | ECO og ettervarme | Status/pådrag i forklaringene; gamle signaler under Teknisk grunnlag; ECO-valg/offset i Innstillinger. |
 | Termiske estimater | Huslast beholdes som kortberegning; tidligere lokale estimater gjenopprettes ikke automatisk. |
 | Elektrisk effekt/energi | Valgfrie målte kilder i Elektrisk-forklaringen. |
-| Tidsstyrte moduser | Kontrollpanel beholdes; native varigheter under System. |
+| Tidsstyrte moduser | Kontrollpanel; native varigheter bak Varigheter ved siden av Ferie. |
 | Eksterne innganger | Hette beholdes; trykkvakt og støvsugermodus er valgfrie emner. |
 | Integrasjonsoppdatering | Opplysninger og native mer-info under System. |
 
@@ -108,11 +119,16 @@ i Service-kortet. Huslast beregnes fortsatt i forklaringskortet uten egen histor
 
 Add `custom:vsr300-settings-card` after updating the existing HACS package.
 Map each entity in the native visual editor and clear unused optional fields.
-The four sections cover temperature/ECO, free cooling, filter maintenance and
-system information, including available mode durations. Number bounds/steps
+The three sections cover temperature/ECO, free cooling and system information.
+Mode durations are edited through Varigheter in the control card. Verify its
+duration bindings; custom mappings are not copied between separate cards.
+Supply/extract readings remain in Cockpit; filter registration/intervals belong
+on the unit panel. Old retired settings fields are ignored as write targets. Number bounds/steps
 and select choices come from HA. Numeric/time/select drafts require Apply;
 switches act directly on known binary states. Reported values are never
 optimistically replaced. Partial time-write failure is explicit. This is a
 frontend for existing integration services, with no separate Modbus owner.
 
 ![Innstillinger med simulerte HA-verdier](images/settings-mobile-simulated.png)
+
+![Modusvarigheter i Kontrollpanel med simulerte HA-verdier](images/control-durations-simulated.png)

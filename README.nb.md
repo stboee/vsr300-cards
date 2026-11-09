@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.3.1**.
+med grafisk valg av entiteter. Kortversjon: **1.4.0**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -23,7 +23,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.3.1`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.4.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -72,6 +72,23 @@ lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
+## Endringer i 1.4.0
+
+**Varigheter** ved siden av Ferie i Kontrollpanel åpner fire justerbare
+modusvarigheter. Å åpne/lukke feltet starter ingen modus. Ildsted forblir en
+avlesning inntil integrasjonen tilbyr en justerbar entitet. Kontroller de fem
+varighetskoblingene i Kontrollpanelets editor. Egne koblinger fra Innstillinger
+flyttes ikke automatisk mellom kortene.
+
+Innstillinger inneholder nå temperatur/ECO, frikjøling og systemopplysninger.
+Tillufts-/avtrekkstemperatur blir i Cockpit. Filterskift og intervallendringer
+håndteres på aggregatets panel; varsler og forklaring beholdes i de andre kortene.
+Sesong for behovsstyring forklares under Auto. Temperaturregulering og ECO-senking
+av ettervarmegrensen har fått tydeligere forklaringer.
+
+Behold kortoppsettene. Gamle ubrukte Innstillinger-felt kan ligge igjen i YAML,
+men vises ikke eller brukes som skrivemål. Se [overgangsveiledningen](SETTINGS.md).
+
 ## Nye kort og emner i 1.3.0
 
 Cockpit og Kontrollpanel beholder kode og oppsett. Status og forklaringer får
@@ -86,7 +103,7 @@ Legg til **Systemair Innstillinger** fra kortvelgeren, eller bruk:
 type: custom:vsr300-settings-card
 ```
 
-Kortet samler temperatur/ECO, frikjøling, filter og systemopplysninger. Behold
+Kortet samler temperatur/ECO, frikjøling og systemopplysninger. Behold
 det gamle Service-kortet til koblinger og betjening er bekreftet. Se
 [Innstillinger og overgang](SETTINGS.md) og [komplett YAML](examples/04-Innstillinger.yaml).
 

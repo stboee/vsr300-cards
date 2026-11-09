@@ -1,4 +1,34 @@
-# Verifikasjon – 1.3.1 – 2026-11-09
+# Verifikasjon – 1.4.0 – 2026-11-09
+
+## Gjennomført lokalt – 1.4.0
+
+Ni kontrollgrupper består med simulerte HA-data. De omfatter:
+
+- Byte-sammenligning av Cockpit/fellesgrunnlag med 1.3.1 bortsett fra versjonen,
+  samt uendrede standardkoblinger for Cockpit og Kontrollpanel.
+- Tre Innstillinger-temaer, fjernede målinger/filterbetjening og kompatibilitet
+  med eldre oppsett. Gamle filterkoblinger kan ikke brukes som skrivemål.
+- Åpne/lukke Varigheter uten tjenestekall; fire number-kontroller og Ildsted som
+  avlesning. Grenser/trinn kommer fra HA, og bare Bruk sender endrede verdier.
+- Korrekte number-payloads, rapportert verdi adskilt fra utkast, beholdt fokus og
+  utkast gjennom HA-oppdateringer/lukking, ugyldige verdier, utilgjengelige kilder,
+  feilede tjenestekall, dobbeltinnsending, omkobling og tømte felt.
+- Eksisterende Auto/Ildsted-moduskommandoer. Modusknapper blokkeres mens et
+  varighetskall pågår. Varighetskontroller blokkeres ved pågående moduskommando.
+- Videreført frikjøling med klokkeslett, native select, delvis tjenestefeil og
+  manglende metadata. Ukjente bryterstatuser gir ingen på/av-handling.
+- Forklaringer om regulering, sesong i Auto, ECO og filter. Elleve standardemner,
+  valgfrie eksterne funksjoner, teknisk grunnlag og entitetshistorikk videreføres.
+- Native editorskjemaer, tre forklaringskolonner og lyst/mørkt oppsett ved
+  320/360/412/900 px. Synlige kontroller er minst 44 CSS-piksler. Skjermbilder
+  er gjennomgått visuelt og er tydelig merket som simulerte i dokumentasjonen.
+
+Dette er lokal kode-/UI-kontroll og dokumentert funksjonsbeskrivelse (D), ikke
+ny fysisk verifikasjon på vårt aggregat (V). Ingen HA-konfigurasjon, lokal
+sensor, helper, integrasjonskode eller Modbus-kommunikasjon er endret.
+Faktisk HACS-installasjon, native editor og betjening i brukerens HA gjenstår.
+Manifest, filnavn, syntaks, eksempler og sjekksummer kontrolleres før publisering,
+og manifest/JavaScript kontrolleres fra den faktiske releasetaggen etterpå.
 
 ## Installasjonsretting – 1.3.1
 

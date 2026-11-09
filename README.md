@@ -4,7 +4,7 @@ Four Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer**, and optional
 **Systemair Innstillinger**,
 with graphical entity selection. Current card
-version: **1.3.1**. Reference setup: HA 2026.10.2 and
+version: **1.4.0**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -25,7 +25,7 @@ same cards are loaded only once. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.3.1`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.4.0`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -74,6 +74,23 @@ local diagnosis and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
 
+## Changes in 1.4.0
+
+**Varigheter** beside Holiday in the control card opens four editable native
+mode durations. Opening/closing this panel does not start a mode. Ildsted stays
+read-only until the integration exposes a writable entity. Check the five
+existing duration bindings in the control card editor; custom bindings from the
+settings card are not transferred between cards automatically.
+
+Settings now contains temperature/ECO, free cooling and system information.
+Supply/extract readings stay in Cockpit. Filter registration and interval changes
+belong on the unit panel; filter warnings and explanations stay visible elsewhere.
+Demand-control season is explained under Auto, and temperature regulation and
+ECO heater-threshold reduction have clearer explanations.
+
+Keep existing card configurations. Retired settings fields may remain in older
+YAML, but are not displayed or used as write targets. See [settings and migration](SETTINGS.md).
+
 ## New in 1.3.0
 
 Cockpit and control code/configuration are preserved. Explanations gain
@@ -88,7 +105,7 @@ Add **Systemair Innstillinger** from the card picker, or use:
 type: custom:vsr300-settings-card
 ```
 
-The optional fourth card groups temperature/ECO, free cooling, maintenance and
+The optional fourth card groups temperature/ECO, free cooling and
 system information. Number constraints and choices come from HA. No new helper
 or Modbus client is created. Keep the old service card until mappings and
 behaviour have been checked. See [settings and migration](SETTINGS.md) and

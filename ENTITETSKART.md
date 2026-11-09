@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.3.1
+# Entitetskart – kortpakke 1.4.0
 
 Startkoblingene er eksempler fra én installasjon. Kontroller og tilpass alle
 entiteter i grafisk editor. Tøm valgfrie kilder som ikke brukes. Eksisterende
@@ -109,19 +109,12 @@ lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
 | `eco_enabled` | `switch.systemair_save_eco_modus` |
 | `eco_offset` | `number.systemair_save_oko_varmeoffset` |
 | `regulation_mode` | `sensor.systemair_save_regulering` |
-| `active_season` | `sensor.systemair_save_aktiv_sesong` |
-| `supply_temperature` | `sensor.systemair_save_tilluftstemperatur` |
-| `extract_temperature` | `sensor.systemair_save_avtrekkstemperatur` |
 | `free_cooling_enabled` | `switch.systemair_save_frikjoling` |
 | `free_cooling_active` | `binary_sensor.systemair_save_frikjoling_aktiv` |
 | `free_cooling_day_min` | `number.systemair_save_frikjoling_dag_min_temperatur` |
 | `free_cooling_night_high` | `number.systemair_save_frikjoling_natt_hoy_grense` |
 | `free_cooling_night_low` | `number.systemair_save_frikjoling_natt_lav_grense` |
 | `free_cooling_room_cancel` | `number.systemair_save_frikjoling_rom_avbryt_temperatur` |
-| `filter_alarm` | `binary_sensor.systemair_save_filteralarm` |
-| `filter_warning` | `binary_sensor.systemair_save_filtervarsel` |
-| `next_filter_change` | `sensor.systemair_save_neste_filterskift` |
-| `filter_interval` | `number.systemair_save_filterintervall_mnd` |
 | `cooling_start_hour` | `number.systemair_save_frikjoling_start_time` |
 | `cooling_start_minute` | `number.systemair_save_frikjoling_start_min` |
 | `cooling_end_hour` | `number.systemair_save_frikjoling_slutt_time` |
@@ -129,22 +122,16 @@ lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
 | `cooling_min_supply` | `select.systemair_save_frikjoling_min_tilluft` |
 | `cooling_min_extract` | `select.systemair_save_frikjoling_min_avtrekk` |
 | `integration_update` | `update.systemair_modbus_update` |
-| `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
-| `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
-| `party_duration` | `number.systemair_save_party_varighet` |
-| `away_duration` | `number.systemair_save_borte_varighet` |
-| `holiday_duration` | `number.systemair_save_ferietid_varighet` |
 
-## Emnevalg
+Modusvarigheter bruker de eksisterende koblingene i Kontrollpanel. Gamle
+filter-, temperatur- og varighetskoblinger i Innstillinger vises ikke eller
+brukes som skrivemål. HA-entitetene slettes ikke.
 
-Status og forklaringer viser Temperatur, Veksler og Filter som standard.
-`show_temperature`, `show_recovery` og `show_filter` kan skjule dem.
-`show_pressure_guard` og `show_vacuum` er av som standard, uavhengig av om
-tilhørende entiteter finnes. Eldre ECO/TRIAC ligger under Teknisk grunnlag.
+Temperatur, Veksler og Filter kan skjules med `show_temperature`,
+`show_recovery` og `show_filter` i forklaringskortet. `show_pressure_guard` og
+`show_vacuum` er av som standard. Eldre ECO/TRIAC ligger under Teknisk grunnlag.
 
-Innstillinger har fire uavhengige visningsvalg: `show_temperature`,
-`show_cooling`, `show_filter` og `show_system`. Disse gjelder bare det kortet.
-
-Klikk på verdirader åpner valgt HA-entitet. Pådrag og aktiv-status er ulike
-roller. Integrasjonsversjon kommer fra valgt update-entitets attributter; den
-utledes ikke fra kortversjon eller kode på GitHub. Se [Innstillinger](SETTINGS.md).
+Innstillinger har tre visningsvalg: `show_temperature`, `show_cooling` og
+`show_system`. De gjelder bare det kortet. Klikk på verdirader i forklaringene
+åpner valgt HA-entitet. Integrasjonsversjon leses fra valgt update-entitet;
+den utledes ikke fra kortversjon eller kode på GitHub. Se [Innstillinger](SETTINGS.md).

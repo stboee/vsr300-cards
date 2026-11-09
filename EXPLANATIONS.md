@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.3.1
+# Status og forklaringer – 1.4.0
 
 Det tredje kortet i samme pakke som SVG og Kontrollpanel:
 
@@ -24,6 +24,16 @@ Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
   grensen; det er ikke en måling av fysisk balanse eller trykk.
 - Statusfeltene vises i tre kolonner, også på mobil. Teksten kan brytes over
   flere linjer og beholder samme skriftstørrelse.
+
+## Presiseringer i 1.4.0
+
+- Temperaturstyring forklarer regulering etter tilluft, egen romføler og avtrekk.
+- Behovsstyringens Sommer/Vinter-status forklares under Auto, med egne
+  sesongsettpunkt for relativ luftfuktighet. Den betyr ikke at ettervarmen er på.
+- ECO forklarer senking av ettervarmegrensen. Eksemplet 20 °C minus 5 °C er en
+  prinsippforklaring, ikke en beregnet faktisk regulatorgrense.
+- Filter forklarer at registrering og intervallendring gjøres på aggregatets panel.
+  Rapportert filterstatus og intervall beholdes som avlesninger.
 
 ## Nye emner og teknisk grunnlag i 1.3.0
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.0 — 2026-11-09
+
+- Add Varigheter beside Holiday in the control card, with native number controls
+  for Boost/Party/Away/Holiday and a read-only Ildsted duration. Existing mode
+  commands and bindings are preserved; opening the panel never starts a mode.
+- Reuse native constraints, explicit Apply, retained drafts, error reporting and
+  pending-command protection across settings and control. No separate Modbus owner.
+- Remove filter maintenance, supply/extract readings, demand season and mode
+  durations from settings. Filter registration/intervals belong on the unit panel;
+  filter warnings and explanation readouts remain available.
+- Explain temperature-regulation alternatives, demand-control season under Auto,
+  and ECO heater-threshold reduction with an explicitly illustrative example.
+- Keep Cockpit unchanged apart from version. Preserve HACS manifest and existing
+  mappings; custom duration bindings must be selected in the control card.
+
 ## 1.3.1 — 2026-11-09
 
 - Fix installation/update failure caused by the missing root `hacs.json` in
