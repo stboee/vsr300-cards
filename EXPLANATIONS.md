@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.4.0
+# Status og forklaringer – 1.4.1
 
 Det tredje kortet i samme pakke som SVG og Kontrollpanel:
 
@@ -25,6 +25,18 @@ Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
 - Statusfeltene vises i tre kolonner, også på mobil. Teksten kan brytes over
   flere linjer og beholder samme skriftstørrelse.
 
+## Endringer i 1.4.1
+
+Filter-emnet og dets fire kildefelt er tatt ut. Filteralarmer og grafikk beholdes
+uendret i Cockpit. Gamle `show_filter`-valg og Filter-koblinger i dette kortet
+brukes ikke. Ikke fjern Cockpits filterkoblinger.
+
+Veksler viser **Velg entitet** når koblingen er tom, **Entitet ikke funnet**
+ved en manglende entitet, og **Pådrag ukjent** ved en eksisterende kilde uten
+numerisk verdi. Velg samme **Vekslerpådrag (%)**-entitet som i Cockpit, hvis begge
+kort brukes. Kortene lagrer koblingene hver for seg. Eksisterende oppsett fylles
+ikke med en gjettet kilde. Null vises som 0 %, og kilden kan åpnes i HA.
+
 ## Presiseringer i 1.4.0
 
 - Temperaturstyring forklarer regulering etter tilluft, egen romføler og avtrekk.
@@ -32,10 +44,8 @@ Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
   sesongsettpunkt for relativ luftfuktighet. Den betyr ikke at ettervarmen er på.
 - ECO forklarer senking av ettervarmegrensen. Eksemplet 20 °C minus 5 °C er en
   prinsippforklaring, ikke en beregnet faktisk regulatorgrense.
-- Filter forklarer at registrering og intervallendring gjøres på aggregatets panel.
-  Rapportert filterstatus og intervall beholdes som avlesninger.
 
-## Nye emner og teknisk grunnlag i 1.3.0
+## Historikk – emner og teknisk grunnlag i 1.3.0
 
 De tre nye emnene kan skjules enkeltvis i grafisk editor. Valgfrie eksterne
 funksjoner aktiveres bare når de er relevante. Eldre ECO-status og TRIAC-råsignal
@@ -48,8 +58,8 @@ HA-filer er nødvendig for å vise de nye integrasjonskildene.
 
 ## Hva kortet gjør selv
 
-De elleve standardfeltene er Balanse, Frikjøling, ECO, Hette, Ettervarme,
-Elektrisk, Huslast, Auto-styring, Temperatur, Veksler og Filter. Temperatur åpner
+De ti standardfeltene er Balanse, Frikjøling, ECO, Hette, Ettervarme,
+Elektrisk, Huslast, Auto-styring, Temperatur og Veksler. Temperatur åpner
 forklaringen Temperaturstyring. Trykkvakt og Sentralstøvsuger er valgfrie og
 skjult som standard. Entitetens tilstedeværelse beviser ikke tilkoblet utstyr. Trykk på et felt for å lese forklaringen og se relevante
 verdier. Trykk på det samme feltet igjen for å lukke teksten, eller på et annet
@@ -147,3 +157,5 @@ House load is calculated from native integration values. No helper,
 button-card dependency or local house-load entity is required. Optional local
 free-cooling diagnoses and measured electrical power remain external HA inputs.
 Check other consumers before removing any old helpers or templates.
+
+Filter-emnet som ble innført i 1.3.0 er fjernet fra forklaringskortet i 1.4.1.

@@ -1,5 +1,5 @@
 # VSR300 – Innstillinger
-# Kortpakke: 1.4.0
+# Kortpakke: 1.4.1
 # Kontroller entitets-ID-er og tilpass dem til din egen HA.
 type: custom:vsr300-settings-card
 title: "Innstillinger"
@@ -21,7 +21,5 @@ entities:
   cooling_end_minute: number.systemair_save_frikjoling_slutt_min
   cooling_min_supply: select.systemair_save_frikjoling_min_tilluft
   cooling_min_extract: select.systemair_save_frikjoling_min_avtrekk
-  integration_update: update.systemair_modbus_update
 show_temperature: true
 show_cooling: true
-show_system: true

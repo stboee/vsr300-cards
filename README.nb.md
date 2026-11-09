@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.4.0**.
+med grafisk valg av entiteter. Kortversjon: **1.4.1**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -23,7 +23,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.4.0`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.4.1`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -72,7 +72,22 @@ lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.4.0
+## Endringer i 1.4.1
+
+Varigheter i Kontrollpanel åpner først fem kompakte modusvalg med gjeldende tid.
+Velg en modus for å åpne bare dens varighetsfelt; nytt trykk lukker feltet.
+Dette starter ingen modus. Lukking av hele panelet nullstiller valget og
+beholder eventuelle utkast.
+
+Innstillinger har nå bare Temperatur og ECO samt Frikjøling. System er fjernet.
+Filter er fjernet fra Status og forklaringer. Cockpit beholder filtergrafikk og alarmer.
+
+**Veksler viser ukjent?** Kortene lagrer koblingene hver for seg. Velg samme
+**Vekslerpådrag (%)**-entitet i forklaringskortets editor som i Cockpit.
+Et tomt felt viser nå **Velg entitet**. En entitet som ikke finnes skilles fra
+ukjent/utilgjengelig måleverdi. Kortet gjetter ingen kilde eller prosent.
+
+## Historikk – 1.4.0
 
 **Varigheter** ved siden av Ferie i Kontrollpanel åpner fire justerbare
 modusvarigheter. Å åpne/lukke feltet starter ingen modus. Ildsted forblir en
@@ -82,14 +97,14 @@ flyttes ikke automatisk mellom kortene.
 
 Innstillinger inneholder nå temperatur/ECO, frikjøling og systemopplysninger.
 Tillufts-/avtrekkstemperatur blir i Cockpit. Filterskift og intervallendringer
-håndteres på aggregatets panel; varsler og forklaring beholdes i de andre kortene.
+håndteres på aggregatets panel; varsler beholdes i Cockpit. Den tidligere Filter-forklaringen ble fjernet i 1.4.1.
 Sesong for behovsstyring forklares under Auto. Temperaturregulering og ECO-senking
 av ettervarmegrensen har fått tydeligere forklaringer.
 
 Behold kortoppsettene. Gamle ubrukte Innstillinger-felt kan ligge igjen i YAML,
 men vises ikke eller brukes som skrivemål. Se [overgangsveiledningen](SETTINGS.md).
 
-## Nye kort og emner i 1.3.0
+## Historikk – 1.3.0
 
 Cockpit og Kontrollpanel beholder kode og oppsett. Status og forklaringer får
 Temperaturstyring, Veksler og Filter; trykkvakt og sentralstøvsuger er valgfrie og
@@ -103,7 +118,7 @@ Legg til **Systemair Innstillinger** fra kortvelgeren, eller bruk:
 type: custom:vsr300-settings-card
 ```
 
-Kortet samler temperatur/ECO, frikjøling og systemopplysninger. Behold
+Kortet samler temperatur/ECO og frikjøling. Behold
 det gamle Service-kortet til koblinger og betjening er bekreftet. Se
 [Innstillinger og overgang](SETTINGS.md) og [komplett YAML](examples/04-Innstillinger.yaml).
 
@@ -146,7 +161,7 @@ SVG-ens totale bredde og skriftstørrelser er beholdt.
 - `≈` markerer integrasjonens estimerte luftmengde. **Vekslerpådrag** er et pådrag, ikke målt virkningsgrad. Ettervarme vises i prosent, uten wattestimat.
 - Hvert aktivt tilkoblet alarmsignal får egen rad. A/B/C er samlealarmer og kan overlappe andre indikasjoner.
 - Luftveiene og animasjonene er skjematiske.
-- **Status og forklaringer** har elleve statusfelt som standard, med to valgfrie eksterne funksjoner og forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Lokal frikjølingsdiagnose og døgnmaksimum er valgfrie eksisterende HA-kilder som skilles fra integrasjonens rapportering. Trykk på verdiradene i forklaringene for å åpne tilhørende HA-entitet og tilgjengelig historikk. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
+- **Status og forklaringer** har ti statusfelt som standard, med to valgfrie eksterne funksjoner og forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Lokal frikjølingsdiagnose og døgnmaksimum er valgfrie eksisterende HA-kilder som skilles fra integrasjonens rapportering. Trykk på verdiradene i forklaringene for å åpne tilhørende HA-entitet og tilgjengelig historikk. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
 
 [Entitetskart](ENTITETSKART.md) · [Endringslogg](CHANGELOG.md) ·
 [Verifikasjon og begrensninger](VERIFIKASJON.md) · [Kilder](SOURCES.md) · [MIT-lisens](LICENSE)

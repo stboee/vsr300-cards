@@ -1,8 +1,8 @@
-# Entitetskart – kortpakke 1.4.0
+# Entitetskart – kortpakke 1.4.1
 
-Startkoblingene er eksempler fra én installasjon. Kontroller og tilpass alle
-entiteter i grafisk editor. Tøm valgfrie kilder som ikke brukes. Eksisterende
-lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
+Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
+korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke
+fylt automatisk. Ingen HA-entiteter slettes av kortpakken.
 
 ## Cockpit / SVG
 
@@ -76,7 +76,7 @@ lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
 | `supply_rpm` | `sensor.systemair_save_tilluftsvifte_hastighet_rpm` |
 | `extract_rpm` | `sensor.systemair_save_avtrekksvifte_hastighet_rpm` |
 | `outdoor_temperature` | `sensor.systemair_save_utetemperatur` |
-| `free_cooling_state` | Tom som standard |
+| `free_cooling_state` | — |
 | `free_cooling_reliable` | `binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige` |
 | `free_cooling_diagnosis` | `sensor.systemair_frikjoling_kandidat` |
 | `outdoor_max_24h` | `sensor.systemair_ute_max_siste_24t` |
@@ -93,10 +93,6 @@ lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
 | `regulation_mode` | `sensor.systemair_save_regulering` |
 | `active_season` | `sensor.systemair_save_aktiv_sesong` |
 | `recovery_output` | `sensor.systemair_save_varmegjenvinning` |
-| `filter_alarm` | `binary_sensor.systemair_save_filteralarm` |
-| `filter_warning` | `binary_sensor.systemair_save_filtervarsel` |
-| `next_filter_change` | `sensor.systemair_save_neste_filterskift` |
-| `filter_interval` | `number.systemair_save_filterintervall_mnd` |
 | `legacy_triac` | `sensor.systemair_save_triac_control_signal` |
 | `legacy_eco` | `binary_sensor.systemair_save_oko_funksjon_aktiv` |
 | `pressure_guard_active` | `binary_sensor.systemair_save_trykkvakt_aktiv` |
@@ -121,17 +117,24 @@ lagrede entitetskart overstyres ikke; nye roller må velges eksplisitt.
 | `cooling_end_minute` | `number.systemair_save_frikjoling_slutt_min` |
 | `cooling_min_supply` | `select.systemair_save_frikjoling_min_tilluft` |
 | `cooling_min_extract` | `select.systemair_save_frikjoling_min_avtrekk` |
-| `integration_update` | `update.systemair_modbus_update` |
 
-Modusvarigheter bruker de eksisterende koblingene i Kontrollpanel. Gamle
-filter-, temperatur- og varighetskoblinger i Innstillinger vises ikke eller
-brukes som skrivemål. HA-entitetene slettes ikke.
+## Visningsvalg og overgang
 
-Temperatur, Veksler og Filter kan skjules med `show_temperature`,
-`show_recovery` og `show_filter` i forklaringskortet. `show_pressure_guard` og
-`show_vacuum` er av som standard. Eldre ECO/TRIAC ligger under Teknisk grunnlag.
+Forklaringskortet har ti standardemner. `show_temperature` og `show_recovery`
+kan skjule Temperatur/Veksler. `show_pressure_guard` og `show_vacuum` er av som
+standard; et eksisterende signal beviser ikke fysisk tilkoblet utstyr.
+Innstillinger har `show_temperature` og `show_cooling`.
 
-Innstillinger har tre visningsvalg: `show_temperature`, `show_cooling` og
-`show_system`. De gjelder bare det kortet. Klikk på verdirader i forklaringene
-åpner valgt HA-entitet. Integrasjonsversjon leses fra valgt update-entitet;
-den utledes ikke fra kortversjon eller kode på GitHub. Se [Innstillinger](SETTINGS.md).
+System og update-koblingen er fjernet fra Innstillinger. Filter med fire
+kilder og `show_filter` er fjernet fra forklaringskortet. Gamle ubrukte felt
+kan ligge igjen i eldre YAML, men vises ikke eller brukes som skrivemål.
+Cockpits filterkoblinger, varsler og grafikk beholdes.
+
+Modusvarigheter bruker Kontrollpanelets eksisterende fem koblinger. Egne
+navn flyttes ikke automatisk fra et annet kort. Varigheter åpner først en
+kompakt meny; bare valgt modus viser editor/avlesning.
+
+Veksler krever `recovery_output` i forklaringskortet. Velg samme entitet som i
+Cockpit når begge brukes. Tom kobling, manglende entitet og utilgjengelig
+verdi skilles. 100 % er pådrag, ikke virkningsgrad. Pådrag og aktiv-status
+er ulike signaler. Klikk på verdirader åpner valgt HA-entitet.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.1 — 2026-11-09
+
+- Compact duration navigation: Varigheter first shows five modes with their
+  reported durations. Selecting one opens only its editor; selecting it again
+  collapses. Closing resets selection while retaining drafts. No navigation
+  action starts a mode or writes a duration.
+- Remove System and its update-entity binding from Settings. It now contains
+  only temperature/ECO and free cooling.
+- Remove Filter and its four source fields from Status og forklaringer.
+  Cockpit filter graphics, alarms and bindings are preserved.
+- Distinguish missing recovery binding, missing entity and unavailable/nonnumeric
+  value. Show mapping guidance without guessing a source or percentage. Both
+  cards agree when explicitly bound to the same entity; existing HA mappings
+  still require checking in the user's card editor.
+
 ## 1.4.0 — 2026-11-09
 
 - Add Varigheter beside Holiday in the control card, with native number controls

@@ -1,6 +1,35 @@
-# Verifikasjon – 1.4.0 – 2026-11-09
+# Verifikasjon – 1.4.1 – 2026-11-09
 
-## Gjennomført lokalt – 1.4.0
+## Gjennomført lokalt – 1.4.1
+
+Ti kontrollgrupper består med simulerte HA-data:
+
+- Cockpit/fellesgrunnlag er byte-identisk med 1.4.0 bortsett fra pakkeversjonen.
+  Cockpit og Kontrollpanel har uendrede standardkoblinger.
+- Fem kompakte varighetsvalg uten editor ved første åpning. Kun valgt felt
+  åpnes; gjentatt trykk lukker. Hele panelet lukker og nullstiller valget,
+  mens utkast bevares. Navigasjon sender ingen tjenestekall.
+- Fire native number-varigheter med grenser/trinn, Bruk, feil, tilgjengelighet,
+  dobbeltrykkbeskyttelse, omkobling og tømte felt. Ildsted er kun avlesning.
+- Kun Temperatur/ECO og Frikjøling i Innstillinger. System og update-koblingen
+  er borte, også med eldre lagrede oppsett. Filter vises ikke i forklaringskortet.
+- Veksler og Cockpit viser begge 100 % når samme testentitet er valgt.
+  Tom/manglende/utilgjengelig kilde skilles uten fallback; 0 % og historikk
+  fungerer. Cockpit viser fortsatt en aktiv filteralarm.
+- Tidligere temperatur-/ECO-/frikjølingskontroller, delvis tidsfeil, teknisk
+  grunnlag, moduskommandoer, entitetsvalg og ti standardemner videreføres.
+- Native editorskjemaer, tre forklaringskolonner, minimum 44 CSS-piksler for
+  synlige kontroller og ingen horisontal overflyt ved 320/360/412/900 px i lyst
+  og mørkt tema. Første varighetsnivå er under 380 CSS-piksler i testoppsettet.
+
+Dette er lokale kode-/UI-kontroller. Den faktiske koblingen som ga «Pådrag
+ukjent» i brukerens HA er ikke lest eller endret. Mest sannsynlig årsak er
+manglende/annen entitetskobling, men den må kontrolleres i kortets editor.
+Ingen HA-konfigurasjon, Modbus, sensor, helper eller integrasjonskode er endret.
+Faktisk installasjon og betjening i HA gjenstår. HACS-manifest og releasefil
+skal kontrolleres fra den faktiske taggen etter publisering.
+
+## Historisk kontrollgrunnlag – 1.4.0
 
 Ni kontrollgrupper består med simulerte HA-data. De omfatter:
 

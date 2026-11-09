@@ -91,10 +91,6 @@
       "regulation_mode": "sensor.systemair_save_regulering",
       "active_season": "sensor.systemair_save_aktiv_sesong",
       "recovery_output": "sensor.systemair_save_varmegjenvinning",
-      "filter_alarm": "binary_sensor.systemair_save_filteralarm",
-      "filter_warning": "binary_sensor.systemair_save_filtervarsel",
-      "next_filter_change": "sensor.systemair_save_neste_filterskift",
-      "filter_interval": "number.systemair_save_filterintervall_mnd",
       "legacy_triac": "sensor.systemair_save_triac_control_signal",
       "legacy_eco": "binary_sensor.systemair_save_oko_funksjon_aktiv",
       "pressure_guard_active": "binary_sensor.systemair_save_trykkvakt_aktiv"
@@ -103,7 +99,6 @@
     "balance_tolerance": 15,
     "show_temperature": true,
     "show_recovery": true,
-    "show_filter": true,
     "show_pressure_guard": false,
     "show_vacuum": false
   },
@@ -126,11 +121,9 @@
       "cooling_end_hour": "number.systemair_save_frikjoling_slutt_time",
       "cooling_end_minute": "number.systemair_save_frikjoling_slutt_min",
       "cooling_min_supply": "select.systemair_save_frikjoling_min_tilluft",
-      "cooling_min_extract": "select.systemair_save_frikjoling_min_avtrekk",
-      "integration_update": "update.systemair_modbus_update"
+      "cooling_min_extract": "select.systemair_save_frikjoling_min_avtrekk"
     },
     "show_temperature": true,
-    "show_cooling": true,
-    "show_system": true
+    "show_cooling": true
   }
 }

@@ -57,6 +57,11 @@ The explanations distinguish temperature regulation, demand-control season and
 ECO heater-threshold reduction. These are documented functions, not new real-unit
 verification. The numeric ECO example is illustrative, not a calculated live limit.
 
+Version 1.4.1 refines duration navigation, removes System/Filter sections and
+adds recovery-binding diagnostics. The actual user's card mappings have not
+been read or changed. Cross-card agreement is locally tested with simulated
+HA states; it is not a new real-unit measurement.
+
 ## External software and documentation
 
 | Source | Use in this package |
