@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.3.0 — 2026-11-09
+
+- Add optional `custom:vsr300-settings-card`: graphical temperature/ECO,
+  free-cooling, filter-maintenance and system sections with native entity editing.
+- Numeric bounds/steps and select choices come from HA. Numeric/time/select
+  drafts require Apply, retain edits through HA updates, and never replace
+  reported values optimistically. Unknown switches cannot be toggled.
+- Time edits validate both native fields before sending; partial failure is
+  explicit. Service errors preserve drafts; pending submissions block duplicates.
+- Add temperature regulation, recovery output and filter explanations, retaining
+  three columns and all existing topics. Pressure guard/vacuum topics are
+  optional and hidden by default; old ECO/TRIAC sources are expandable details.
+- Existing saved entity mappings remain authoritative. New sources must be
+  selected in the visual editor; missing values stay unknown.
+- Cockpit, control, shared code and their default bindings are unchanged apart
+  from the package version. No new Modbus owner, helper, sensor or automation.
+
 ## 1.2.3 — 2026-11-03
 
 - Entity rows in Status og forklaringer open their mapped HA entity through

@@ -1,6 +1,6 @@
-# Status og forklaringer – 1.2.3
+# Status og forklaringer – 1.3.0
 
-Et valgfritt tredje kort i samme pakke som SVG og Kontrollpanel:
+Det tredje kortet i samme pakke som SVG og Kontrollpanel:
 
 ```yaml
 type: custom:vsr300-explanations-card
@@ -25,10 +25,23 @@ Bytt til dine entiteter og tøm valgfrie felt du ikke bruker.
 - Statusfeltene vises i tre kolonner, også på mobil. Teksten kan brytes over
   flere linjer og beholder samme skriftstørrelse.
 
+## Nye emner og teknisk grunnlag i 1.3.0
+
+De tre nye emnene kan skjules enkeltvis i grafisk editor. Valgfrie eksterne
+funksjoner aktiveres bare når de er relevante. Eldre ECO-status og TRIAC-råsignal
+vises under Teknisk grunnlag i de respektive forklaringene. Disse bruker egne
+valgbare kilder og erstatter ikke de vanlige statusene eller pådragsprosenten.
+
+Eksisterende lagrede entitetskart overstyres ikke. Nye kildefelt som mangler i et
+gammelt oppsett forblir tomme og må velges i editoren. Ingen endring av lokale
+HA-filer er nødvendig for å vise de nye integrasjonskildene.
+
 ## Hva kortet gjør selv
 
-De åtte feltene er Balanse, Frikjøling, ECO, Hette, Ettervarme, Elektrisk,
-Huslast og Auto-styring. Trykk på et felt for å lese forklaringen og se relevante
+De elleve standardfeltene er Balanse, Frikjøling, ECO, Hette, Ettervarme,
+Elektrisk, Huslast, Auto-styring, Temperatur, Veksler og Filter. Temperatur åpner
+forklaringen Temperaturstyring. Trykkvakt og Sentralstøvsuger er valgfrie og
+skjult som standard. Entitetens tilstedeværelse beviser ikke tilkoblet utstyr. Trykk på et felt for å lese forklaringen og se relevante
 verdier. Trykk på det samme feltet igjen for å lukke teksten, eller på et annet
 felt for å bytte forklaring. **Lukk** nederst skjuler også forklaringen.
 Menyvalget gjelder hvert kort for seg,
@@ -108,10 +121,13 @@ eller tøm feltet for å bruke bare rapporterte integrasjonsverdier.
 
 Add **Systemair Status og forklaringer** after updating the existing HACS
 package. Configure every entity you use in the native visual editor; clear
-unused optional fields. The eight topics, explanations and source readouts
+unused optional fields. The original topics, explanations and source readouts
 are retained from the maintainer's supplied card. Selection is local to each
 card: tap the selected tile again to close it, or use Close below the text.
-The tiles keep three columns on mobile without smaller font sizes.
+The tiles keep three columns on mobile without smaller font sizes. Version 1.3.0
+adds temperature regulation, recovery output and filter topics. Optional external
+functions default to hidden; older ECO/TRIAC signals have expandable technical rows.
+Existing saved mappings are not backfilled with installation-specific defaults.
 Tap any entity row in an explanation to open its mapped HA entity and available
 history. The label, value and optional source ID share one native button,
 including keyboard support. The explanation stays open. Missing entities have

@@ -43,6 +43,14 @@ integration entity IDs. Screenshots use simulated states and placeholder icons.
 The HA configuration export, register PDF and original local YAML card are not
 part of this repository. The converted explanations card is included from 1.2.0.
 
+Version 1.3.0, 2026-11-09, adds the optional graphical settings card and three
+new explanation topics. Baseline content was HA-diagnose.txt 4.8.3 (2026-10-21),
+reviewed against Howard v1.3.0 number/select/sensor/binary-sensor code. It is not
+an export of the currently installed HA configuration. Number limits and choices
+come from live HA metadata; no second Modbus client or regulator is introduced.
+Pressure guard and vacuum functions are separately optional; old raw signals
+stay in technical explanation details.
+
 ## External software and documentation
 
 | Source | Use in this package |
@@ -52,6 +60,8 @@ part of this repository. The converted explanations card is included from 1.2.0.
 | [HA action event for custom cards](https://contributors.home-assistant.io/blog/2023/07/07/action-event-custom-cards/) | Native `hass-action` with `tap_action: more-info`, using the configured entity. |
 | [HA core 2026.10.2 frontend manifest](https://github.com/home-assistant/core/blob/2026.10.2/homeassistant/components/frontend/manifest.json) | Reference frontend version 20260930.4 for API compatibility review. |
 | [Howard Systemair Modbus v1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus/tree/v1.3.0) | Source of the reference entities and their documented/code-derived meanings. |
+| [Howard v1.3.0 numbers](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/number.py) | Existing number services, bounds, steps and units; numeric values are not written by another Modbus client. |
+| [Howard v1.3.0 selects](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/select.py) | Free-cooling minimum fan-level options and select service. |
 | [Howard v1.3.0 binary sensors](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/v1.3.0/custom_components/systemair_modbus/binary_sensor.py) | A/B/C summary alarm, filter alarm and filter warning sources. |
 | [HA frontend schema types 20260930.4](https://github.com/home-assistant/frontend/blob/20260930.4/src/components/ha-form/types.ts) | Native editor field defaults, boolean and select selectors. |
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |

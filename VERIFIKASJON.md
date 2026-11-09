@@ -1,6 +1,45 @@
-# Verifikasjon – 1.2.3 – 2026-11-03
+# Verifikasjon – 1.3.0 – 2026-11-09
 
-## Gjennomført lokalt for 1.2.3
+## Gjennomført lokalt for 1.3.0
+
+- Sju kontrollgrupper består, med konkrete kontroller av fire registrerte
+  kort, nye emner, native innstillinger, feiltilfeller, lagrede koblinger og
+  mobil-/desktopvisning. Ingen tester utføres mot brukerens HA eller aggregat.
+- Cockpit, Kontrollpanel og felleskode er sammenlignet med publisert 1.2.3 og
+  er byte-identiske bortsett fra pakkeversjonen. Standardkoblingene er identiske.
+- Temperaturstyring, Veksler og Filter fungerer som egne forklaringer. De
+  opprinnelige emnene videreføres. Trykkvakt og støvsugermodus er skjult som
+  standard; gamle ECO/TRIAC-signaler ligger i utvidbart teknisk grunnlag.
+- Eksisterende entitetskart beholdes. Nye kildefelt i gamle lagrede oppsett
+  blir ikke automatisk fylt med referanseinstallasjonens navn. Tømte felt
+  forblir tomme, ukjente verdier blir ikke null eller av, og nullpådrag vises.
+- Nye number-felt bruker HA-grenser og trinn. Plus/minus endrer bare utkast,
+  Bruk sender korrekt number.set_value, og rapportert verdi endres først
+  med HA-data. Ugyldige verdier/trinn og manglende metadata sender ingen kall.
+- Switch-valg bruker eksplisitt turn_on/turn_off. Ukjent status gir ingen
+  av/på-handling eller falsk aria-checked=false. Select bruker native alternativer.
+- Start/slutt validerer begge felt før sending og sender bare endrede tall.
+  Delvis feil er synlig; ingen automatisk tilbakerulling. Ved andre tjenestefeil
+  beholdes utkast, og nye innsendinger blokkeres mens et kall pågår.
+- Ulagrede valg, fokus og utvidede detaljer beholdes ved HA-oppdateringer.
+  Remapping sender til riktig entitet. Native mer-info sender ingen innstilling.
+- Integrasjonsversjon leses fra valgt update-entitets attributter. Åpning av
+  mer-info foretar ingen programvareinstallasjon. Modusvarigheter er tilgjengelige
+  som integrasjonen leverer dem, med Ildsted-varighet som avlesning.
+- Alle fire temaer er kontrollert ved 320/360/412/900 px i lyst og mørkt tema,
+  med kontrollhøyder på minst 44 CSS-piksler og uten horisontal overflyt i
+  kontrolloppsettet. Forklaringskortet har fortsatt tre kolonner. Nye bilder
+  er gjennomgått visuelt; de bruker simulerte HA-tilstander og erstatningsikoner.
+- Ingen HTTP/WebSocket/Modbus-klient, bakgrunnspolling, nye HA-entiteter eller
+  helpers opprettes. Bare eksisterende HA-tjenester forespørres ved betjening.
+
+Kildegrunnlaget er Howard v1.3.0-kode og HA-diagnose 4.8.3 fra 2026-10-21.
+Det beviser ikke dagens installerte HA-/integrasjonsversjon eller originale
+Lovelace-oppsett. Faktisk editor, betjening og oppdateringsforløp i HA må bekreftes
+etter installasjon. Klokkeslett består av to separate HA-entiteter og er ikke en
+atomisk endring. Ingen V-verifikasjon på aggregatet er gjennomført i denne runden.
+
+## Historisk kontrollgrunnlag – 1.2.3, 2026-11-03
 
 - 14 kontrollgrupper for Status og forklaringer består, med tidligere
   beregninger, ukjente verdier, lokale kilder, remapping og menyoppførsel.

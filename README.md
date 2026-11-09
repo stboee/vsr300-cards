@@ -1,9 +1,10 @@
 # VSR300 Cards
 
-Three Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
-**Systemair Kontrollpanel**, and optional **Systemair Status og forklaringer**,
+Four Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
+**Systemair Kontrollpanel**, **Systemair Status og forklaringer**, and optional
+**Systemair Innstillinger**,
 with graphical entity selection. Current card
-version: **1.2.3**. Reference setup: HA 2026.10.2 and
+version: **1.3.0**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -14,7 +15,7 @@ version: **1.2.3**. Reference setup: HA 2026.10.2 and
 2. Add **`https://github.com/stboee/vsr300-cards`**, select type **Dashboard** (Plugin/Lovelace in older HACS versions), and add the repository.
 3. Open VSR300 Cards in HACS and download the latest release.
 4. Under **Settings → Dashboards → Resources**, check that the HACS resource is present as a **JavaScript module**: `/hacsfiles/vsr300-cards/vsr300-cards.js`. Keep any query string managed by HACS. If the resource is missing, add it once.
-5. Fully reload the browser and add **Systemair SVG**, **Systemair Kontrollpanel** and optionally **Systemair Status og forklaringer** from the dashboard card picker. Adapt the entities in every card you use.
+5. Fully reload the browser and add **Systemair SVG**, **Systemair Kontrollpanel**, and optionally **Systemair Status og forklaringer** and **Systemair Innstillinger** from the dashboard card picker. Adapt the entities in every card you use.
 
 When switching from manual installation, replace the old
 `/local/vsr300/vsr300-cards.js?...` resource with the HACS resource so that the
@@ -24,7 +25,7 @@ same cards are loaded only once. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.2.3`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.3.0`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -69,6 +70,26 @@ local diagnosis and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
 
+## New in 1.3.0
+
+Cockpit and control code/configuration are preserved. Explanations gain
+temperature control, recovery output and filter topics; pressure guard and vacuum
+functions are optional and hidden by default. Older ECO/TRIAC sources belong
+to expandable technical sections. Existing entity mappings stay authoritative:
+select new source fields in the editor or hide unwanted new topics.
+
+Add **Systemair Innstillinger** from the card picker, or use:
+
+```yaml
+type: custom:vsr300-settings-card
+```
+
+The optional fourth card groups temperature/ECO, free cooling, maintenance and
+system information. Number constraints and choices come from HA. No new helper
+or Modbus client is created. Keep the old service card until mappings and
+behaviour have been checked. See [settings and migration](SETTINGS.md) and
+[complete YAML](examples/04-Innstillinger.yaml).
+
 ## Tap values in the SVG card
 
 Tap a value row to open its mapped entity in Home Assistant's standard more-info
@@ -103,13 +124,15 @@ thermal efficiency, and no new history is created by the card.
 - `≈` marks the integration's estimated airflow. **Vekslerpådrag** is control output, not measured heat-recovery efficiency. Heater output is shown in percent, without a watt estimate.
 - Each active configured alarm signal gets its own row. A/B/C are summary alarms and may overlap other indications.
 - The air paths and animations are schematic.
-- **Status og forklaringer** has eight status tiles and explanations, local open/close selection (tap the same tile again to close), three columns on mobile, calculated house load, and optional measured power. It needs neither an input_select helper nor button-card. Local free-cooling diagnosis and 24-hour maximum are optional existing HA sources, clearly separate from integration reports. Tap the entity rows inside explanations to open their mapped HA entity and available history. See [explanations card and migration](EXPLANATIONS.md).
+- **Status og forklaringer** has eleven default status topics plus two optional external functions and explanations, local open/close selection (tap the same tile again to close), three columns on mobile, calculated house load, and optional measured power. It needs neither an input_select helper nor button-card. Local free-cooling diagnosis and 24-hour maximum are optional existing HA sources, clearly separate from integration reports. Tap the entity rows inside explanations to open their mapped HA entity and available history. See [explanations card and migration](EXPLANATIONS.md).
 
 ![Cards rendered with simulated values](images/overview-simulated.png)
 
 ![Light theme rendered with simulated values](images/overview-light-simulated.png)
 
 ![Optional explanations card with simulated values](images/explanations-simulated.png)
+
+![Optional settings card with simulated values](images/settings-mobile-simulated.png)
 
 *Simulated values and placeholder icons; Home Assistant supplies the actual icons.*
 

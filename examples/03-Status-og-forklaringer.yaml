@@ -1,8 +1,7 @@
-# VSR300 – valgfritt Status og forklaringer-kort
-# Kortpakke: 1.2.3
-# Kontroller entitetskoblingene. Valgfrie felt kan tømmes.
+# VSR300 – Status og forklaringer
+# Kortpakke: 1.3.0
 type: custom:vsr300-explanations-card
-title: Status og forklaringer
+title: "Status og forklaringer"
 show_title: true
 entities:
   supply_flow: sensor.systemair_save_tilluft_luftmengde
@@ -35,5 +34,20 @@ entities:
   eco_offset: number.systemair_save_oko_varmeoffset
   overheat_temperature: sensor.systemair_save_overheat_temperature
   air_quality: sensor.systemair_save_luftkvalitet
+  regulation_mode: sensor.systemair_save_regulering
+  active_season: sensor.systemair_save_aktiv_sesong
+  recovery_output: sensor.systemair_save_varmegjenvinning
+  filter_alarm: binary_sensor.systemair_save_filteralarm
+  filter_warning: binary_sensor.systemair_save_filtervarsel
+  next_filter_change: sensor.systemair_save_neste_filterskift
+  filter_interval: number.systemair_save_filterintervall_mnd
+  legacy_triac: sensor.systemair_save_triac_control_signal
+  legacy_eco: binary_sensor.systemair_save_oko_funksjon_aktiv
+  pressure_guard_active: binary_sensor.systemair_save_trykkvakt_aktiv
 show_sources: false
 balance_tolerance: 15
+show_temperature: true
+show_recovery: true
+show_filter: true
+show_pressure_guard: false
+show_vacuum: false
