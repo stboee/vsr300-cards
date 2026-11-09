@@ -1,6 +1,22 @@
-# Verifikasjon – 1.3.0 – 2026-11-09
+# Verifikasjon – 1.3.1 – 2026-11-09
 
-## Gjennomført lokalt for 1.3.0
+## Installasjonsretting – 1.3.1
+
+- Prosjekteieren rapporterte at installasjon av v1.3.0 ble avvist fordi
+  `hacs.json` manglet. Filen manglet i både publisert tag og standardgrenen.
+- `hacs.json` ligger nå i roten og angir navn, `content_in_root: true`,
+  `filename: vsr300-cards.js` og README-visning. Feltene er kontrollert mot
+  [HACS' publiseringsdokumentasjon](https://www.hacs.dev/docs/publish/start/).
+- JSON, felttyper, plassering, filnavn, JavaScript-syntaks, pakkeversjon og
+  sjekksummer er kontrollert lokalt. Hele JavaScript-filen er byte-identisk
+  med 1.3.0 etter normalisering av de to versjonsangivelsene.
+- Publiseringskontrollen skal lese manifestet og JavaScript-filen fra den
+  faktiske releasetaggen, og sammenligne releasefilens SHA-256 med den lokale
+  filen. En fil som bare finnes i `main`, reparerer ikke en gammel tag.
+- Faktisk installasjon/oppdatering med HACS må bekreftes i brukerens HA.
+  Ingen HA-konfigurasjon eller kommunikasjon med aggregatet endres her.
+
+## Historisk kontrollgrunnlag – 1.3.0, 2026-11-09
 
 - Sju kontrollgrupper består, med konkrete kontroller av fire registrerte
   kort, nye emner, native innstillinger, feiltilfeller, lagrede koblinger og

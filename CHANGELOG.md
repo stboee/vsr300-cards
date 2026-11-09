@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.1 — 2026-11-09
+
+- Fix installation/update failure caused by the missing root `hacs.json` in
+  release 1.3.0. Declare the single root-level `vsr300-cards.js` bundle and
+  README rendering explicitly.
+- Publish a new tag and release containing the manifest. A manifest added only
+  to the default branch would not repair installation of the existing tag.
+- Card behavior, layouts and entity mappings are unchanged from 1.3.0; only the
+  displayed package version changes. No Home Assistant configuration changes.
+
 ## 1.3.0 — 2026-11-09
 
 - Add optional `custom:vsr300-settings-card`: graphical temperature/ECO,

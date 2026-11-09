@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.3.0
+# Entitetskart – kortpakke 1.3.1
 
 Startkoblingene er eksempler fra én installasjon. Kontroller og tilpass alle
 entiteter i grafisk editor. Tøm valgfrie kilder som ikke brukes. Eksisterende

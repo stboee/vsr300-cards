@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.3.0**.
+med grafisk valg av entiteter. Kortversjon: **1.3.1**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -23,7 +23,7 @@ Ved overgang fra manuell installasjon erstatter du den gamle ressursen
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.3.0`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.3.1`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -41,6 +41,10 @@ oppsettene, må du også kontrollere og tilpasse alle entitets-ID-er under
 Selve frontendfilen krever ingen omstart av Home Assistant.
 
 ## Oppdatering
+
+Hvis installasjon av 1.3.0 feiler med melding om manglende `hacs.json`, oppdaterer
+du repositoryinformasjonen i HACS og velger **1.3.1 eller nyere**. Denne versjonen
+inneholder den manglende installasjonsfilen. Behold kortene og entitetsvalgene dine.
 
 **HACS:** Installer tilbudt oppdatering i HACS og last nettlesersiden helt på
 nytt, også på mobilen. HACS håndterer filen og ressursversjonen; du trenger ikke

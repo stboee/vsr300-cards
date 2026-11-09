@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.3.0 · 2026-11-09
+/* VSR300 custom cards · version 1.3.1 · 2026-11-09
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.3.0';
+  const VERSION = '1.3.1';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
