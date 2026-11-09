@@ -14,12 +14,14 @@ version: **1.4.1**. Reference setup: HA 2026.10.2 and
 1. In HACS, open the three-dot menu and select **Custom repositories**.
 2. Add **`https://github.com/stboee/vsr300-cards`**, select type **Dashboard** (Plugin/Lovelace in older HACS versions), and add the repository.
 3. Open VSR300 Cards in HACS and download the latest release.
-4. Under **Settings → Dashboards → Resources**, check that the HACS resource is present as a **JavaScript module**: `/hacsfiles/vsr300-cards/vsr300-cards.js`. Keep any query string managed by HACS. If the resource is missing, add it once.
-5. Fully reload the browser and add **Systemair SVG**, **Systemair Kontrollpanel**, and optionally **Systemair Status og forklaringer** and **Systemair Innstillinger** from the dashboard card picker. Adapt the entities in every card you use.
+4. Fully reload the browser and add **Systemair SVG**, **Systemair Kontrollpanel**, and optionally **Systemair Status og forklaringer** and **Systemair Innstillinger** from the dashboard card picker. Adapt the entities in every card you use.
 
-When switching from manual installation, replace the old
-`/local/vsr300/vsr300-cards.js?...` resource with the HACS resource so that the
-same cards are loaded only once. Keep the existing card configurations.
+HACS registers the dashboard resource automatically; no manual resource entry
+is needed for this installation method.
+
+When switching from manual installation, remove the old
+`/local/vsr300/vsr300-cards.js?...` resource so that the cards are loaded only
+once through HACS. Keep the existing card configurations.
 
 ## Manual installation
 

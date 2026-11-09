@@ -1,5 +1,12 @@
 # Changelog
 
+## Documentation — 2026-11-09
+
+- Correct HACS installation instructions in English and Norwegian: HACS
+  registers the dashboard resource automatically. Remove the manual-resource
+  step and clarify removal of an old manual resource when migrating to HACS.
+- Documentation only; card code, version 1.4.1 and release tags are unchanged.
+
 ## 1.4.1 — 2026-11-09
 
 - Compact duration navigation: Varigheter first shows five modes with their
