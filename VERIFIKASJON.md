@@ -1,4 +1,31 @@
-# Verifikasjon – 1.6.0 – 2026-11-10
+# Verifikasjon – 1.6.1 – 2026-11-10
+
+## Gjennomført lokalt – 1.6.1
+
+Tre avgrensede kontrollgrupper består med simulerte HA-data:
+
+- Hele JavaScript-pakken er byte-identisk med 1.6.0 etter fjerning av bare det
+  nye CSS-oppsettet, dets to renderreferanser og versjonsstrengene. Alle fire
+  standardkoblinger er identiske. Cockpit, Kontrollpanel, beregninger og
+  funksjonell kode er uendret.
+- Åpne felt i Innstillinger og Status/forklaringer matcher Kontrollpanelets
+  fylte blå bakgrunn. Grønn aktivitetsmarkering og forgrunn matcher også.
+  Ukjente data og varseltekst bruker samme sterke ravgule fyll; feil er røde.
+  Ti representative tekstpar per tema er målt til minst 6,48:1, over målet
+  på 4,5:1. Tall beholder sin betydning og ordinære, nøytrale presentasjon.
+- Lyst og mørkt tema ved 320/360/412/900 CSS-piksler passer uten horisontal
+  overflyt. Tre statuskolonner, 44-pikslers innstillingskontroller, tydelig
+  tastaturfokus, historikk og utkast gjennom temaendringer består. Åpning,
+  lukking og historikk sendte ingen tjenestekall. Ingen sidefeil eller
+  eksterne forespørsler ble registrert i testnettleseren.
+
+Skjermbilder bruker simulerte data og lokale native MDI-symboler. Dette er
+lokal presentasjonskontroll, ikke en ny test på brukerens HA eller VSR300.
+Ingen HA-konfigurasjon, entiteter, integrasjonskode eller Modbus endres.
+Faktisk HACS-oppdatering og visning i HA gjenstår. Tagg, manifest og
+releasefilens sjekksum kontrolleres etter publisering.
+
+## Historisk kontrollgrunnlag – 1.6.0
 
 ## Gjennomført lokalt – 1.6.0
 

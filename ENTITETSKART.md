@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.6.0
+# Entitetskart – kortpakke 1.6.1
 
 Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
 korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke

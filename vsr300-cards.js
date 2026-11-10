@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.6.0 · 2026-11-10
+/* VSR300 custom cards · version 1.6.1 · 2026-11-10
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.6.0';
+  const VERSION = '1.6.1';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -719,6 +719,24 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     .setting-topic{min-height:144px}.settings-menu{gap:8px}.panel-title ha-icon{color:var(--vsr-secondary)}
     @container(max-width:380px){ha-card{padding:12px}.status-grid,.duration-mode-grid{gap:6px}.status-button,.duration-choice{padding:9px 4px}.setting-topic{min-height:144px}}
   `;
+  // Settings and explanations use the same filled highlights as Control.
+  // Kept separate from UI_STYLE so Control and Cockpit remain unchanged.
+  const STRONG_HIGHLIGHT_STYLE = `
+    :host{--vsr-on-status:light-dark(#ffffff,#101a26)}
+    .status-button[aria-expanded=true],.setting-topic[aria-expanded=true]{background:var(--vsr-blue);border-color:var(--vsr-blue);color:var(--vsr-on-blue);box-shadow:none}
+    .status-button[aria-expanded=true]>ha-icon,.setting-topic[aria-expanded=true]>ha-icon{color:inherit}
+    .status-button[aria-expanded=true] .reading:not(.state-chip),.status-button[aria-expanded=true] .kind:not(.state-chip),.setting-topic[aria-expanded=true] .setting-reading,.setting-topic[aria-expanded=true] .setting-sub{color:var(--vsr-on-blue)}
+    @media(hover:hover){.status-button[aria-expanded=true]:hover,.setting-topic[aria-expanded=true]:hover{box-shadow:inset 0 0 0 1px var(--vsr-on-blue)}}
+    .state-chip[data-tone=active],.status-button .reading.state-chip[data-tone=active],.status-button .kind.state-chip[data-tone=active]{background:var(--vsr-green);color:var(--vsr-on-status)}
+    .state-chip[data-tone=attention],.status-button .reading.state-chip[data-tone=attention],.status-button .kind.state-chip[data-tone=attention]{background:var(--vsr-amber);color:var(--vsr-on-status)}
+    .state-chip[data-tone=danger],.status-button .reading.state-chip[data-tone=danger]{background:var(--vsr-red);color:var(--vsr-on-status)}
+    .state-chip ha-icon{color:inherit}
+    .status-button .reading.state-chip{display:block}
+    .status-button .reading.state-chip ha-icon{--mdc-icon-size:15px;margin-right:4px;vertical-align:-3px}
+    .notice{background:var(--vsr-amber);color:var(--vsr-on-status)}
+    .error,.setting-error{background:var(--vsr-red);color:var(--vsr-on-status)}
+    .setting-feedback:not(.setting-error){background:var(--vsr-field);border-left:4px solid var(--vsr-blue)}
+  `;
   // Presentation is scoped to these three cards; Cockpit keeps its own palette.
   class StyledCard extends BaseCard {
     set hass(value) {
@@ -1348,7 +1366,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       if (oldDetails) this._technicalOpen[oldDetails.dataset.technicalTopic] = oldDetails.open;
       const topics = this._visibleTopics(), topic = topics.find(item => item.key === this._selected);
       if (!topic) this._selected = null;
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${topics.map(item => {
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}${UI_STYLE}${STRONG_HIGHLIGHT_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${topics.map(item => {
         const status = statuses[item.key];
         const marked = status.tone && status.tone !== 'neutral';
         const marker = status.tone === 'active' ? 'mdi:check' : status.tone === 'danger' ? 'mdi:alert-circle-outline' : 'mdi:information-outline';
@@ -1491,7 +1509,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       for(const detail of this.shadowRoot.querySelectorAll('details[data-details]'))this._detailsOpen[detail.dataset.details]=detail.open;
       const focus=this.shadowRoot.activeElement?.dataset.focusKey||this._pendingFocus;
       const sections=SETTING_SECTIONS.filter(s=>this._config['show_'+s.key]),section=sections.find(s=>s.key===this._section),summaries=this._summaries();if(!section)this._section=null;
-      this.shadowRoot.innerHTML=`<style>${SHARED_STYLE}${SETTINGS_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}<div class="settings-menu">${sections.map(s=>`<button class="setting-topic" type="button" data-section="${s.key}" data-focus-key="topic-${s.key}" aria-expanded="${this._section===s.key}" aria-controls="settings-content"><ha-icon icon="${s.icon}" aria-hidden="true"></ha-icon><strong>${s.name}</strong><span class="setting-reading">${escape(summaries[s.key].label)}</span><span class="setting-sub">${escape(summaries[s.key].sub)}</span></button>`).join('')}</div><div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div><div id="settings-content">${section?this._panel(section):''}</div>${sections.length?'':'<p>Velg hvilke temaer som skal vises i kortets oppsett.</p>'}</ha-card>`;
+      this.shadowRoot.innerHTML=`<style>${SHARED_STYLE}${SETTINGS_STYLE}${UI_STYLE}${STRONG_HIGHLIGHT_STYLE}</style><ha-card>${this._heading()}<div class="settings-menu">${sections.map(s=>`<button class="setting-topic" type="button" data-section="${s.key}" data-focus-key="topic-${s.key}" aria-expanded="${this._section===s.key}" aria-controls="settings-content"><ha-icon icon="${s.icon}" aria-hidden="true"></ha-icon><strong>${s.name}</strong><span class="setting-reading">${escape(summaries[s.key].label)}</span><span class="setting-sub">${escape(summaries[s.key].sub)}</span></button>`).join('')}</div><div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div><div id="settings-content">${section?this._panel(section):''}</div>${sections.length?'':'<p>Velg hvilke temaer som skal vises i kortets oppsett.</p>'}</ha-card>`;
       if(focus)Array.from(this.shadowRoot.querySelectorAll('[data-focus-key]')).find(el=>el.dataset.focusKey===focus)?.focus({preventScroll:true});
     }
   }

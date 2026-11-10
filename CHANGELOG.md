@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.1 — 2026-11-10
+
+- Apply Control's stronger filled blue selections and green activity markers to
+  Settings and Status/explanations. Strengthen amber unknown/uncertain markers
+  and red faults/service errors with matching high-contrast foregrounds.
+- Keep values neutral and preserve state meanings. Selected fields retain
+  keyboard focus, readable secondary labels and distinct status chips. Let
+  status text wrap beside small inline icons on narrow screens.
+- Cockpit and Control are unchanged apart from the package version. All entity
+  mappings, calculations and service behavior are unchanged; the only source
+  additions are scoped CSS and its two render references.
+- Local scoped checks cover theme/color parity, contrast, mobile layout,
+  history, focus and retained drafts. Update documentation and simulated images.
+
 ## 1.6.0 — 2026-11-10
 
 - Strengthen only Control highlights with filled blue selection and higher

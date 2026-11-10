@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.6.0**.
+med grafisk valg av entiteter. Kortversjon: **1.6.1**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -25,7 +25,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.6.0`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.6.1`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -74,7 +74,18 @@ lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.6.0
+## Endringer i 1.6.1
+
+Innstillinger og Status og forklaringer bruker nå de samme sterkere, fylte
+uthevingene som Kontrollpanel. Åpne felt er blå. Rapportert aktivitet,
+manglende/usikre data og faktiske feil får sterkere grønne, ravgule og røde
+merker, med lesbar tekst og symboler. Betydningen og verdiene er uendret.
+
+Cockpit og Kontrollpanel er uendret bortsett fra pakkeversjonen. Entitetsvalg,
+betjening og historikk beholdes. Oppdater gjennom HACS og last nettleseren helt
+på nytt på PC og mobil. Behold kortene og entitetskoblingene.
+
+## Historikk – 1.6.0
 
 Kontrollpanel har sterkere, fylte uthevingsfarger. Trykk direkte på Ildsted,
 Boost, Party, Borte eller Ferie for å åpne varighet og startvalg. Dette sender

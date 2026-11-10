@@ -79,6 +79,12 @@ an atomic transaction. Partial failure is explicit. Ildsted remains a read-only
 sensor; no writable source is invented. Other card classes/styles and Cockpit
 were compared with 1.5.0, alongside local simulated service/UI checks.
 
+Version 1.6.1, 2026-11-10, changes only scoped CSS for Settings and explanations.
+After removing the CSS block, its two render references and version strings,
+the entire bundle is byte-identical to 1.6.0. Strong selections and activity
+markers were compared with Control in a local browser. There are no new source
+entities, calculations, register assumptions or physical-unit test claims.
+
 ## External software and documentation
 
 | Source | Use in this package |
