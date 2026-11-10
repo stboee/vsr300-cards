@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.5.0**.
+med grafisk valg av entiteter. Kortversjon: **1.6.0**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -25,7 +25,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.5.0`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.6.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -74,7 +74,32 @@ lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.5.0
+## Endringer i 1.6.0
+
+Kontrollpanel har sterkere, fylte uthevingsfarger. Trykk direkte på Ildsted,
+Boost, Party, Borte eller Ferie for å åpne varighet og startvalg. Dette sender
+ingen kommando. Nytt trykk på samme modus lukker feltet. Den separate
+**Varigheter**-knappen er fjernet.
+
+| Valg | Handling |
+| --- | --- |
+| Lagre | Sender bare varigheten. Ingen startkommando. |
+| Lagre og start | Sender varigheten først og deretter modusens native startkommando. |
+| Lukk | Lukker feltet uten å lagre eller starte. Utkast beholdes. |
+
+Hvis varigheten ikke kan lagres, sendes ingen startkommando. Hvis lagringen
+lykkes, men start feiler, vises dette som et delvis resultat; ingen automatisk
+tilbakerulling utføres. Verdier og aktiv modus viser alltid siste HA-rapportering.
+
+Ildsted er fortsatt kun en varighetssensor i Howard v1.3.0. Her vises avlesning,
+**Start** og **Lukk**. Start bruker aggregatets innstilte varighet. Det samme
+startvalget beholdes hvis en valgfri varighetskilde mangler eller ikke kan redigeres.
+Auto og Manuell betjenes som før. Cockpit og de to andre kortenes utseende beholdes.
+
+Oppdater i HACS og last nettleseren helt på nytt på PC og mobil. Eksisterende
+kort og entitetskoblinger beholdes.
+
+## Historikk – 1.5.0
 
 Kontrollpanel, Status og forklaringer og Innstillinger har fått et felles visuelt
 uttrykk med nøytrale flater, tydelige rammer og samme knapper. Cockpit beholder

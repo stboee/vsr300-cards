@@ -70,6 +70,15 @@ Cockpit and its shared base are byte-identical apart from the package version.
 Local visual checks use simulated states and a bundled MDI font; they are not
 measurements or verification on the physical unit.
 
+Version 1.6.0, 2026-11-10, refines only Control interaction and highlights.
+Howard v1.3.0 `number.py` was read again: the four mode duration numbers await
+register writing and coordinator refresh. `button.py` awaits the mode-command
+write and refresh. The card awaits the native duration service before the native
+mode service, without a direct Modbus client. This is a two-step operation, not
+an atomic transaction. Partial failure is explicit. Ildsted remains a read-only
+sensor; no writable source is invented. Other card classes/styles and Cockpit
+were compared with 1.5.0, alongside local simulated service/UI checks.
+
 ## External software and documentation
 
 | Source | Use in this package |

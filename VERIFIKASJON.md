@@ -1,4 +1,46 @@
-# Verifikasjon – 1.5.0 – 2026-11-10
+# Verifikasjon – 1.6.0 – 2026-11-10
+
+## Gjennomført lokalt – 1.6.0
+
+Tolv kontrollgrupper består med simulerte HA-data. Ingen praktisk test utføres
+på brukerens HA eller VSR300. Siste praktiske status/verifikasjonsgrense beholdes.
+
+- Cockpit og dets fellesgrunnlag er byte-identiske med 1.5.0 bortsett fra
+  pakkeversjonen. Forklaringskortets kode/layout, Innstillinger-klassen og de
+  delte fargetokenene er sammenlignet og uendret. Alle fire standardkoblinger
+  er identiske. Den delte number-rendereren har bare valgfrie tekst-/knappespor;
+  Innstillinger bruker fortsatt de tidligere standardene og består funksjonssjekkene.
+- Fem tidsstyrte modusknapper åpner eget felt direkte. Ingen separat
+  Varigheter-knapp eller undermeny. Åpning, nytt trykk og Lukk sender ingenting.
+  Lukking bevarer utkast; fokus returneres til riktig modus.
+- Lagre sender bare valgt native number-varighet. Lagre og start sender denne
+  først og avventer tjenesten før native moduskommando. Timer/døgn/minutter,
+  native grenser/trinn, egne koblinger og allerede rapporterte verdier består.
+- Avbrutt bekreftelse sender ingenting. Ugyldig verdi/metadata eller manglende
+  startmål hindrer sekvensen før lagring. Feilet lagring hindrer start; feilet
+  start etter sendt varighet vises eksplisitt uten rollback. Utkast beholdes.
+- Busy-låsen varer gjennom begge operasjonene og blokkerer doble innsendinger,
+  andre moduskommandoer og lukking. Endret entitetskobling under lagring hindrer
+  etterfølgende start. Ingen rapportert verdi/modus erstattes optimistisk.
+- Ildsted er kun sensoravlesning med Start/Lukk; ingen skriving til sensoren.
+  Start bruker aggregatets eksisterende varighet. Manglende eller ikke redigerbar
+  valgfri varighet beholder samme eksplisitte Start. Auto/Manuell er kontrollert.
+- Sterkere fylte farger er avgrenset til Kontrollpanel. Åtte representative
+  tekstpar i hvert tema er målt: minst 6,03:1. Mobilbredder 320/360/412 og desktop
+  900 CSS-piksler passer uten klipping, med 44-pikslers kontroller og synlig
+  tastaturfokus. Handlingsknappene brytes til flere linjer når plassen krever det.
+- Tidligere temperatur-/ECO-/frikjølingskontroller, delvise tidsfeil, tekniske
+  avlesninger, entitetshistorikk, tre forklaringskolonner og temaendringer består.
+  Testnettleseren rapporterte ingen sidefeil eller eksterne forespørsler.
+- Howard v1.3.0 number-/button-kode er lest: tjenestene avventer registerskriving
+  og coordinator-refresh. Dette er kildegrunnlag, ikke en ny fysisk test av
+  firmware, Modbus eller lagre/start på aggregatet.
+
+Faktisk HACS-oppdatering og betjening i brukerens HA gjenstår. Manifest, tagg,
+releasefil og sjekksum skal kontrolleres etter publisering. Ingen HA-konfigurasjon,
+helpers, templates, sensorer, Modbus-polling eller integrasjonskode endres her.
+
+## Historisk kontrollgrunnlag – 1.5.0
 
 ## Gjennomført lokalt – 1.5.0
 

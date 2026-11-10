@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.5.0 · 2026-11-10
+/* VSR300 custom cards · version 1.6.0 · 2026-11-10
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.5.0';
+  const VERSION = '1.6.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -807,107 +807,132 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       finally{this._busy=false;this._renderIfReady();this._pendingFocus=undefined;}
     }
     _moreInfo(role){const id=this._config.entities[role];if(this._field(role)&&id&&this._entity(role))this.dispatchEvent(new CustomEvent('hass-action',{bubbles:true,composed:true,detail:{config:{entity:id,tap_action:{action:'more-info'}},action:'tap'}}));}
-    _numberControl(role,label){
+    _numberControl(role,label,options={}){
       if(!this._config.entities[role])return'';
       const m=this._numberModel(role),disabled=this._busy||!m.valid,raw=this._drafts[role]??(m.value===null?'':String(m.value)),n=raw.trim()===''?NaN:Number(raw),pending=Object.hasOwn(this._drafts,role);
-      return`<form class="setting-control" data-number-form="${role}"><label for="input-${role}">${escape(label||SETTING_LABELS[role]||this._field(role).label)}</label><div class="reported">Rapportert: ${escape(this._display(role))}</div><div class="number-entry"><button type="button" data-step-role="${role}" data-delta="-1" data-focus-key="minus-${role}" aria-label="Reduser ${escape(this._field(role).label)}" ${disabled||n<=m.min?'disabled':''}>−</button><input id="input-${role}" type="number" inputmode="decimal" data-draft-key="${role}" data-focus-key="input-${role}" value="${escape(raw)}" ${m.valid?`min="${m.min}" max="${m.max}" step="${m.step}"`:''} ${disabled?'disabled':''} required/><button type="button" data-step-role="${role}" data-delta="1" data-focus-key="plus-${role}" aria-label="Øk ${escape(this._field(role).label)}" ${disabled||n>=m.max?'disabled':''}>+</button></div><div class="draft-note" data-draft-note data-pending="${pending}">${pending?'Ikke lagret':m.valid?'Velg verdi og trykk Bruk.':'Innstillingen er ikke tilgjengelig.'}</div><button class="apply" type="submit" data-focus-key="apply-${role}" ${disabled?'disabled':''}>Bruk</button></form>`;
+      const submitLabel=options.submitLabel||'Bruk';
+      const actions=options.actions??`<button class="apply" type="submit" data-focus-key="apply-${role}" ${disabled?'disabled':''}>${escape(submitLabel)}</button>`;
+      return`<form class="setting-control" data-number-form="${role}"><label for="input-${role}">${escape(label||SETTING_LABELS[role]||this._field(role).label)}</label><div class="reported">Rapportert: ${escape(this._display(role))}</div><div class="number-entry"><button type="button" data-step-role="${role}" data-delta="-1" data-focus-key="minus-${role}" aria-label="Reduser ${escape(this._field(role).label)}" ${disabled||n<=m.min?'disabled':''}>−</button><input id="input-${role}" type="number" inputmode="decimal" data-draft-key="${role}" data-focus-key="input-${role}" value="${escape(raw)}" ${m.valid?`min="${m.min}" max="${m.max}" step="${m.step}"`:''} ${disabled?'disabled':''} required/><button type="button" data-step-role="${role}" data-delta="1" data-focus-key="plus-${role}" aria-label="Øk ${escape(this._field(role).label)}" ${disabled||n>=m.max?'disabled':''}>+</button></div><div class="draft-note" data-draft-note data-pending="${pending}">${pending?'Ikke lagret':m.valid?'Velg verdi og trykk '+escape(submitLabel)+'.':'Innstillingen er ikke tilgjengelig.'}</div>${actions}</form>`;
     }
   }
 
+  const CONTROL_MODES = [
+    {action:'fireplace',role:'fireplace_duration',name:'Ildsted',unit:'min',icon:'mdi:fireplace'},
+    {action:'boost',role:'boost_duration',name:'Boost',unit:'min',icon:'mdi:fan-plus'},
+    {action:'party',role:'party_duration',name:'Party',unit:'t',icon:'mdi:account-group-outline'},
+    {action:'away',role:'away_duration',name:'Borte',unit:'t',icon:'mdi:home-export-outline'},
+    {action:'holiday',role:'holiday_duration',name:'Ferie',unit:'d',icon:'mdi:bag-suitcase-outline'},
+  ];
   class Vsr300ControlCard extends NativeSettingsCard {
     static fields = CONTROL_FIELDS;
     static defaultTitle = '';
     static settingFields = CONTROL_FIELDS.filter(field=>field.key.endsWith('_duration'));
     constructor() {
-      super();this._durationsOpen=false;this._durationRole=null;
-      this.shadowRoot.addEventListener('click', event => {
+      super();this._durationRole=null;
+      this.shadowRoot.addEventListener('click',event=>{
         const button=event.composedPath().find(el=>el instanceof HTMLElement&&el.matches('button'));
         if(!button||button.disabled)return;
-        if(button.hasAttribute('data-duration-toggle')){this._durationsOpen=!this._durationsOpen;this._durationRole=null;this._renderIfReady();}
-        else if(button.dataset.durationChoice){const role=button.dataset.durationChoice;this._durationRole=this._durationRole===role?null:role;this._renderIfReady();}
-        else if(button.hasAttribute('data-duration-close')){this._durationsOpen=false;this._durationRole=null;this._renderIfReady();this.shadowRoot.querySelector('[data-duration-toggle]')?.focus({preventScroll:true});}
+        if(button.dataset.modeChoice){
+          const mode=CONTROL_MODES.find(mode=>mode.action===button.dataset.modeChoice);if(!mode||this._busy)return;
+          this._durationRole=this._durationRole===mode.role?null:mode.role;
+          this._message='';this._error='';this._serviceError='';this._renderIfReady();
+        }else if(button.hasAttribute('data-duration-close')){
+          if(this._busy)return;
+          const mode=CONTROL_MODES.find(mode=>mode.role===this._durationRole);this._durationRole=null;this._renderIfReady();
+          this.shadowRoot.querySelector(`[data-mode-choice="${mode?.action}"]`)?.focus({preventScroll:true});
+        }else if(button.dataset.saveStart)this._commitDuration(button.dataset.saveStart,true);
         else if(button.dataset.action)this._activate(button.dataset.action);
       });
     }
     _available(role) {
-      const entity = this._hass.states[this._config.entities[role]];
-      // An HA button may legitimately have state 'unknown' before its first press.
-      return !!entity && entity.state !== 'unavailable';
+      const entity=this._hass.states[this._config.entities[role]];
+      // HA buttons legitimately report unknown before their first press.
+      return !!entity&&entity.state!=='unavailable';
     }
-    _button(action, name, label, icon, active, large = false) {
-      const command = ['manual', 'fireplace'].includes(action) ? 'mode_select' : action + '_button';
-      const enabled = this._available(command) && !this._busy;
-      const speed = ['low', 'normal', 'high'].includes(action);
-      return `<button type="button" data-action="${action}" class="${large ? 'large ' : ''}${active ? 'active' : ''}" aria-pressed="${active}" ${enabled ? '' : 'disabled'} title="${escape(enabled ? name : name + ' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong>${active ? `<span class="state-chip" data-tone="${speed ? 'selected' : 'active'}"><ha-icon icon="mdi:check" aria-hidden="true"></ha-icon>${speed ? 'Valgt' : 'Aktiv'}</span>` : ''}<small>${escape(label)}</small></button>`;
+    _modeCommand(action){
+      if(!['auto','manual','low','normal','high','fireplace','boost','party','away','holiday'].includes(action))throw new Error('Ukjent modusvalg.');
+      const option={manual:'Manual',fireplace:'Fireplace'}[action],role=option?'mode_select':action+'_button';
+      if(!this._available(role))throw new Error('Modusbetjeningen er ikke tilgjengelig. Kontroller entitetskoblingen og integrasjonen.');
+      return{role,domain:option?'select':'button',service:option?'select_option':'press',data:{entity_id:this._config.entities[role],...(option?{option}:{})}};
     }
-    _duration(role, unit) {
-      const v = number(this._hass.states, this._config.entities[role]);
-      return v === null || v < 0 ? 'Varighet ukjent' : `${v} ${unit}`;
+    _button(action,name,label,icon,active,large=false){
+      const timed=CONTROL_MODES.find(mode=>mode.action===action),expanded=timed?.role===this._durationRole;
+      const enabled=!this._busy&&(timed||this._available(['manual','fireplace'].includes(action)?'mode_select':action+'_button'));
+      const speed=['low','normal','high'].includes(action);
+      return`<button type="button" ${timed?`data-mode-choice="${action}" aria-expanded="${expanded}" aria-controls="duration-settings"`:`data-action="${action}" aria-pressed="${active}"`} data-focus-key="mode-${action}" class="${large?'large ':''}${active?'active ':''}${expanded?'mode-open':''}" ${enabled?'':'disabled'} title="${escape(timed?'Åpne varighet og startvalg for '+name:enabled?name:name+' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong>${active?`<span class="state-chip" data-tone="${speed?'selected':'active'}"><ha-icon icon="mdi:check" aria-hidden="true"></ha-icon>${speed?'Valgt':'Aktiv'}</span>`:''}<small>${escape(label)}</small>${timed?`<span class="mode-disclosure"><ha-icon icon="${expanded?'mdi:chevron-up':'mdi:chevron-down'}" aria-hidden="true"></ha-icon><span class="visually-hidden">${expanded?'Lukk':'Åpne'} valg</span></span>`:''}</button>`;
     }
-    _render() {
+    _duration(role,unit){const v=number(this._hass.states,this._config.entities[role]);return v===null||v<0?'Varighet ukjent':`${v} ${unit}`;}
+    _render(){
       const focus=this.shadowRoot.activeElement?.dataset.focusKey||this._pendingFocus;
-      const states = this._hass.states, e = this._config.entities;
-      const mode = state(states, e.mode), source = state(states, e.auto_source), speed = state(states, e.manual_speed);
-      const modeKnown = Object.hasOwn(MODE_NAMES, mode);
-      const manual = typeof mode === 'string' && mode.startsWith('manual_');
-      const autoLabel = !modeKnown ? 'Modus ukjent' : mode !== 'auto' ? 'Ikke aktiv' : AUTO_NAMES[source] || 'Styrekilde ukjent';
-      const speedName = { Low: 'Lav', Normal: 'Normal', High: 'Høy', Stop: 'Stopp' }[speed] || 'Ukjent';
-      const showManual = manual || state(states, e.mode_select) === 'Manual';
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${SETTINGS_STYLE}${DURATION_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}
-        <div class="grid two">
-          ${this._button('auto', 'Auto', autoLabel, 'mdi:fan-auto', mode === 'auto', true)}
-          ${this._button('manual', 'Manuell', 'Manuell · ' + speedName, 'mdi:hand-back-right-outline', manual, true)}
-        </div>
-        ${showManual ? `<h3>Manuell viftehastighet</h3><div class="grid three">
-          ${this._button('low', 'Lav', 'Manuell', 'mdi:fan-speed-1', speed === 'Low')}
-          ${this._button('normal', 'Normal', 'Manuell', 'mdi:fan-speed-2', speed === 'Normal')}
-          ${this._button('high', 'Høy', 'Manuell', 'mdi:fan-speed-3', speed === 'High')}
-        </div>` : ''}
-        <h3>Tidsstyrte og spesialmoduser</h3><div class="grid three">
-          ${this._button('fireplace', 'Ildsted', this._duration('fireplace_duration', 'min'), 'mdi:fireplace', mode === 'fireplace')}
-          ${this._button('boost', 'Boost', this._duration('boost_duration', 'min'), 'mdi:fan-plus', mode === 'boost')}
-          ${this._button('party', 'Party', this._duration('party_duration', 't'), 'mdi:account-group-outline', mode === 'party')}
-          ${this._button('away', 'Borte', this._duration('away_duration', 't'), 'mdi:home-export-outline', mode === 'away')}
-          ${this._button('holiday', 'Ferie', this._duration('holiday_duration', 'd'), 'mdi:bag-suitcase-outline', mode === 'holiday')}
-          <button type="button" data-duration-toggle data-focus-key="duration-toggle" aria-expanded="${this._durationsOpen}" aria-controls="duration-settings" class="duration-toggle"><ha-icon icon="mdi:timer-cog-outline" aria-hidden="true"></ha-icon><strong>Varigheter</strong><small>Innstillinger</small></button>
-        </div><div class="error" role="alert"></div>
-        <div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div>
-        ${this._durationsOpen?this._durationPanel():''}</ha-card>`;
-      if (this._serviceError) this.shadowRoot.querySelector('.error').textContent = this._serviceError;
+      const states=this._hass.states,e=this._config.entities,mode=state(states,e.mode),source=state(states,e.auto_source),speed=state(states,e.manual_speed);
+      const modeKnown=Object.hasOwn(MODE_NAMES,mode),manual=typeof mode==='string'&&mode.startsWith('manual_');
+      const autoLabel=!modeKnown?'Modus ukjent':mode!=='auto'?'Ikke aktiv':AUTO_NAMES[source]||'Styrekilde ukjent';
+      const speedName={Low:'Lav',Normal:'Normal',High:'Høy',Stop:'Stopp'}[speed]||'Ukjent';
+      const showManual=manual||state(states,e.mode_select)==='Manual';
+      this.shadowRoot.innerHTML=`<style>${SHARED_STYLE}${SETTINGS_STYLE}${UI_STYLE}${DURATION_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}
+        <div class="grid two">${this._button('auto','Auto',autoLabel,'mdi:fan-auto',mode==='auto',true)}${this._button('manual','Manuell','Manuell · '+speedName,'mdi:hand-back-right-outline',manual,true)}</div>
+        ${showManual?`<h3>Manuell viftehastighet</h3><div class="grid three">${this._button('low','Lav','Manuell','mdi:fan-speed-1',speed==='Low')}${this._button('normal','Normal','Manuell','mdi:fan-speed-2',speed==='Normal')}${this._button('high','Høy','Manuell','mdi:fan-speed-3',speed==='High')}</div>`:''}
+        <h3>Tidsstyrte og spesialmoduser</h3><div class="grid three">${CONTROL_MODES.map(item=>this._button(item.action,item.name,this._duration(item.role,item.unit),item.icon,mode===item.action)).join('')}</div>
+        <div class="error" role="alert"></div><div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div>
+        ${this._durationRole?this._durationPanel():''}</ha-card>`;
+      if(this._serviceError)this.shadowRoot.querySelector('.error').textContent=this._serviceError;
       if(focus)Array.from(this.shadowRoot.querySelectorAll('[data-focus-key]')).find(el=>el.dataset.focusKey===focus)?.focus({preventScroll:true});
     }
-    getCardSize(){return this._durationsOpen?(this._durationRole?15:11):8;}
+    getCardSize(){return this._durationRole?13:8;}
     _durationPanel(){
-      const modes=[['fireplace_duration','Ildsted','min','mdi:fireplace'],['boost_duration','Boost','min','mdi:fan-plus'],['party_duration','Party','t','mdi:account-group-outline'],['away_duration','Borte','t','mdi:home-export-outline'],['holiday_duration','Ferie','d','mdi:bag-suitcase-outline']];
-      const selected=modes.find(([role])=>role===this._durationRole);
-      let editor='';
-      if(selected){
-        const [role,name,unit]=selected;
-        if(!this._config.entities[role])editor='<p class="duration-help">Velg varighetsentiteten i kortets oppsett.</p>';
-        else if(role==='fireplace_duration')editor=`<div class="readout duration-readonly"><span>Ildsted (minutter)</span><button type="button" class="info-button" data-info-role="fireplace_duration" data-focus-key="info-fireplace-duration" ${this._entity('fireplace_duration')?'':'disabled'}>${escape(this._display('fireplace_duration'))}</button><small>Avlesning. Endres i Systemair-appen eller på aggregatets betjeningspanel.</small></div>`;
-        else editor=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[unit]+')');
+      const mode=CONTROL_MODES.find(mode=>mode.role===this._durationRole);if(!mode)return'';
+      const {role,name,action}=mode,editable=role!=='fireplace_duration'&&!!this._config.entities[role]&&this._numberModel(role).valid;
+      let startAvailable=false;try{this._modeCommand(action);startAvailable=true;}catch{}
+      const close=`<button type="button" class="settings-close" data-duration-close data-focus-key="duration-close" ${this._busy?'disabled':''}><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button>`;
+      let content;
+      if(editable){
+        const actions=`<div class="duration-actions"><button class="apply duration-save" type="submit" data-focus-key="apply-${role}" ${this._busy?'disabled':''}>Lagre</button><button class="apply duration-start" type="button" data-save-start="${role}" data-focus-key="save-start-${role}" ${this._busy||!startAvailable?'disabled':''}>Lagre og start</button>${close}</div>`;
+        content=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[mode.unit]+')',{submitLabel:'Lagre',actions});
+      }else{
+        const explanation=role==='fireplace_duration'?'Avlesning. Ildsted-varigheten endres i Systemair-appen eller på aggregatets betjeningspanel.':!this._config.entities[role]?'Velg varighetsentiteten i kortets oppsett for å kunne redigere den.':'Varigheten kan ikke redigeres nå. Kontroller entitetens verdi og grenser.';
+        content=`<div class="readout duration-readonly"><span>Rapportert varighet</span><button type="button" class="info-button" data-info-role="${role}" data-focus-key="info-${role}" ${this._entity(role)?'':'disabled'}>${escape(this._display(role))}</button><small>${explanation} Start bruker varigheten som allerede ligger i aggregatet.</small></div><div class="duration-actions"><button class="apply duration-start" type="button" data-action="${action}" data-focus-key="start-${role}" ${this._busy||!startAvailable?'disabled':''}>Start</button>${close}</div>`;
       }
-      return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><h3 id="duration-title">Modusvarigheter</h3>
-        <div class="duration-mode-grid">${modes.map(([role,name,unit,icon])=>`<button type="button" class="duration-choice" data-duration-choice="${role}" data-focus-key="duration-choice-${role}" aria-expanded="${this._durationRole===role}" aria-controls="duration-value-panel" ${this._busy?'disabled':''}><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong><small>${escape(this._duration(role,unit))}</small></button>`).join('')}</div>
-        <div id="duration-value-panel">${editor}</div><div class="settings-foot"><button type="button" class="settings-close" data-duration-close data-focus-key="duration-close"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div></section>`;
+      return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><div class="panel-title"><ha-icon icon="${mode.icon}" aria-hidden="true"></ha-icon><h3 id="duration-title">${name} · varighet og start</h3></div>${content}${startAvailable?'':'<p class="duration-help">Start er utilgjengelig. Kontroller modusentiteten i kortets oppsett.</p>'}</section>`;
     }
-    async _activate(action) {
-      if (this._busy) return;
-      const names = { fireplace: 'Ildsted', boost: 'Boost / oppfriskning', party: 'Party', away: 'Borte', holiday: 'Ferie' };
-      if (names[action] && !window.confirm(`Starte ${names[action]}-modus?`)) return;
-      const select = { manual: 'Manual', fireplace: 'Fireplace' }[action];
-      const role = select ? 'mode_select' : action + '_button';
-      const allowed = ['auto', 'manual', 'low', 'normal', 'high', 'fireplace', 'boost', 'party', 'away', 'holiday'];
-      if (!allowed.includes(action) || !this._available(role)) return;
-      this._busy = true; this._serviceError = ''; this._error = ''; this._message = ''; this._render();
-      try {
-        await this._hass.callService(select ? 'select' : 'button', select ? 'select_option' : 'press', {
-          entity_id: this._config.entities[role], ...(select ? { option: select } : {}),
-        });
-      } catch (error) {
-        this._serviceError = 'Kunne ikke endre modus. Kontroller integrasjonens status i Home Assistant.';
-        console.warn('VSR300: service call failed', error);
-      } finally { this._busy = false; this._render(); }
+    _setNumber(role){this._commitDuration(role,false);}
+    async _commitDuration(role,start){
+      if(this._busy||role!==this._durationRole)return;
+      const mode=CONTROL_MODES.find(mode=>mode.role===role);if(!mode||role==='fireplace_duration')return;
+      this._error='';this._message='';this._serviceError='';let duration,activation;
+      try{
+        const raw=this._drafts[role]??String(this._numberModel(role).value??'');
+        duration=this._command(role,raw.trim()===''?NaN:Number(raw));
+        if(start)activation=this._modeCommand(mode.action);
+      }catch(error){this._error=error.message;this._renderIfReady();return;}
+      if(start&&!window.confirm(`Starte ${mode.name}-modus med varighet ${duration.data.value} ${mode.unit}?`))return;
+      if(!start&&duration.same){delete this._drafts[role];this._message='Varigheten er allerede rapportert.';this._renderIfReady();return;}
+      const durationId=this._config.entities[role];
+      this._pendingFocus=this.shadowRoot.activeElement?.dataset.focusKey;this._busy=true;
+      this._message=start?'Lagrer varighet og sender startkommando …':'Lagrer varighet …';this._renderIfReady();let saved=duration.same;
+      try{
+        if(!duration.same)await this._hass.callService(duration.domain,duration.service,duration.data);
+        saved=true;
+        if(start){
+          const current=this._modeCommand(mode.action);
+          if(this._config.entities[role]!==durationId||current.data.entity_id!==activation.data.entity_id)throw new Error('Entitetskobling endret.');
+          await this._hass.callService(activation.domain,activation.service,activation.data);
+        }
+        delete this._drafts[role];
+        this._message=start?'Startkommando sendt. Verdiene viser siste rapportering.':'Varighet sendt. Verdien viser siste rapportering.';
+      }catch(error){
+        this._message='';
+        this._error=start&&saved?'Varigheten er sendt eller allerede rapportert, men modusen kunne ikke startes. Kontroller status før nytt forsøk.':start?'Kunne ikke lagre varigheten. Ingen startkommando ble sendt.':'Kunne ikke lagre varigheten. Kontroller integrasjonen og prøv igjen.';
+      }finally{this._busy=false;this._renderIfReady();this._pendingFocus=undefined;}
+    }
+    async _activate(action){
+      if(this._busy)return;
+      let command;try{command=this._modeCommand(action);}catch(error){this._error=error.message;this._renderIfReady();return;}
+      const mode=CONTROL_MODES.find(mode=>mode.action===action);
+      if(mode&&!window.confirm(`Starte ${mode.name}-modus?`))return;
+      this._busy=true;this._serviceError='';this._error='';this._message='';this._render();
+      try{await this._hass.callService(command.domain,command.service,command.data);}
+      catch(error){this._serviceError='Kunne ikke endre modus. Kontroller integrasjonens status i Home Assistant.';console.warn('VSR300: service call failed',error);}
+      finally{this._busy=false;this._render();}
     }
   }
 
@@ -1368,11 +1393,24 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     @container(max-width:380px){ha-card{padding:12px}.settings-menu{gap:8px}.setting-topic{padding:14px 6px;min-height:144px}.setting-reading{font-size:20px}.setting-control{padding:10px}.time-grid{grid-template-columns:minmax(0,1fr)}}
   `;
   const DURATION_STYLE = `
-    .duration-panel{padding:14px;border:1px solid var(--divider-color,#636363);border-radius:20px;margin:16px 0}.duration-panel h3{font-size:18px;margin-bottom:12px}
-    .duration-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.duration-choice{min-height:78px;border-radius:14px;gap:4px;padding:8px 4px;overflow-wrap:anywhere}.duration-choice ha-icon{--mdc-icon-size:24px}.duration-choice strong{font-size:14px}.duration-choice small{font-size:13px}
-    .duration-readonly{margin-top:12px}.duration-readonly .info-button{font-size:20px;font-weight:700}.duration-readonly small{display:block;font-size:13px;line-height:1.5;color:var(--secondary-text-color,#9b9b9b)}.duration-help{margin-top:12px!important}
-    .duration-panel .settings-foot{margin-top:12px}
-    @container(max-width:380px){.duration-panel{padding:10px}.duration-mode-grid{gap:6px}}
+    button.active,button.mode-open{background:var(--vsr-blue);border-color:var(--vsr-blue);color:var(--vsr-on-blue);box-shadow:none}
+    button.active>ha-icon,button.active>small,button.mode-open>ha-icon,button.mode-open>small{color:inherit}
+    button.active .mode-disclosure,button.mode-open .mode-disclosure{color:inherit}
+    button.active:hover,button.mode-open:hover{box-shadow:inset 0 0 0 1px var(--vsr-on-blue)}
+    .state-chip[data-tone=active]{background:var(--vsr-green);color:light-dark(#ffffff,#101a26)}
+    .state-chip[data-tone=selected]{background:var(--vsr-surface);color:var(--vsr-blue)}
+    .state-chip ha-icon{color:inherit}
+    .mode-disclosure{display:inline-flex;justify-content:center;color:var(--vsr-secondary);margin-top:0}.mode-disclosure ha-icon{--mdc-icon-size:18px;color:inherit}
+    .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+    .duration-panel{padding:14px;border:2px solid var(--vsr-blue);border-radius:12px;margin:16px 0;background:var(--vsr-surface)}
+    .duration-panel h3{font-size:18px;margin:0}.duration-panel .panel-title{margin-bottom:12px}.duration-panel .panel-title ha-icon{color:var(--vsr-blue);flex:none}
+    .duration-panel .setting-control{margin-bottom:0}.duration-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
+    .duration-actions .apply{margin:0;width:auto;min-width:78px;white-space:normal}.duration-save{background:var(--vsr-field);color:var(--vsr-blue);border-color:var(--vsr-blue)}
+    .duration-readonly{margin-top:12px}.duration-readonly .info-button{font-size:20px;font-weight:600}.duration-readonly small{display:block;font-size:13px;line-height:1.5;color:var(--vsr-secondary)}.duration-help{margin-top:12px!important}
+    .notice{background:var(--vsr-amber);color:light-dark(#ffffff,#101a26)}
+    .error,.setting-error{background:var(--vsr-red);color:light-dark(#ffffff,#101a26)}
+    .setting-feedback:not(.setting-error){background:var(--vsr-field);border-left:4px solid var(--vsr-blue)}
+    @container(max-width:380px){.duration-panel{padding:10px}.duration-actions{gap:6px}}
   `;
 
   class Vsr300SettingsCard extends NativeSettingsCard {

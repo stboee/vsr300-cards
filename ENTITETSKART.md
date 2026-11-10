@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.5.0
+# Entitetskart – kortpakke 1.6.0
 
 Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
 korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke
@@ -131,8 +131,9 @@ kan ligge igjen i eldre YAML, men vises ikke eller brukes som skrivemål.
 Cockpits filterkoblinger, varsler og grafikk beholdes.
 
 Modusvarigheter bruker Kontrollpanelets eksisterende fem koblinger. Egne
-navn flyttes ikke automatisk fra et annet kort. Varigheter åpner først en
-kompakt meny; bare valgt modus viser editor/avlesning.
+navn flyttes ikke automatisk fra et annet kort. Trykk direkte på en tidsstyrt
+modus for editor/avlesning med Lagre, Lagre og start og Lukk. Ildsted er kun
+avlesning med Start og Lukk. Ingen ny entitet er nødvendig.
 
 Veksler krever `recovery_output` i forklaringskortet. Velg samme entitet som i
 Cockpit når begge brukes. Tom kobling, manglende entitet og utilgjengelig

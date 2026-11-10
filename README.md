@@ -4,7 +4,7 @@ Four Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer**, and optional
 **Systemair Innstillinger**,
 with graphical entity selection. Current card
-version: **1.5.0**. Reference setup: HA 2026.10.2 and
+version: **1.6.0**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -27,7 +27,7 @@ once through HACS. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.5.0`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.6.0`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -76,7 +76,31 @@ local diagnosis and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
 
-## Changes in 1.5.0
+## Changes in 1.6.0
+
+Control uses stronger filled highlights. Tap Ildsted, Boost, Party, Borte or
+Ferie directly to open its duration and start options without sending commands.
+Tap it again to collapse. The separate **Varigheter** button is removed.
+
+| Choice | Action |
+| --- | --- |
+| Lagre (Save) | Sends only the duration, with no start command. |
+| Lagre og start (Save and start) | Awaits the duration service before sending the native mode command. |
+| Lukk (Close) | Closes without saving or starting; drafts are retained. |
+
+A failed save prevents Start. If saving succeeds but Start fails, the partial
+result is explicit and no rollback is attempted. Readings and active mode remain
+integration reports, without optimistic confirmation.
+
+Howard v1.3.0 exposes Ildsted duration only as a sensor. It has a readout,
+**Start** and **Lukk**; Start uses the duration already configured in the unit.
+Explicit Start is also retained when an optional duration source is missing or
+not editable. Auto/Manual, Cockpit and the other two cards retain their behavior
+and appearance.
+
+Update in HACS and fully reload each browser. Keep existing cards and mappings.
+
+## History — 1.5.0
 
 Control, Status og forklaringer and Settings share neutral surfaces, consistent
 borders and buttons, and a semantic palette. Cockpit keeps its existing graphics

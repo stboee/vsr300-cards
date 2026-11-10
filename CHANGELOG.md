@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.6.0 — 2026-11-10
+
+- Strengthen only Control highlights with filled blue selection and higher
+  contrast activity markers. Cockpit and other card palettes are preserved.
+- Move duration editing/start options directly into each timed mode tile.
+  Remove the separate Varigheter menu; opening/repeated closing sends nothing.
+- Add Save, Save and start and Close. Save only sends the native duration.
+  Save and start awaits duration before the mode service under one busy guard;
+  unchanged durations skip redundant writes. Existing confirmations are retained.
+- Failed saves prevent Start. Failed Start after a successful save reports the
+  partial result without rollback or optimistic state changes. Preserve drafts,
+  focus, source bindings, native constraints and double-submit protection.
+- Ildsted stays read-only with Start/Close. Missing or noneditable optional
+  duration sources retain explicit Start using the unit's configured duration.
+  Existing Auto/Manual actions are preserved; Close never stops ventilation.
+- Twelve local groups pass with simulated states, service/error cases, unchanged
+  other-card behavior, mobile layouts and high-contrast light/dark highlights.
+  Actual HA installation/operation remains a user check.
+
 ## 1.5.0 — 2026-11-10
 
 - Unify Control, Status/explanations and Settings with neutral surfaces and
