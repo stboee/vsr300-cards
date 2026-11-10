@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.6.1 · 2026-11-10
+/* VSR300 custom cards · version 1.7.0 · 2026-11-10
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.6.1';
+  const VERSION = '1.7.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -964,12 +964,15 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     ...['supply_rpm', 'extract_rpm', 'outdoor_temperature'].map(key => explanationField(key, { optional: true })),
     FIELD('free_cooling_state', 'Frikjøling – rapportert tilstand (valgfri)', 'sensor', '', { optional: true }),
     FIELD('free_cooling_reliable', 'Frikjøling – temperaturer pålitelige (valgfri)', 'binary_sensor', 'binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige', { optional: true }),
-    FIELD('free_cooling_diagnosis', 'Frikjøling – lokal HA-diagnose (valgfri)', 'sensor', 'sensor.systemair_frikjoling_kandidat', { optional: true }),
     FIELD('outdoor_max_24h', 'Utetemperatur – maks siste 24t (valgfri)', 'sensor', 'sensor.systemair_ute_max_siste_24t', { optional: true }),
     FIELD('free_cooling_day_min', 'Frikjøling – daggrense (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_dag_min_temperatur', { optional: true }),
     FIELD('free_cooling_night_high', 'Frikjøling – natt høy (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_natt_hoy_grense', { optional: true }),
     FIELD('free_cooling_night_low', 'Frikjøling – natt lav (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_natt_lav_grense', { optional: true }),
     FIELD('free_cooling_room_cancel', 'Frikjøling – rom avbryt (°C, valgfri)', 'number', 'number.systemair_save_frikjoling_rom_avbryt_temperatur', { optional: true }),
+    FIELD('cooling_start_hour', 'Frikjøling – start time (valgfri)', 'number', 'number.systemair_save_frikjoling_start_time', { optional: true }),
+    FIELD('cooling_start_minute', 'Frikjøling – start minutt (valgfri)', 'number', 'number.systemair_save_frikjoling_start_min', { optional: true }),
+    FIELD('cooling_end_hour', 'Frikjøling – slutt time (valgfri)', 'number', 'number.systemair_save_frikjoling_slutt_time', { optional: true }),
+    FIELD('cooling_end_minute', 'Frikjøling – slutt minutt (valgfri)', 'number', 'number.systemair_save_frikjoling_slutt_min', { optional: true }),
     FIELD('electric_power', 'Målt elektrisk effekt (W/kW, valgfri)', 'sensor', 'sensor.vsr300_power', { optional: true }),
     FIELD('electric_energy', 'Målt energi (valgfri)', 'sensor', 'sensor.vsr300_energy', { optional: true }),
     FIELD('supply_setpoint', 'Tilluftsettpunkt (valgfri)', 'number', 'number.systemair_save_tilluft_setpunkt_degc', { optional: true }),
@@ -1002,19 +1005,22 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "name": "Frikjøling",
     "title": "Frikjøling",
     "icon": "mdi:weather-windy",
-    "text": "**Frikjøling** bruker kaldere uteluft til å kjøle boligen uten mekanisk kjøling.\n\nKjøleeffekt vises gjennom **Huslast**. Når frikjøling rapporteres aktiv og Huslast er positiv, viser Huslast-knappen verdien som **W kjøl**. Verdien er et lokalt effektestimat basert på estimert luftmengde.\n\nStatusknappen kan vise flere tilstander:\n\n**Av**  \nFrikjøling er ikke aktivert/tillatt i aggregatet.\n\n**På**  \nFrikjøling er tillatt, men HA-diagnosen matcher ikke en mer spesifikk tilstand akkurat nå.\n\n**Aktiv**  \nIntegrasjonen rapporterer frikjøling aktiv nå. Da er det normalt at tillufttemperaturen blir lavere enn valgt tilluftssettpunkt, fordi hensikten er å kjøle huset.\n\n**Kandidat**  \nDe eksponerte verdiene i HA tyder på at frikjøling kan starte eller burde kunne kjøre nå. Dette er en HA-diagnose, ikke nødvendigvis Systemair sin interne beslutning.\n\n**Venter tid**  \nTemperaturvilkårene ser ut til å kunne være OK, men nåværende tidspunkt er utenfor start-/sluttvinduet for frikjøling.\n\n**Dag ikke OK**  \nMaks utetemperatur siste 24 timer er lavere enn `Frikjøling – dag min. temperatur`. Aggregatet skal normalt bare nattkjøle hvis dagen har vært varm nok.\n\n**For varmt**  \nAktuell utetemperatur er over `Frikjøling – natt høy grense`. Natteluften er da ikke kjølig nok til nyttig frikjøling.\n\n**For kaldt**  \nAktuell utetemperatur er under `Frikjøling – natt lav grense`. Aggregatet bør da stoppe/blokkere frikjøling for å unngå for kald tilluft/overkjøling.\n\n**Rom kaldt**  \nAvtrekk-/romtemperaturen er på eller under `Frikjøling – rom avbryt temperatur`. Huset er da kaldt nok, og frikjøling skal ikke fortsette.\n\n**Rapportert diagnostikk** kan vise Dagfase eller Temperaturer usikre når tilsvarende integrasjonsentiteter er valgt. Dette vises separat fra en valgfri lokal HA-diagnose.\n\n**Lokal HA-diagnose** er kilden til Kandidat, Venter tid og de lokale temperaturvurderingene. Disse brukes bare når en slik sensor er valgt og har en kjent verdi. De er ikke avleste begrunnelser fra firmware. Uten diagnosen vises fortsatt rapportert aktivitet og tillatelse.\n\nEn maksimumstemperatur over siste døgn krever historikk. Kortet utleder ikke denne fra en enkelt temperaturavlesning og oppretter ingen historikksensor.",
+    "text": "**Frikjøling** bruker kjøligere uteluft til å kjøle boligen. Rapportert aktivitet og diagnostikk kommer fra integrasjonen. **Kandidatvurderingen beregnes i dette kortet** og er ikke aggregatets interne beslutning eller en startkommando.\n\n**Aktiv** betyr at integrasjonen rapporterer frikjøling aktiv nå. Denne avlesningen har prioritet. **Av** betyr at frikjøling ikke er tillatt. Rapportert Dagfase, deaktivert tilstand eller upålitelige temperaturer har prioritet foran kandidatvurderingen når disse valgfrie kildene er valgt.\n\nNår frikjøling er tillatt, men rapporteres inaktiv, vurderes følgende i rekkefølge:\n\n- **Dag ikke OK:** Maks utetemperatur siste 24 timer er lavere enn daggrensen.\n- **For varmt:** Utetemperaturen er over øvre nattgrense.\n- **For kaldt:** Utetemperaturen er under nedre nattgrense.\n- **Rom kaldt:** Avtrekkstemperaturen er på eller under avbrytgrensen.\n- **Venter tid:** Temperaturvilkårene er oppfylt, men tidspunktet er utenfor tidsvinduet.\n- **Kandidat:** Alle disse lokale vilkårene er oppfylt. Det garanterer ikke at aggregatet starter; andre interne vilkår kan finnes.\n\nAlle nødvendige temperaturer, grenser og fire tidsverdier må være tilgjengelige. Ellers vises **Ukjent · Mangler datagrunnlag**, med årsaken nedenfor. Ingen temperaturer eller tidsgrenser gjettes.\n\nTidsvinduet bruker Home Assistants tidssone. Denne må samsvare med aggregatets klokke. Startminuttet inngår, sluttminuttet inngår ikke. Et vindu kan krysse midnatt. Lik start og slutt gir et tomt tidsvindu.\n\n**Maks siste 24 timer** kommer fra en separat HA-statistikksensor basert på integrasjonens utetemperatur. Kortet henter ingen døgnhistorikk og oppretter ingen sensorer. Denne rullerende verdien er ikke dokumentert som identisk med aggregatets interne dagvurdering.\n\n**Huslast** viser et termisk effektestimat fra temperaturer og estimert luftmengde. Når frikjøling rapporteres aktiv og Huslast er positiv, merkes verdien W kjøl. Dette er ikke en fysisk måling av kjøleeffekt.",
     "roles": [
       "free_cooling_active",
       "free_cooling_enabled",
       "free_cooling_state",
       "free_cooling_reliable",
-      "free_cooling_diagnosis",
       "outdoor_temperature",
       "outdoor_max_24h",
       "free_cooling_day_min",
       "free_cooling_night_high",
       "free_cooling_night_low",
-      "free_cooling_room_cancel"
+      "free_cooling_room_cancel",
+      "cooling_start_hour",
+      "cooling_start_minute",
+      "cooling_end_hour",
+      "cooling_end_minute"
     ]
   },
   {
@@ -1223,6 +1229,27 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
   class Vsr300ExplanationsCard extends StyledCard {
     static fields = EXPLANATION_FIELDS;
     static defaultTitle = 'Status og forklaringer';
+    connectedCallback() { this._renderIfReady(); }
+    disconnectedCallback() { this._stopCoolingClock(); }
+    set hass(value) {
+      const zoneChanged = this._hass?.config?.time_zone !== value?.config?.time_zone;
+      super.hass = value;
+      if (zoneChanged) this._renderIfReady();
+    }
+    get hass() { return super.hass; }
+    _stopCoolingClock() {
+      if (this._coolingTimer !== undefined) clearTimeout(this._coolingTimer);
+      this._coolingTimer = undefined;
+    }
+    _scheduleCoolingClock(calculated) {
+      this._stopCoolingClock();
+      if (!this.isConnected || !calculated) return;
+      // Only a local minute-boundary refresh. No history query or service call.
+      this._coolingTimer = setTimeout(() => {
+        this._coolingTimer = undefined;
+        this._renderIfReady();
+      }, 60000 - Date.now() % 60000 + 20);
+    }
     constructor() {
       super(); this._selected = null; this._technicalOpen = {};
       this.shadowRoot.addEventListener('click', event => {
@@ -1248,6 +1275,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     setConfig(config) {
       if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Kortoppsettet må være et objekt.');
       if (config?.show_sources != null && typeof config.show_sources !== 'boolean') throw new Error('Vis datakilder må være på eller av.');
+      if (config.entities != null && (typeof config.entities !== 'object' || Array.isArray(config.entities))) throw new Error('entities må inneholde entitetskoblingene.');
       const tolerance = config?.balance_tolerance ?? 15;
       if (typeof tolerance !== 'number' || !Number.isFinite(tolerance) || tolerance < 0) throw new Error('Balansegrensen må være et tall fra 0 og oppover.');
       const visibility = {};
@@ -1255,7 +1283,10 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
         if (config[key] != null && typeof config[key] !== 'boolean') throw new Error('Emnevalg må være på eller av.');
         visibility[key] = config[key] ?? initial;
       }
-      super.setConfig({ ...config, ...visibility, show_title: config?.show_title ?? true, show_sources: config?.show_sources ?? false, balance_tolerance: tolerance });
+      // Retired source is ignored, including in old saved configurations.
+      const entities = config.entities == null ? config.entities : { ...config.entities };
+      if (entities) delete entities.free_cooling_diagnosis;
+      super.setConfig({ ...config, entities, ...visibility, show_title: config?.show_title ?? true, show_sources: config?.show_sources ?? false, balance_tolerance: tolerance });
     }
     static getStubConfig() { return { ...super.getStubConfig(), show_title: true, show_sources: false, balance_tolerance: 15, ...Object.fromEntries(Object.values(EXTRA_TOPIC_OPTIONS).map(([key, , initial]) => [key, initial])) }; }
     static getConfigForm() {
@@ -1264,7 +1295,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       form.schema.splice(2, 0, { name: 'show_sources', default: false, selector: { boolean: {} } }, { name: 'balance_tolerance', default: 15, selector: { number: { min: 0, mode: 'box', unit_of_measurement: 'm³/h' } } });
       form.schema.splice(4, 0, ...Object.values(EXTRA_TOPIC_OPTIONS).map(([name, , initial]) => ({ name, default: initial, selector: { boolean: {} } })));
       form.computeLabel = field => ({ show_sources: 'Vis entitets-ID-er i forklaringene', balance_tolerance: 'Grense for markering av estimert ubalanse', ...Object.fromEntries(Object.values(EXTRA_TOPIC_OPTIONS).map(([key, text]) => [key, text])) })[field.name] || label(field);
-      form.computeHelper = field => field.name === 'free_cooling_diagnosis' ? 'Valgfri lokal tolkning fra eksisterende HA-sensor. Bevarer Kandidat/Venter tid og temperaturdiagnoser; er ikke en firmwarestatus.' : field.name === 'outdoor_max_24h' ? 'Valgfri historikkbasert HA-verdi. Kortet oppretter ingen døgnsensor.' : field.name === 'electric_power' ? 'Valgfri faktisk måling, for eksempel Shelly. Brukes ikke i Huslast-beregningen.' : helper(field);
+      form.computeHelper = field => field.name === 'outdoor_max_24h' ? 'Historikkbasert HA-statistikksensor for kandidatvurderingen. Se installasjonsveiledningen for oppsett. Kortet oppretter ingen døgnsensor.' : ['cooling_start_hour', 'cooling_start_minute', 'cooling_end_hour', 'cooling_end_minute'].includes(field.name) ? 'Velg samme integrasjonsentitet som i Innstillinger. Alle fire tidsverdier trengs for kandidatvurderingen.' : field.name === 'electric_power' ? 'Valgfri faktisk måling, for eksempel Shelly. Brukes ikke i Huslast-beregningen.' : helper(field);
       return form;
     }
     _visibleTopics() { return EXPLANATION_TOPICS.filter(topic => !EXTRA_TOPIC_OPTIONS[topic.key] || this._config[EXTRA_TOPIC_OPTIONS[topic.key][0]]); }
@@ -1285,6 +1316,36 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       if (kind === 'power') return !unit || unit === 'W' ? value : unit === 'kW' ? value * 1000 : null;
       return value;
     }
+    _freeCoolingCandidate(now = Date.now()) {
+      const unknown = detail => ({ label: 'Ukjent', tone: 'attention', kind: 'Mangler datagrunnlag', detail });
+      const temperatureRoles = ['outdoor_max_24h', 'free_cooling_day_min', 'outdoor_temperature', 'free_cooling_night_high', 'free_cooling_night_low', 'extract_temperature', 'free_cooling_room_cancel'];
+      const temperatures = Object.fromEntries(temperatureRoles.map(role => {
+        const value = this._quantity(role, 'temperature');
+        return [role, value === null ? null : Number(value.toFixed(6))];
+      }));
+      const timeRoles = ['cooling_start_hour', 'cooling_start_minute', 'cooling_end_hour', 'cooling_end_minute'];
+      const times = Object.fromEntries(timeRoles.map(role => [role, number(this._hass.states, this._config.entities[role])]));
+      const missing = [...temperatureRoles.filter(role => temperatures[role] === null), ...timeRoles.filter(role => !Number.isInteger(times[role]) || times[role] < 0 || times[role] > (role.endsWith('hour') ? 23 : 59))];
+      if (missing.length) return unknown('Mangler gyldige verdier: ' + missing.map(role => EXPLANATION_FIELDS.find(field => field.key === role).label.replace(/\s*\(valgfri\)/g, '')).join(', ') + '.');
+      if (this._hass.states[this._config.entities.outdoor_max_24h]?.attributes?.source_value_valid === false) return unknown('Døgnmaks-sensoren rapporterer ugyldig kildeverdi.');
+      if (temperatures.free_cooling_night_low > temperatures.free_cooling_night_high) return unknown('Nedre nattgrense er høyere enn øvre nattgrense.');
+      const zone = this._hass.config?.time_zone;
+      if (!zone || !Number.isFinite(now)) return unknown('Home Assistants tidssone eller tidspunkt er ikke tilgjengelig.');
+      let minute;
+      try {
+        const parts = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(now));
+        minute = Number(parts.find(part => part.type === 'hour').value) * 60 + Number(parts.find(part => part.type === 'minute').value);
+      } catch { return unknown('Home Assistants tidssone kunne ikke brukes.'); }
+      const start = times.cooling_start_hour * 60 + times.cooling_start_minute, end = times.cooling_end_hour * 60 + times.cooling_end_minute;
+      const inWindow = start <= end ? minute >= start && minute < end : minute >= start || minute < end;
+      const t = temperatures;
+      const label = t.outdoor_max_24h < t.free_cooling_day_min ? 'Dag ikke OK'
+        : t.outdoor_temperature > t.free_cooling_night_high ? 'For varmt'
+        : t.outdoor_temperature < t.free_cooling_night_low ? 'For kaldt'
+        : t.extract_temperature <= t.free_cooling_room_cancel ? 'Rom kaldt'
+        : !inWindow ? 'Venter tid' : 'Kandidat';
+      return { label, tone: 'neutral', kind: 'Beregnet i kortet' };
+    }
     _freeCooling() {
       const e = this._config.entities, s = this._hass.states;
       const active = binary(s, e.free_cooling_active), enabled = binary(s, e.free_cooling_enabled);
@@ -1296,11 +1357,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       if (['disabled', '0'].includes(diagnostic)) return { label: 'Tilstand: av', tone: 'neutral', kind: 'Rapportert diagnostikk' };
       if (['daytime', '2'].includes(diagnostic)) return { label: 'Dagfase', tone: 'neutral', kind: 'Rapportert diagnostikk' };
       if (['temperatures_not_reliable', '3'].includes(diagnostic) || binary(s, e.free_cooling_reliable) === false) return { label: 'Temperaturer usikre', tone: 'attention', kind: 'Rapportert diagnostikk' };
-      const local = this._raw('free_cooling_diagnosis');
-      for (const [fragment, label] of [['Kandidat nå', 'Kandidat'], ['utenfor', 'Venter tid'], ['Dagvilkår', 'Dag ikke OK'], ['For varmt', 'For varmt'], ['For kaldt', 'For kaldt'], ['Rom kaldt', 'Rom kaldt']]) {
-        if (local?.includes(fragment)) return { label, tone: 'neutral', kind: 'Lokal HA-diagnose' };
-      }
-      return { label: 'På', tone: 'neutral', kind: 'Rapportert · inaktiv' };
+      return this._freeCoolingCandidate();
     }
     _recoveryStatus(){
       const id=this._config.entities.recovery_output,entity=this._hass.states[id],value=number(this._hass.states,id);
@@ -1357,7 +1414,8 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const text = topic.text.replace(/\{\{([a-z0-9_]+)\}\}/g, (_, role) => EXPLANATION_FIELDS.find(field => field.key === role)?.label || 'Beregnet i kortet');
       const technical = this._entityRows(topic.technicalRoles || []);
       const recoveryHint=topic.key==='recovery'&&(!this._config.entities.recovery_output||!this._hass.states[this._config.entities.recovery_output])?'<div class="notice" role="status">Velg Vekslerpådrag (%) i Entitetskoblinger. Bruk samme entitet som i Cockpit hvis begge kort brukes.</div>':'';
-      return `<h3 id="explanation-title">${escape(topic.title)}</h3><p class="summary">${escape(status.label)} · ${escape(status.kind)}</p>${recoveryHint}${explanationHtml(text)}${this._entityRows(topic.roles)}${technical ? `<details class="technical-data" data-technical-topic="${topic.key}" ${this._technicalOpen[topic.key] ? 'open' : ''}><summary>Teknisk grunnlag</summary><p>Separate eldre signaler for sammenligning. De erstatter ikke statusen over.</p>${technical}</details>` : ''}<div class="close-row"><button class="close-button" data-close type="button"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div>`;
+      const dataHint = status.detail ? `<div class="notice" role="status">${escape(status.detail)}</div>` : '';
+      return `<h3 id="explanation-title">${escape(topic.title)}</h3><p class="summary">${escape(status.label)} · ${escape(status.kind)}</p>${recoveryHint}${dataHint}${explanationHtml(text)}${this._entityRows(topic.roles)}${technical ? `<details class="technical-data" data-technical-topic="${topic.key}" ${this._technicalOpen[topic.key] ? 'open' : ''}><summary>Teknisk grunnlag</summary><p>Separate eldre signaler for sammenligning. De erstatter ikke statusen over.</p>${technical}</details>` : ''}<div class="close-row"><button class="close-button" data-close type="button"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div>`;
     }
     _render() {
       const focused = this.shadowRoot.activeElement, focus = focused?.dataset.topic, focusRole = focused?.dataset.entityRole;
@@ -1376,6 +1434,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       else if (focusRole) this.shadowRoot.querySelector(`button[data-entity-role="${focusRole}"]`)?.focus({ preventScroll: true });
       else if (focusClose) this.shadowRoot.querySelector('button[data-close]')?.focus({ preventScroll: true });
       else if (focused?.tagName === 'SUMMARY') this.shadowRoot.querySelector('details summary')?.focus({ preventScroll: true });
+      this._scheduleCoolingClock(statuses.free_cooling.kind === 'Beregnet i kortet');
     }
   }
 

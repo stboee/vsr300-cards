@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.7.0 — 2026-11-10
+
+- Calculate free-cooling candidacy in Status og forklaringer from integration
+  temperatures, thresholds and start/end time, plus the existing rolling
+  24-hour outdoor-maximum Statistics sensor. Remove the local candidate-sensor
+  dependency and ignore its retired binding in old card configurations.
+- Preserve reported activity and native diagnostic priority. Label the local
+  assessment separately; unavailable or invalid necessary inputs are explicit
+  unknowns without guessed temperature or time defaults.
+- Add four graphical start/end hour/minute bindings. Existing mappings remain
+  authoritative: select these new fields using the same sources as Settings.
+  Use HA's time zone, cross-midnight windows and local minute-boundary refresh;
+  no history polling, HA entity creation or extra Modbus communication.
+- Document the complete Statistics definition, buffer limits, installation and
+  manual removal of the old candidate template after checking other references.
+- Cockpit, Control, Settings and their service behavior are preserved apart
+  from the package version. The unit's internal free-cooling decision remains
+  distinct from the card's interpretation.
+
 ## 1.6.1 — 2026-11-10
 
 - Apply Control's stronger filled blue selections and green activity markers to

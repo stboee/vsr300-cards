@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.6.1
+# Entitetskart – kortpakke 1.7.0
 
 Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
 korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke
@@ -78,8 +78,11 @@ fylt automatisk. Ingen HA-entiteter slettes av kortpakken.
 | `outdoor_temperature` | `sensor.systemair_save_utetemperatur` |
 | `free_cooling_state` | — |
 | `free_cooling_reliable` | `binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige` |
-| `free_cooling_diagnosis` | `sensor.systemair_frikjoling_kandidat` |
 | `outdoor_max_24h` | `sensor.systemair_ute_max_siste_24t` |
+| `cooling_start_hour` | `number.systemair_save_frikjoling_start_time` |
+| `cooling_start_minute` | `number.systemair_save_frikjoling_start_min` |
+| `cooling_end_hour` | `number.systemair_save_frikjoling_slutt_time` |
+| `cooling_end_minute` | `number.systemair_save_frikjoling_slutt_min` |
 | `free_cooling_day_min` | `number.systemair_save_frikjoling_dag_min_temperatur` |
 | `free_cooling_night_high` | `number.systemair_save_frikjoling_natt_hoy_grense` |
 | `free_cooling_night_low` | `number.systemair_save_frikjoling_natt_lav_grense` |
@@ -139,3 +142,7 @@ Veksler krever `recovery_output` i forklaringskortet. Velg samme entitet som i
 Cockpit når begge brukes. Tom kobling, manglende entitet og utilgjengelig
 verdi skilles. 100 % er pådrag, ikke virkningsgrad. Pådrag og aktiv-status
 er ulike signaler. Klikk på verdirader åpner valgt HA-entitet.
+
+Frikjølingskandidaten beregnes i forklaringskortet fra disse kildene.
+Den tidligere `free_cooling_diagnosis`-koblingen ignoreres. Døgnmaks er fortsatt
+en lokal HA-statistikksensor; se [oppsett og overgang](FREE-COOLING.md).

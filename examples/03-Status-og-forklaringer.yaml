@@ -1,5 +1,5 @@
 # VSR300 – Status og forklaringer
-# Kortpakke: 1.6.1
+# Kortpakke: 1.7.0
 type: custom:vsr300-explanations-card
 title: "Status og forklaringer"
 show_title: true
@@ -22,12 +22,15 @@ entities:
   outdoor_temperature: sensor.systemair_save_utetemperatur
   free_cooling_state: ''
   free_cooling_reliable: binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige
-  free_cooling_diagnosis: sensor.systemair_frikjoling_kandidat
   outdoor_max_24h: sensor.systemair_ute_max_siste_24t
   free_cooling_day_min: number.systemair_save_frikjoling_dag_min_temperatur
   free_cooling_night_high: number.systemair_save_frikjoling_natt_hoy_grense
   free_cooling_night_low: number.systemair_save_frikjoling_natt_lav_grense
   free_cooling_room_cancel: number.systemair_save_frikjoling_rom_avbryt_temperatur
+  cooling_start_hour: number.systemair_save_frikjoling_start_time
+  cooling_start_minute: number.systemair_save_frikjoling_start_min
+  cooling_end_hour: number.systemair_save_frikjoling_slutt_time
+  cooling_end_minute: number.systemair_save_frikjoling_slutt_min
   electric_power: sensor.vsr300_power
   electric_energy: sensor.vsr300_energy
   supply_setpoint: number.systemair_save_tilluft_setpunkt_degc

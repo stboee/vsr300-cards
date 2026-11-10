@@ -1,4 +1,49 @@
-# Verifikasjon – 1.6.1 – 2026-11-10
+# Verifikasjon – 1.7.0 – 2026-11-10
+
+## Gjennomført lokalt – 1.7.0
+
+Sju logikkgrupper og tre nettlesergrupper består med simulerte HA-data.
+Ingen ny praktisk test utføres på brukerens HA eller VSR300.
+
+- Kandidatvurderingen beholder temperaturrekkefølgen fra den vedlagte aktive
+  templaten: daggrense, øvre/nedre nattgrense, romgrense, tidsvindu, kandidat.
+  Likhet med dag-/nattgrense tillates; likhet med romgrensen blokkerer.
+  Numerisk null og negative temperaturer beholdes som gyldige verdier.
+- Alle elleve nødvendige temperatur-/tidsverdier kontrolleres som manglende,
+  ukjente, utilgjengelige, ikke-numeriske og uten valgt entitet. Resultatet er
+  ukjent uten erstatningstemperaturer eller tider. Ugyldige klokkeslett,
+  omvendte nattgrenser, ugyldig tidssone og ugyldig statistikkilde er med.
+- HA-tidssone, minuttskifte, start/slutt, vindu over midnatt, tomt vindu og
+  begge forekomster av høstens gjentatte klokkeslett er kontrollert. °F og
+  blandede °C/°F-kilder normaliseres, også ved likhet med terskel.
+- Rapportert aktiv, deaktivert, ukjent og kjent native diagnostikk har prioritet.
+  Den gamle kandidat-koblingen ignoreres. Lagrede koblinger overstyres ikke;
+  fire nye tidskoblinger i et eksisterende kort må velges av brukeren.
+- Én lokal tidtaker oppdaterer ved minuttskifte når vurderingen kan beregnes.
+  Den stoppes ved frakobling og når slik vurdering ikke brukes. Ingen nye
+  historikkforespørsler, tjenestekall, HA-entiteter eller Modbus-klienter innføres.
+- Nettleseren viser Kandidat, Venter tid, manglende døgnmaks og rapportert Aktiv.
+  Kildene kan åpnes i vanlig HA-mer-info, og valgt forklaring/fokus består.
+  Endring av bare HA-tidssonen oppdaterer også vurderingen.
+- Lyst/mørkt tema ved 320/360/412/900 CSS-piksler har tre statuskolonner uten
+  horisontal overflyt. Ingen sidefeil, eksterne forespørsler eller tjenestekall
+  ble registrert i testnettleseren.
+- Cockpit, Kontrollpanel og deres felles kode er byte-sammenlignet med 1.6.1,
+  med bare pakkeversjonen normalisert. Innstillinger-koden og standardvalgene
+  til disse tre kortene er identiske. Nye tidsfelt gjelder forklaringskortet.
+
+Logikkontrollen kan gjentas med `node tests/free-cooling.cjs` fra repositoriet.
+Nettleserkontrollen bruker en lokal HA-simulering, ikke en installert HA-frontend.
+Vedlikeholderen oppgir HA 2026.11.1. Faktisk HACS-oppdatering, de fire nye
+entitetsvalgene og visning i HA gjenstår som brukerkontroll.
+
+Den eksisterende Statistics-definisjonen er lest fra vedlikeholderens
+containerutskrift. Attributter og CSV-eksport støtter å beholde den som
+døgnmaks-kilde. Dette verifiserer ikke at rullerende HA-maksimum tilsvarer
+firmwarens interne dagvilkår, eller at kandidaten beskriver alle interne sperrer.
+Rå brukerhistorikk er ikke inkludert i repositoriet.
+
+## Historisk kontrollgrunnlag – 1.6.1
 
 ## Gjennomført lokalt – 1.6.1
 

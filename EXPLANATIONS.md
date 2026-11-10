@@ -1,4 +1,4 @@
-# Status og forklaringer – 1.6.1
+# Status og forklaringer – 1.7.0
 
 Det tredje kortet i samme pakke som SVG og Kontrollpanel:
 
@@ -10,6 +10,14 @@ Oppdater pakken gjennom HACS, last nettlesersiden helt på nytt og legg til
 **Systemair Status og forklaringer** fra kortvelgeren. De to andre kortene
 beholder eksisterende oppsett. Et komplett eksempel ligger i
 [03-Status-og-forklaringer.yaml](examples/03-Status-og-forklaringer.yaml).
+
+## Frikjølingskandidat i 1.7.0
+
+Kandidatvurderingen beregnes nå i kortet. Behold døgnmaks-sensoren, og velg
+alle fire tidsentiteter i tillegg til temperaturer og grenser. Rapporterte
+statuser har prioritet. Manglende gyldig grunnlag vises som ukjent.
+Den tidligere `free_cooling_diagnosis`-koblingen ignoreres og kan fjernes.
+Se [komplett sensordefinisjon og overgang](FREE-COOLING.md).
 
 ## Oppsett
 
@@ -114,14 +122,15 @@ styrekilde, uten å oversette den til Lav/Normal/Høy.
 | Målt energi | Vises blant de relevante verdiene når en energisensor er valgt. Kortet beregner ikke energi fra et øyeblikksbilde av effekt. |
 | Frikjøling – rapportert tilstand | Valgfri native diagnostikk fra integrasjonen, blant annet Dagfase og Temperaturer usikre. |
 | Frikjøling – temperaturer pålitelige | Separat rapportert diagnostikk. Ukjent verdi behandles ikke som av. |
-| Frikjøling – lokal HA-diagnose | Bevarer de tidligere Kandidat, Venter tid, Dag ikke OK, For varmt, For kaldt og Rom kaldt fra en eksisterende sensor. Feltet merkes **Lokal HA-diagnose**. |
-| Utetemperatur – maks siste 24t | Eksisterende historikkbasert sensor, hvis ønskelig. Kortet lager ikke døgnmaksimum fra en enkelt avlesning. |
+| Frikjølingskandidat | Beregnes i kortet fra temperaturer, grenser, tid og døgnmaks. Merkes **Beregnet i kortet**. Ingen kandidat-sensor kreves. |
+| Utetemperatur – maks siste 24t | Eksisterende HA-statistikksensor til kandidatvurderingen. Kortet henter ingen historikk. Se [definisjon](FREE-COOLING.md). |
+| Frikjøling – start-/sluttime og minutt | Fire number-entiteter fra integrasjonen. Velg samme kilder som i Innstillinger. Tidsvinduet bruker HA-installasjonens tidssone. |
 
 Rapportert frikjølingsaktivitet har prioritet i statusfeltet. Deretter brukes
-kjente native diagnoser, og deretter en eventuell lokal diagnose. De enkelte
-verdiene kan ses hver for seg i forklaringen. Lokal diagnose er en tolkning,
-ikke en avlest begrunnelse fra firmware. Tømmes de lokale feltene, fungerer
-grunnstatusen fortsatt fra integrasjonens aktivitet og tillatelse.
+kjente native diagnoser, og deretter kortets kandidatvurdering. Denne er en
+lokal tolkning, ikke en avlest begrunnelse fra firmware. Mangler nødvendige
+kilder, vises kandidatvurderingen som ukjent. Rapportert aktivitet, tillatelse
+og eventuell diagnostikk kan fortsatt leses separat i forklaringen.
 
 ## Overgang fra det gamle YAML-kortet
 
@@ -132,10 +141,9 @@ grunnstatusen fortsatt fra integrasjonens aktivitet og tillatelse.
    Disse kan fortsatt ha andre brukere i HA; kontroller øvrige referanser før
    eventuell opprydding. Pakken sletter eller endrer ingen HA-konfigurasjon.
 
-Den valgfrie lokale frikjølingsdiagnosen er fortsatt en egen HA-kilde dersom
-den velges. Den er ikke erstattet av en ny regulator eller en ny beregning av
-alle startvilkår. Behold den hvis dens mer detaljerte lokale diagnose ønskes,
-eller tøm feltet for å bruke bare rapporterte integrasjonsverdier.
+Fra 1.7.0 kreves ikke den gamle kandidat-sensoren. Følg
+[overgangsveiledningen](FREE-COOLING.md) før du fjerner template-blokken selv.
+Behold døgnmaks-sensoren og alle øvrige funksjoner som fortsatt brukes.
 
 ## English quick guide
 
@@ -154,8 +162,11 @@ including keyboard support. The explanation stays open. Missing entities have
 no action; existing unavailable entities remain inspectable. Card-local house
 load has no separate history; its underlying source rows can be opened.
 House load is calculated from native integration values. No helper,
-button-card dependency or local house-load entity is required. Optional local
-free-cooling diagnoses and measured electrical power remain external HA inputs.
-Check other consumers before removing any old helpers or templates.
+button-card dependency or local house-load entity is required. The optional
+24-hour maximum and measured electrical power remain external HA inputs.
+From 1.7.0 the card calculates free-cooling candidacy itself. The old candidate
+sensor is no longer used; select the four new time bindings and retain the
+24-hour maximum. See [setup and migration](FREE-COOLING.md). Check other
+consumers before removing any old helpers or templates.
 
 Filter-emnet som ble innført i 1.3.0 er fjernet fra forklaringskortet i 1.4.1.

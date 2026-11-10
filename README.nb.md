@@ -3,8 +3,8 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.6.1**.
-Referanseoppsettet er HA 2026.10.2 og
+med grafisk valg av entiteter. Kortversjon: **1.7.0**.
+Vedlikeholderen oppgir HA 2026.11.1 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 ## Installer med HACS – egendefinert repository
@@ -25,7 +25,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.6.1`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.7.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -41,6 +41,10 @@ Komplette YAML-oppsett ligger i [01-SVG.yaml](examples/01-SVG.yaml),
 oppsettene, må du også kontrollere og tilpasse alle entitets-ID-er under
 `entities:` før kortene tas i bruk.** Navnene er eksempler fra én installasjon.
 Selve frontendfilen krever ingen omstart av Home Assistant.
+
+For den valgfrie frikjølingsvurderingen må
+[døgnmaks-sensor og tidskoblinger](FREE-COOLING.md) være satt opp. Kortet kan
+brukes uten vurderingen; manglende kandidatgrunnlag vises eksplisitt.
 
 ## Oppdatering
 
@@ -70,11 +74,25 @@ type: custom:vsr300-explanations-card
 ```
 
 Kontroller entitetskoblingene. Startverdiene er eksempler, også for de valgfrie
-lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
+døgnmaks- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.6.1
+## Endringer i 1.7.0
+
+Frikjølingskandidaten beregnes nå i Status og forklaringer. Grunnlaget er valgte
+integrasjonstemperaturer, grenser og start-/sluttid, samt eksisterende døgnmaks
+i HA. Kortet henter ingen historikk og oppretter ingen entiteter. Rapportert
+aktivitet og diagnostikk har fortsatt prioritet. Manglende nødvendige verdier
+vises som ukjent, uten antatte temperaturer eller tider.
+
+**Eksisterende kort:** behold entitetsvalgene og velg de fire nye feltene for
+start-/sluttime og minutt i forklaringskortets editor. Bruk samme number-entiteter
+som i Innstillinger; koblingene kopieres ikke mellom kort. Kontroller vurderingen
+før du selv fjerner den gamle kandidat-templaten. Den gamle kortkoblingen
+ignoreres. Behold døgnmaks-sensoren. Se [sensordefinisjon og overgang](FREE-COOLING.md).
+
+## Historikk – 1.6.1
 
 Innstillinger og Status og forklaringer bruker nå de samme sterkere, fylte
 uthevingene som Kontrollpanel. Åpne felt er blå. Rapportert aktivitet,
@@ -223,7 +241,7 @@ SVG-ens totale bredde og skriftstørrelser er beholdt.
 - `≈` markerer integrasjonens estimerte luftmengde. **Vekslerpådrag** er et pådrag, ikke målt virkningsgrad. Ettervarme vises i prosent, uten wattestimat.
 - Hvert aktivt tilkoblet alarmsignal får egen rad. A/B/C er samlealarmer og kan overlappe andre indikasjoner.
 - Luftveiene og animasjonene er skjematiske.
-- **Status og forklaringer** har ti statusfelt som standard, med to valgfrie eksterne funksjoner og forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Lokal frikjølingsdiagnose og døgnmaksimum er valgfrie eksisterende HA-kilder som skilles fra integrasjonens rapportering. Trykk på verdiradene i forklaringene for å åpne tilhørende HA-entitet og tilgjengelig historikk. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
+- **Status og forklaringer** har ti statusfelt som standard, med to valgfrie eksterne funksjoner og forklaringer, lokalt menyvalg (nytt trykk på samme felt lukker teksten), tre kolonner også på mobil, beregnet Huslast og valgfri effektmåling. Det krever verken input_select-hjelper eller button-card. Frikjølingskandidaten beregnes i kortet fra integrasjonsverdier og en valgfri eksisterende døgnmaks-sensor. Vurderingen skilles fra integrasjonens rapportering. Trykk på verdiradene i forklaringene for å åpne tilhørende HA-entitet og tilgjengelig historikk. Se [kortet og overgangen fra YAML](EXPLANATIONS.md).
 
 [Entitetskart](ENTITETSKART.md) · [Endringslogg](CHANGELOG.md) ·
 [Verifikasjon og begrensninger](VERIFIKASJON.md) · [Kilder](SOURCES.md) · [MIT-lisens](LICENSE)

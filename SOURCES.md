@@ -85,6 +85,24 @@ the entire bundle is byte-identical to 1.6.0. Strong selections and activity
 markers were compared with Control in a local browser. There are no new source
 entities, calculations, register assumptions or physical-unit test claims.
 
+Version 1.7.0, 2026-11-10, moves the local free-cooling candidate assessment
+from the maintainer's supplied active template into the explanations card.
+The supplied `systemair_24h.yaml` definition was confirmed by the maintainer's
+container readout, together with current Statistics attributes and a CSV history
+export. That supports retaining the existing Statistics source; raw HA telemetry
+is not redistributed. HA 2026.11.1 is maintainer-reported, not a live installation
+tested from this environment. Howard v1.3.0 remains the reviewed integration.
+
+The handover register PDF's free-cooling table, printed pages 46–47, was read
+and visually checked. It documents IR3102, IR4114, IR4119 and IR4120, not an
+exposed 24-hour outdoor maximum or complete candidate decision. The card does
+not treat these observation registers as the decision-making firmware itself.
+The existing reported-active binding is retained; this release does not add
+physical verification of IR4111 or change its provisional project status.
+The local rolling maximum and candidate result are not represented as firmware
+measurements. Time-window evaluation assumes HA's configured time zone agrees
+with the unit clock. Installation and migration are in [FREE-COOLING.md](FREE-COOLING.md).
+
 ## External software and documentation
 
 | Source | Use in this package |
@@ -102,6 +120,8 @@ entities, calculations, register assumptions or physical-unit test claims.
 | [HA frontend schema types 20260930.4](https://github.com/home-assistant/frontend/blob/20260930.4/src/components/ha-form/types.ts) | Native editor field defaults, boolean and select selectors. |
 | [MDN reduced-motion media query](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion) | Behaviour of the optional Auto animation mode. |
 | [HA state objects](https://www.home-assistant.io/docs/configuration/state_object/) | Report/update timestamps used to anchor the local countdown display. |
+| [HA Statistics](https://www.home-assistant.io/integrations/statistics/) | Existing rolling-maximum helper, sample/time limits, buffer attributes and startup restoration. |
+| [HA History](https://www.home-assistant.io/integrations/history/) | User-supplied CSV export and the distinction between recorded changes and polling frequency. |
 | [MDN setInterval](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval) | Local one-second visual updates and timer cleanup. |
 | [HACS custom repositories](https://www.hacs.dev/docs/faq/custom_repositories/) | Add this GitHub repository manually in HACS. |
 | [HACS dashboard elements](https://hacs.dev/docs/use/repositories/type/dashboard/) | Dashboard type, downloaded frontend files and the `/hacsfiles/` resource endpoint. |

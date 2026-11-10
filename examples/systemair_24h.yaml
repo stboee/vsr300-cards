@@ -1,0 +1,13 @@
+# VSR300 Cards 1.7.0 — optional Statistics source for the candidate assessment.
+# List entry for an existing sensor: / !include_dir_merge_list sensor/ setup.
+# Keep an existing instance. Adapt the source entity; do not create a duplicate.
+# See ../FREE-COOLING.md for includes, actual entity IDs and buffer limits.
+- platform: statistics
+  name: "Systemair ute max siste 24t"
+  unique_id: systemair_ute_max_siste_24t
+  entity_id: sensor.systemair_save_utetemperatur
+  state_characteristic: value_max
+  max_age:
+    hours: 24
+  sampling_size: 1000
+  precision: 1

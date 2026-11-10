@@ -76,7 +76,6 @@
       "outdoor_temperature": "sensor.systemair_save_utetemperatur",
       "free_cooling_state": "",
       "free_cooling_reliable": "binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige",
-      "free_cooling_diagnosis": "sensor.systemair_frikjoling_kandidat",
       "outdoor_max_24h": "sensor.systemair_ute_max_siste_24t",
       "free_cooling_day_min": "number.systemair_save_frikjoling_dag_min_temperatur",
       "free_cooling_night_high": "number.systemair_save_frikjoling_natt_hoy_grense",
@@ -93,7 +92,11 @@
       "recovery_output": "sensor.systemair_save_varmegjenvinning",
       "legacy_triac": "sensor.systemair_save_triac_control_signal",
       "legacy_eco": "binary_sensor.systemair_save_oko_funksjon_aktiv",
-      "pressure_guard_active": "binary_sensor.systemair_save_trykkvakt_aktiv"
+      "pressure_guard_active": "binary_sensor.systemair_save_trykkvakt_aktiv",
+      "cooling_start_hour": "number.systemair_save_frikjoling_start_time",
+      "cooling_start_minute": "number.systemair_save_frikjoling_start_min",
+      "cooling_end_hour": "number.systemair_save_frikjoling_slutt_time",
+      "cooling_end_minute": "number.systemair_save_frikjoling_slutt_min"
     },
     "show_sources": false,
     "balance_tolerance": 15,

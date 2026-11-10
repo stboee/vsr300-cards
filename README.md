@@ -4,7 +4,7 @@ Four Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer**, and optional
 **Systemair Innstillinger**,
 with graphical entity selection. Current card
-version: **1.6.1**. Reference setup: HA 2026.10.2 and
+version: **1.7.0**. Maintainer-reported setup: HA 2026.11.1 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -27,7 +27,7 @@ once through HACS. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.6.1`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.7.0`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -43,6 +43,10 @@ Complete YAML configurations are available in [01-SVG.yaml](examples/01-SVG.yaml
 examples, also check and adapt every entity ID under `entities:` before using
 the cards.** The prefilled IDs are installation-specific examples.
 The frontend file itself does not require a Home Assistant restart.
+
+For the optional free-cooling candidate assessment, configure the
+[24-hour maximum sensor and time bindings](FREE-COOLING.md). The card works
+without that assessment; missing candidate inputs are shown explicitly.
 
 ## Updates
 
@@ -72,11 +76,25 @@ type: custom:vsr300-explanations-card
 ```
 
 Check its entity bindings. Your initial presets are examples, including optional
-local diagnosis and electrical-meter entities. Clear optional fields you do not
+24-hour maximum and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
 
-## Changes in 1.6.1
+## Changes in 1.7.0
+
+Free-cooling candidacy is now calculated inside Status og forklaringer. It uses
+the mapped integration temperatures, thresholds and start/end hour/minute, plus
+the existing HA 24-hour outdoor maximum. No history polling or new HA entity is
+created. Reported activity/diagnostics retain priority. Missing necessary input
+is explicitly unknown, without guessed temperatures or times.
+
+**Existing cards:** keep all entity mappings and select the four new free-cooling
+start/end time fields in the explanations editor. Use the same number entities
+as Settings; bindings are not copied between cards. Then check the calculation
+before manually removing the old local candidate template. Its old binding is
+ignored. Keep the maximum sensor. See [sensor definition and migration](FREE-COOLING.md).
+
+## History — 1.6.1
 
 Settings and Status og forklaringer now use the same stronger filled highlights
 as Control. Open fields are blue; reported activity, missing/uncertain data and
@@ -220,7 +238,7 @@ thermal efficiency, and no new history is created by the card.
 - `≈` marks the integration's estimated airflow. **Vekslerpådrag** is control output, not measured heat-recovery efficiency. Heater output is shown in percent, without a watt estimate.
 - Each active configured alarm signal gets its own row. A/B/C are summary alarms and may overlap other indications.
 - The air paths and animations are schematic.
-- **Status og forklaringer** has ten default status topics plus two optional external functions and explanations, local open/close selection (tap the same tile again to close), three columns on mobile, calculated house load, and optional measured power. It needs neither an input_select helper nor button-card. Local free-cooling diagnosis and 24-hour maximum are optional existing HA sources, clearly separate from integration reports. Tap the entity rows inside explanations to open their mapped HA entity and available history. See [explanations card and migration](EXPLANATIONS.md).
+- **Status og forklaringer** has ten default status topics plus two optional external functions and explanations, local open/close selection (tap the same tile again to close), three columns on mobile, calculated house load, and optional measured power. It needs neither an input_select helper nor button-card. Free-cooling candidacy is calculated in the card from integration values and an optional existing HA 24-hour maximum sensor, clearly separate from integration reports. Tap the entity rows inside explanations to open their mapped HA entity and available history. See [explanations card and migration](EXPLANATIONS.md).
 
 ![Cards rendered with simulated values](images/overview-simulated.png)
 
