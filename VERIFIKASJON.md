@@ -1,4 +1,39 @@
-# Verifikasjon – 1.4.1 – 2026-11-09
+# Verifikasjon – 1.5.0 – 2026-11-10
+
+## Gjennomført lokalt – 1.5.0
+
+Elleve kontrollgrupper består med simulerte HA-data. Dette er lokal kode- og
+UI-verifikasjon, ikke nye målinger eller praktiske tester på vårt VSR300.
+
+- Cockpit, dets fellesgrunnlag og diagram er byte-identiske med 1.4.1 bortsett
+  fra pakkeversjonen. Standardkoblingene til alle fire kort er uendret.
+- Moduskommandoer, bekreftelser, varighetsvalg, native grenser/trinn, klokkeslett,
+  delvise tjenestefeil, doble innsendinger, fokus, utkast og historikk består.
+  Rapporterte verdier endres ikke optimistisk etter et tjenestekall.
+- Grønt markerer rapportert aktivitet. Blått markerer valg/betjening. Ettervarme
+  og vekslerprosent er nøytrale tall; aktiv varme vises separat uten rød alarm.
+  Ravgult skiller manglende/ukjente nødvendige kilder; en ikke valgt valgfri
+  effektmåler forblir nøytral. Auto-konfigurasjonsfeil og tjenestefeil er røde.
+- Toleransen for sammenligning av luftmengdeestimatene beholdes. Overskridelse
+  markeres som ulikt estimat, uten å påstå fysisk ubalanse eller gi grønt
+  kvalitetsstempel når estimatene er like. Beregningene er uendret.
+- HA-tema byttes også når entitetsobjektene er identiske. Fargebyttet krever
+  ingen ny rendering og bevarer inndata, fokus og utkast.
+- Lyst/mørkt oppsett ved 320/360/412/900 CSS-piksler, tre forklaringskolonner,
+  minst 44 CSS-piksler for synlige kontroller og synlig tastaturfokus består.
+- Elleve representative fargepar per tema er målt i nettleseren: tekst minst
+  5,78:1 og kontrollkanter minst 3,41:1 i testpalettene. Det oppfyller de valgte
+  målene på 4,5:1 og 3:1 for disse parene, ikke en full WCAG-sertifisering.
+  Egendefinerte HA-temaer kan påvirke kortbakgrunnen og må vurderes separat.
+- Alle refererte MDI-ikonnavn finnes i Material Design Icons 7.4.47. Lokale
+  forhåndsvisninger bruker denne fonten; HA leverer sine egne ikoner i drift.
+- Ingen eksterne forespørsler eller sidefeil i testnettleseren. Ingen tilgang
+  til brukerens HA, Modbus, integrasjon, templates, helpers eller aggregat.
+
+Faktisk HACS-oppdatering og visning/betjening i brukerens HA gjenstår.
+Manifest og JavaScript kontrolleres også fra den publiserte taggen.
+
+## Historisk kontrollgrunnlag – 1.4.1
 
 ## Gjennomført lokalt – 1.4.1
 

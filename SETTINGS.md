@@ -1,4 +1,4 @@
-# Innstillinger – kortpakke 1.4.1
+# Innstillinger – kortpakke 1.5.0
 
 Et valgfritt fjerde kort i samme JavaScript-pakke. Oppdater gjennom HACS,
 last dashboardet på nytt og legg til **Systemair Innstillinger** fra kortvelgeren:

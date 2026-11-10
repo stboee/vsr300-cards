@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.5.0 — 2026-11-10
+
+- Unify Control, Status/explanations and Settings with neutral surfaces and
+  borders, blue selection/actions and small semantic status markers. Remove
+  per-function colored outlines and decorative gradients. Cockpit is unchanged
+  apart from the package version.
+- Use green only for reported activity, amber for missing/uncertain required
+  data or an airflow-estimate difference, and red for actual configuration or
+  service errors. Keep heater and recovery percentages neutral. Optional unset
+  power is neutral; an explicitly configured unavailable source is distinguished.
+- Retain the estimate tolerance with an explicit amber estimate-difference label;
+  do not imply physical balance or efficiency. Keep all calculations and sources.
+- Standardize relevant native MDI icons, readable disabled controls, keyboard
+  focus, buttons and fields in both themes. HA theme-only updates preserve DOM,
+  focus and drafts. Three mobile columns and existing mappings are retained.
+- Refresh simulated previews and document the palette. Local behavior, layout
+  and contrast checks passed; actual HA installation remains a user check.
+
 ## Documentation — 2026-11-09
 
 - Correct HACS installation instructions in English and Norwegian: HACS

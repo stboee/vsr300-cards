@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.4.1 · 2026-11-09
+/* VSR300 custom cards · version 1.5.0 · 2026-11-10
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.4.1';
+  const VERSION = '1.5.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -665,7 +665,72 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
   }
 
   // Shared native entity controls: the integration remains the sole Modbus owner.
-  class NativeSettingsCard extends BaseCard {
+  const UI_STYLE = `
+    :host{color-scheme:light dark;container-type:inline-size;
+      --vsr-surface:var(--card-background-color,light-dark(#ffffff,#20262e));
+      --vsr-field:light-dark(#f5f7f9,#29313b);--vsr-text:light-dark(#17212b,#f3f5f7);
+      --vsr-secondary:light-dark(#4d5966,#bec7d0);--vsr-rule:light-dark(#d5dce3,#46515e);
+      --vsr-control-border:light-dark(#7b8794,#778698);--vsr-blue:light-dark(#135bbb,#8db9ff);
+      --vsr-on-blue:light-dark(#ffffff,#101a26);--vsr-blue-soft:light-dark(#e8f0fc,#233954);
+      --vsr-green:light-dark(#17653b,#8adbaa);--vsr-green-soft:light-dark(#eaf5ee,#143626);
+      --vsr-amber:light-dark(#8a4d00,#ffd17a);--vsr-amber-soft:light-dark(#fff3d6,#493611);
+      --vsr-red:light-dark(#b4232b,#ffb4b9);--vsr-red-soft:light-dark(#ffeded,#411f26);
+      --vsr-muted:light-dark(#eef1f4,#303842);color:var(--vsr-text)}
+    ha-card{display:block;box-sizing:border-box;padding:16px;border:1px solid var(--vsr-rule);border-radius:16px;background:var(--vsr-surface);color:var(--vsr-text)}
+    h2,h3{font-weight:600;line-height:1.4}h2{margin:0 0 14px;padding:0;font-size:20px}h3{margin:18px 0 10px;font-size:16px}
+    button{background:var(--vsr-field);border:1px solid var(--vsr-control-border);border-radius:12px;color:var(--vsr-text);box-shadow:none;line-height:1.4;touch-action:manipulation}
+    button strong{font-weight:600;font-size:15px}button small{color:var(--vsr-secondary);opacity:1;font-size:13px}
+    ha-icon{color:var(--vsr-secondary);--mdc-icon-size:26px}.large{border-radius:12px;min-height:130px}.large ha-icon{--mdc-icon-size:30px}.large strong{font-size:20px}
+    button.active,.status-button[aria-expanded=true],.setting-topic[aria-expanded=true],.duration-toggle[aria-expanded=true],.duration-choice[aria-expanded=true]{border:1px solid var(--vsr-blue);box-shadow:inset 0 0 0 1px var(--vsr-blue);background:var(--vsr-blue-soft);outline:none}
+    button.active>ha-icon,button[aria-expanded=true]>ha-icon{color:var(--vsr-blue)}
+    button:focus-visible,button.entity-row:focus-visible,.status-button:focus-visible,.setting-topic:focus-visible,.duration-choice:focus-visible,.duration-toggle:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--vsr-blue);outline-offset:2px}
+    button:disabled,input:disabled,select:disabled{opacity:1;cursor:not-allowed;color:var(--vsr-secondary)}button:disabled{border-style:dashed}button:disabled>ha-icon{color:var(--vsr-secondary)}
+    @media(hover:hover){button:not(:disabled):hover{box-shadow:inset 0 0 0 1px var(--vsr-control-border)}button.active:hover,button[aria-expanded=true]:hover{box-shadow:inset 0 0 0 1px var(--vsr-blue)}}
+    .state-chip{display:inline-flex;align-items:center;justify-content:center;gap:4px;max-width:100%;box-sizing:border-box;padding:3px 7px;border-radius:6px;font-size:13px;font-weight:500;line-height:1.4;background:var(--vsr-muted);color:var(--vsr-secondary);overflow-wrap:anywhere}
+    .state-chip ha-icon{--mdc-icon-size:15px;color:inherit}
+    .state-chip[data-tone=active]{background:var(--vsr-green-soft);color:var(--vsr-green)}
+    .state-chip[data-tone=attention]{background:var(--vsr-amber-soft);color:var(--vsr-amber)}
+    .state-chip[data-tone=danger]{background:var(--vsr-red-soft);color:var(--vsr-red)}
+    .state-chip[data-tone=selected]{background:var(--vsr-blue-soft);color:var(--vsr-blue)}
+    .notice{background:var(--vsr-amber-soft);color:var(--vsr-amber);border-radius:10px;font-size:14px}
+    .error,.setting-error{background:var(--vsr-red-soft);color:var(--vsr-red)}
+    .setting-feedback:not(.setting-error){background:var(--vsr-blue-soft);color:var(--vsr-text)}
+    .grid{gap:8px;margin-bottom:16px}.grid:last-child{margin-bottom:0}
+    .status-button,.setting-topic,.duration-choice{border-color:var(--vsr-control-border);border-radius:12px;background:var(--vsr-field);box-shadow:none}
+    .status-button{min-height:124px;gap:7px}.status-button .reading{font-size:17px;font-weight:500;line-height:1.35;color:var(--vsr-text);font-variant-numeric:tabular-nums}
+    .status-button .reading.state-chip{font-size:14px}.status-button .reading[data-tone=active]{color:var(--vsr-green)}.status-button .reading[data-tone=attention]{color:var(--vsr-amber)}.status-button .reading[data-tone=danger]{color:var(--vsr-red)}
+    .status-button .kind,.setting-sub,.reported,.draft-note,.values .source,.readout span,.duration-readonly small,.info-button .source{color:var(--vsr-secondary);font-size:13px;line-height:1.4}
+    .status-button .kind.state-chip[data-tone=active]{color:var(--vsr-green)}.status-button .kind.state-chip[data-tone=attention]{color:var(--vsr-amber)}
+    .status-button ha-icon,.setting-topic ha-icon,.panel-title ha-icon{--mdc-icon-size:26px}
+    .summary{font-weight:600}.values td,.info-table td{border-color:var(--vsr-rule)}
+    .entity-row{background:transparent;border:0;border-radius:6px;box-shadow:none}.entity-row .entity-value{font-variant-numeric:tabular-nums;font-weight:500}
+    @media(hover:hover){button.entity-row:hover{background:var(--vsr-field);box-shadow:none}}
+    .explanation-panel,.settings-panel{border-color:var(--vsr-rule)}.explanation-panel h3,.settings-panel h3{font-size:20px}
+    .technical-data,details,.setting-control{border:1px solid var(--vsr-rule);border-radius:12px;background:var(--vsr-field)}
+    .readout{border-radius:12px;background:var(--vsr-field)}.setting-reading{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+    .setting-control label,.control-label,summary{font-weight:600}.draft-note[data-pending=true]{color:var(--vsr-blue)}
+    input,select{background:var(--vsr-surface);border:1px solid var(--vsr-control-border);color:var(--vsr-text);font-size:16px;border-radius:8px}
+    input[type=number],input[type=time]{font-size:20px;font-variant-numeric:tabular-nums}
+    .apply,.switch-button[aria-checked=true]{background:var(--vsr-blue);border:1px solid var(--vsr-blue);color:var(--vsr-on-blue);font-weight:600}
+    .apply:disabled{background:var(--vsr-field);border-color:var(--vsr-control-border);color:var(--vsr-secondary)}
+    .number-entry button,.apply,.switch-button,.settings-close,.close-button,.info-button{border-radius:8px;min-height:44px}
+    .settings-close ha-icon,.close-button ha-icon{--mdc-icon-size:20px}.info-button{background:transparent;border:0}
+    .duration-panel{border:1px solid var(--vsr-rule);border-radius:12px;background:var(--vsr-surface)}.duration-choice{min-height:84px}.duration-choice ha-icon{--mdc-icon-size:24px}
+    .setting-topic{min-height:144px}.settings-menu{gap:8px}.panel-title ha-icon{color:var(--vsr-secondary)}
+    @container(max-width:380px){ha-card{padding:12px}.status-grid,.duration-mode-grid{gap:6px}.status-button,.duration-choice{padding:9px 4px}.setting-topic{min-height:144px}}
+  `;
+  // Presentation is scoped to these three cards; Cockpit keeps its own palette.
+  class StyledCard extends BaseCard {
+    set hass(value) {
+      // Update the palette even when HA reports identical state objects.
+      // With no explicit HA preference, inherit the browser's color scheme.
+      this.style.colorScheme = typeof value?.themes?.darkMode === 'boolean' ? (value.themes.darkMode ? 'dark' : 'light') : '';
+      super.hass = value;
+    }
+    get hass() { return super.hass; }
+  }
+  const uiText = value => escape(value).replace(/Behovsstyring/g, 'Behovs&shy;styring').replace(/Varmefunksjon/g, 'Varme&shy;funksjon');
+  class NativeSettingsCard extends StyledCard {
     constructor() {
       super();this._drafts={};this._busy=false;this._error='';this._message='';
       this.shadowRoot.addEventListener('input',event=>this._rememberDraft(event));
@@ -769,10 +834,11 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       // An HA button may legitimately have state 'unknown' before its first press.
       return !!entity && entity.state !== 'unavailable';
     }
-    _button(action, name, label, icon, active, color, large = false) {
+    _button(action, name, label, icon, active, large = false) {
       const command = ['manual', 'fireplace'].includes(action) ? 'mode_select' : action + '_button';
       const enabled = this._available(command) && !this._busy;
-      return `<button type="button" data-action="${action}" class="${large ? 'large ' : ''}${active ? 'active' : ''}" style="--accent:${color};--tint:${color}55" aria-pressed="${active}" ${enabled ? '' : 'disabled'} title="${escape(enabled ? name : name + ' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong><small>${escape(label)}</small></button>`;
+      const speed = ['low', 'normal', 'high'].includes(action);
+      return `<button type="button" data-action="${action}" class="${large ? 'large ' : ''}${active ? 'active' : ''}" aria-pressed="${active}" ${enabled ? '' : 'disabled'} title="${escape(enabled ? name : name + ' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong>${active ? `<span class="state-chip" data-tone="${speed ? 'selected' : 'active'}"><ha-icon icon="mdi:check" aria-hidden="true"></ha-icon>${speed ? 'Valgt' : 'Aktiv'}</span>` : ''}<small>${escape(label)}</small></button>`;
     }
     _duration(role, unit) {
       const v = number(this._hass.states, this._config.entities[role]);
@@ -787,32 +853,32 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const autoLabel = !modeKnown ? 'Modus ukjent' : mode !== 'auto' ? 'Ikke aktiv' : AUTO_NAMES[source] || 'Styrekilde ukjent';
       const speedName = { Low: 'Lav', Normal: 'Normal', High: 'Høy', Stop: 'Stopp' }[speed] || 'Ukjent';
       const showManual = manual || state(states, e.mode_select) === 'Manual';
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${SETTINGS_STYLE}${DURATION_STYLE}</style>${this._heading()}${this._missingNotice()}
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${SETTINGS_STYLE}${DURATION_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}
         <div class="grid two">
-          ${this._button('auto', 'Auto', autoLabel, 'mdi:fan-auto', mode === 'auto', '#84cc16', true)}
-          ${this._button('manual', 'Manuell', 'Manuell · ' + speedName, 'mdi:hand-back-right-outline', manual, '#38bdf8', true)}
+          ${this._button('auto', 'Auto', autoLabel, 'mdi:fan-auto', mode === 'auto', true)}
+          ${this._button('manual', 'Manuell', 'Manuell · ' + speedName, 'mdi:hand-back-right-outline', manual, true)}
         </div>
         ${showManual ? `<h3>Manuell viftehastighet</h3><div class="grid three">
-          ${this._button('low', 'Lav', 'Manuell', 'mdi:fan-speed-1', speed === 'Low', '#69f0ae')}
-          ${this._button('normal', 'Normal', 'Manuell', 'mdi:fan-speed-2', speed === 'Normal', '#40c4ff')}
-          ${this._button('high', 'Høy', 'Manuell', 'mdi:fan-speed-3', speed === 'High', '#ffab40')}
+          ${this._button('low', 'Lav', 'Manuell', 'mdi:fan-speed-1', speed === 'Low')}
+          ${this._button('normal', 'Normal', 'Manuell', 'mdi:fan-speed-2', speed === 'Normal')}
+          ${this._button('high', 'Høy', 'Manuell', 'mdi:fan-speed-3', speed === 'High')}
         </div>` : ''}
         <h3>Tidsstyrte og spesialmoduser</h3><div class="grid three">
-          ${this._button('fireplace', 'Ildsted', this._duration('fireplace_duration', 'min'), 'mdi:fireplace', mode === 'fireplace', '#ff7043')}
-          ${this._button('boost', 'Boost', this._duration('boost_duration', 'min'), 'mdi:fan-plus', mode === 'boost', '#40c4ff')}
-          ${this._button('party', 'Party', this._duration('party_duration', 't'), 'mdi:account-group', mode === 'party', '#ec4899')}
-          ${this._button('away', 'Borte', this._duration('away_duration', 't'), 'mdi:home-export-outline', mode === 'away', '#94a3b8')}
-          ${this._button('holiday', 'Ferie', this._duration('holiday_duration', 'd'), 'mdi:beach', mode === 'holiday', '#94a3b8')}
-          <button type="button" data-duration-toggle data-focus-key="duration-toggle" aria-expanded="${this._durationsOpen}" aria-controls="duration-settings" class="duration-toggle" style="--accent:#c084fc;--tint:#c084fc55"><ha-icon icon="mdi:timer-cog-outline" aria-hidden="true"></ha-icon><strong>Varigheter</strong><small>Innstillinger</small></button>
+          ${this._button('fireplace', 'Ildsted', this._duration('fireplace_duration', 'min'), 'mdi:fireplace', mode === 'fireplace')}
+          ${this._button('boost', 'Boost', this._duration('boost_duration', 'min'), 'mdi:fan-plus', mode === 'boost')}
+          ${this._button('party', 'Party', this._duration('party_duration', 't'), 'mdi:account-group-outline', mode === 'party')}
+          ${this._button('away', 'Borte', this._duration('away_duration', 't'), 'mdi:home-export-outline', mode === 'away')}
+          ${this._button('holiday', 'Ferie', this._duration('holiday_duration', 'd'), 'mdi:bag-suitcase-outline', mode === 'holiday')}
+          <button type="button" data-duration-toggle data-focus-key="duration-toggle" aria-expanded="${this._durationsOpen}" aria-controls="duration-settings" class="duration-toggle"><ha-icon icon="mdi:timer-cog-outline" aria-hidden="true"></ha-icon><strong>Varigheter</strong><small>Innstillinger</small></button>
         </div><div class="error" role="alert"></div>
         <div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div>
-        ${this._durationsOpen?this._durationPanel():''}`;
+        ${this._durationsOpen?this._durationPanel():''}</ha-card>`;
       if (this._serviceError) this.shadowRoot.querySelector('.error').textContent = this._serviceError;
       if(focus)Array.from(this.shadowRoot.querySelectorAll('[data-focus-key]')).find(el=>el.dataset.focusKey===focus)?.focus({preventScroll:true});
     }
     getCardSize(){return this._durationsOpen?(this._durationRole?15:11):8;}
     _durationPanel(){
-      const modes=[['fireplace_duration','Ildsted','min','mdi:fireplace','#ff7043'],['boost_duration','Boost','min','mdi:fan-plus','#40c4ff'],['party_duration','Party','t','mdi:account-group','#ec4899'],['away_duration','Borte','t','mdi:home-export-outline','#94a3b8'],['holiday_duration','Ferie','d','mdi:beach','#94a3b8']];
+      const modes=[['fireplace_duration','Ildsted','min','mdi:fireplace'],['boost_duration','Boost','min','mdi:fan-plus'],['party_duration','Party','t','mdi:account-group-outline'],['away_duration','Borte','t','mdi:home-export-outline'],['holiday_duration','Ferie','d','mdi:bag-suitcase-outline']];
       const selected=modes.find(([role])=>role===this._durationRole);
       let editor='';
       if(selected){
@@ -822,7 +888,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
         else editor=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[unit]+')');
       }
       return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><h3 id="duration-title">Modusvarigheter</h3>
-        <div class="duration-mode-grid">${modes.map(([role,name,unit,icon,color])=>`<button type="button" class="duration-choice" data-duration-choice="${role}" data-focus-key="duration-choice-${role}" aria-expanded="${this._durationRole===role}" aria-controls="duration-value-panel" style="--accent:${color};--tint:${color}22" ${this._busy?'disabled':''}><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong><small>${escape(this._duration(role,unit))}</small></button>`).join('')}</div>
+        <div class="duration-mode-grid">${modes.map(([role,name,unit,icon])=>`<button type="button" class="duration-choice" data-duration-choice="${role}" data-focus-key="duration-choice-${role}" aria-expanded="${this._durationRole===role}" aria-controls="duration-value-panel" ${this._busy?'disabled':''}><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong><small>${escape(this._duration(role,unit))}</small></button>`).join('')}</div>
         <div id="duration-value-panel">${editor}</div><div class="settings-foot"><button type="button" class="settings-close" data-duration-close data-focus-key="duration-close"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div></section>`;
     }
     async _activate(action) {
@@ -892,7 +958,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "key": "free_cooling",
     "name": "Frikjøling",
     "title": "Frikjøling",
-    "icon": "mdi:snowflake",
+    "icon": "mdi:weather-windy",
     "text": "**Frikjøling** bruker kaldere uteluft til å kjøle boligen uten mekanisk kjøling.\n\nKjøleeffekt vises gjennom **Huslast**. Når frikjøling rapporteres aktiv og Huslast er positiv, viser Huslast-knappen verdien som **W kjøl**. Verdien er et lokalt effektestimat basert på estimert luftmengde.\n\nStatusknappen kan vise flere tilstander:\n\n**Av**  \nFrikjøling er ikke aktivert/tillatt i aggregatet.\n\n**På**  \nFrikjøling er tillatt, men HA-diagnosen matcher ikke en mer spesifikk tilstand akkurat nå.\n\n**Aktiv**  \nIntegrasjonen rapporterer frikjøling aktiv nå. Da er det normalt at tillufttemperaturen blir lavere enn valgt tilluftssettpunkt, fordi hensikten er å kjøle huset.\n\n**Kandidat**  \nDe eksponerte verdiene i HA tyder på at frikjøling kan starte eller burde kunne kjøre nå. Dette er en HA-diagnose, ikke nødvendigvis Systemair sin interne beslutning.\n\n**Venter tid**  \nTemperaturvilkårene ser ut til å kunne være OK, men nåværende tidspunkt er utenfor start-/sluttvinduet for frikjøling.\n\n**Dag ikke OK**  \nMaks utetemperatur siste 24 timer er lavere enn `Frikjøling – dag min. temperatur`. Aggregatet skal normalt bare nattkjøle hvis dagen har vært varm nok.\n\n**For varmt**  \nAktuell utetemperatur er over `Frikjøling – natt høy grense`. Natteluften er da ikke kjølig nok til nyttig frikjøling.\n\n**For kaldt**  \nAktuell utetemperatur er under `Frikjøling – natt lav grense`. Aggregatet bør da stoppe/blokkere frikjøling for å unngå for kald tilluft/overkjøling.\n\n**Rom kaldt**  \nAvtrekk-/romtemperaturen er på eller under `Frikjøling – rom avbryt temperatur`. Huset er da kaldt nok, og frikjøling skal ikke fortsette.\n\n**Rapportert diagnostikk** kan vise Dagfase eller Temperaturer usikre når tilsvarende integrasjonsentiteter er valgt. Dette vises separat fra en valgfri lokal HA-diagnose.\n\n**Lokal HA-diagnose** er kilden til Kandidat, Venter tid og de lokale temperaturvurderingene. Disse brukes bare når en slik sensor er valgt og har en kjent verdi. De er ikke avleste begrunnelser fra firmware. Uten diagnosen vises fortsatt rapportert aktivitet og tillatelse.\n\nEn maksimumstemperatur over siste døgn krever historikk. Kortet utleder ikke denne fra en enkelt temperaturavlesning og oppretter ingen historikksensor.",
     "roles": [
       "free_cooling_active",
@@ -929,7 +995,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "key": "hood",
     "name": "Hette",
     "title": "Hette",
-    "icon": "mdi:chef-hat",
+    "icon": "mdi:fan",
     "text": "**Hette** viser om kjøkkenhettefunksjonen i aggregatet er aktiv.\n\n**Av** betyr at kjøkkenhetteinngangen ikke påvirker ventilasjonen akkurat nå.  \n**Aktiv** betyr at aggregatet har registrert kjøkkenhettefunksjon/ekstern inngang og kan kompensere med endret luftmengde.\n\nTypiske effekter:\n- endret tilluft-/avtrekksbalanse\n- høyere viftehastighet\n- midlertidig overstyring av normal drift\n- mulig avvik mellom valgt og rapportert driftsmodus",
     "roles": [
       "cooker_hood_active",
@@ -943,7 +1009,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "key": "heater",
     "name": "Ettervarme",
     "title": "Ettervarme",
-    "icon": "mdi:heat-wave",
+    "icon": "mdi:radiator",
     "text": "**Ettervarme** er det elektriske varmeelementet på tilluftssiden.\n\nVarmestatus og pådrag vises separat:\n\n- **Aktiv farge** betyr at aggregatet rapporterer varmefunksjonen aktiv.\n- **Inaktiv farge** betyr at aggregatet rapporterer varmefunksjonen inaktiv.\n- **Gul markering / Ukjent** betyr at varmestatusen mangler eller er utilgjengelig.\n- **Prosenttallet** er rapportert TRIAC-pådrag. Manglende pådrag vises som ukjent.\n\n**0 %** betyr null rapportert TRIAC-pådrag ved avlesningen. Prosenttallet\nbrukes ikke alene til å avgjøre om varmefunksjonen er aktiv. Et pådrag over\nnull er et utgangssignal, ikke en måling av elektrisk effekt i W.\n\nStatusknappens farge kommer fra `{{heater_active}}`\n(IR3103). Prosenttallet kommer fra `{{heater_output}}`\n(IR2149). Hvis signalene avviker, vises de hver for seg.\n\nEttervarme bestemmes ikke av én enkelt sensor. Den styres av aggregatets\ntemperaturregulering og kan påvirkes av tilluftstemperatur, tilluftssettpunkt,\nutetemperatur, avtrekk-/romtemperatur, reguleringsmodus, aktiv sesong, ECO,\nfrikjøling og spesialmoduser.",
     "roles": [
       "heater_active",
@@ -1007,7 +1073,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "key": "temperature",
     "name": "Temperatur",
     "title": "Temperaturstyring",
-    "icon": "mdi:thermostat",
+    "icon": "mdi:thermometer",
     "text": "**Temperaturstyring** beskriver hvilken temperatur aggregatet regulerer etter. Dette er et annet valg enn Manuell / Auto for viftestyringen.\n\n- **Tilluftsregulering**: aggregatet forsøker å holde valgt temperatur på luften som blåses inn i huset.\n- **Romregulering**: aggregatet regulerer etter en egen romføler. Romregulering krever denne føleren; avtrekksføleren blir ikke automatisk en romføler.\n- **Avtrekksregulering**: aggregatet regulerer etter temperaturen på luften som trekkes ut av huset.\n\nVed rom- og avtrekksregulering tilpasses tilluftstemperaturen innenfor aggregatets konfigurerte grenser. Settpunktsentiteten heter tilluftsettpunkt i integrasjonen; den må vurderes sammen med rapportert reguleringsmåte. Kortet oppretter ingen ny regulator eller romsensor.\n\nReguleringsmåten er en avlesning i integrasjon v1.3.0. Endring gjøres på aggregatets betjeningspanel. Temperatursettpunkt og ECO-valg finnes i Innstillinger-kortet.\n\nECO, frikjøling og spesialmoduser kan påvirke driften. En forskjell mellom settpunkt og temperatur avslører ikke alene årsaken. Verdiene er siste tilgjengelige HA-avlesninger og trenger ikke være fra samme Modbus-uttak.",
     "roles": [
       "supply_setpoint",
@@ -1025,7 +1091,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     "key": "recovery",
     "name": "Veksler",
     "title": "Veksler og varmegjenvinning",
-    "icon": "mdi:heat-exchanger",
+    "icon": "mdi:swap-horizontal",
     "text": "**Vekslerpådrag** er integrasjonens rapporterte pådrag i prosent. **100 % betyr ikke 100 % temperaturvirkningsgrad.**\n\nKortet viser pådrag, temperaturer og frikjølingsstatus hver for seg. Det utleder ikke overført varme i W eller fysisk gjenvinningsgrad fra pådraget.\n\nTilluftstemperaturen kan påvirkes av både veksleren og ettervarmen. Estimerte luftmengder er ikke fysisk målte luftmengder. En temperaturforskjell alene skiller derfor ikke sikkert alle bidragene.\n\nAvkasttemperatur er ikke tilgjengelig som verifisert måling i vårt oppsett. Kortet lager ingen avkasttemperatur eller restvarmeberegning. Verdiene under er grunnlaget for å følge driften, ikke en ny regulator.\n\nVelg integrasjonens Vekslerpådrag (%) i dette kortets entitetskoblinger. Hvis du bruker Cockpit, velg samme entitet i begge kort. Koblingene lagres hver for seg; kortet gjetter ikke en kilde når feltet er tomt.",
     "roles": [
       "recovery_output",
@@ -1077,8 +1143,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     :host{container-type:inline-size}
     ha-card{display:block;background:var(--card-background-color,#1c1c1c);color:var(--primary-text-color,#e2e8f0);border-radius:20px;padding:16px}
     .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-    .status-button{min-height:112px;padding:10px 6px;gap:6px;border-radius:18px;border-color:var(--accent);background:var(--tile-tint);overflow-wrap:anywhere}
-    .status-button[aria-expanded=true]{outline:2px solid var(--accent);outline-offset:2px}
+    .status-button{min-height:112px;padding:10px 6px;gap:6px;border-radius:18px;overflow-wrap:anywhere}
     .status-button strong{font-size:14px}.status-button .reading{font-size:16px;font-weight:850;line-height:1.3}.status-button .kind{font-size:12px;line-height:1.3;color:var(--secondary-text-color,#9b9b9b)}
     .status-button ha-icon{--mdc-icon-size:28px}.explanation-panel{margin-top:20px;border-top:1px solid var(--divider-color,#636363);padding-top:16px;font-size:15px;line-height:1.55}
     .explanation-panel[hidden]{display:none}.explanation-panel h3{margin:0 0 8px;font-size:20px}.summary{font-weight:700;margin:0 0 12px}.explanation-panel p{margin:0 0 14px}.explanation-panel ul{padding-left:22px;margin:0 0 14px}
@@ -1112,7 +1177,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     flush(); return result.join('');
   }
 
-  class Vsr300ExplanationsCard extends BaseCard {
+  class Vsr300ExplanationsCard extends StyledCard {
     static fields = EXPLANATION_FIELDS;
     static defaultTitle = 'Status og forklaringer';
     constructor() {
@@ -1180,24 +1245,24 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     _freeCooling() {
       const e = this._config.entities, s = this._hass.states;
       const active = binary(s, e.free_cooling_active), enabled = binary(s, e.free_cooling_enabled);
-      if (active === true) return { label: 'Aktiv', color: '#38bdf8', kind: 'Rapportert' };
-      if (enabled === false) return { label: active === null ? 'Av · status ukjent' : 'Av', color: active === null ? '#facc15' : '#64748b', kind: 'Rapportert' };
-      if (active === null) return { label: 'Status ukjent', color: '#facc15', kind: 'Mangler avlesning' };
-      if (enabled === null) return { label: 'Valg ukjent', color: '#facc15', kind: 'Mangler avlesning' };
+      if (active === true) return { label: 'Aktiv', tone: 'active', kind: 'Rapportert' };
+      if (enabled === false) return { label: active === null ? 'Av · status ukjent' : 'Av', tone: active === null ? 'attention' : 'neutral', kind: 'Rapportert' };
+      if (active === null) return { label: 'Status ukjent', tone: 'attention', kind: 'Mangler avlesning' };
+      if (enabled === null) return { label: 'Valg ukjent', tone: 'attention', kind: 'Mangler avlesning' };
       const diagnostic = this._raw('free_cooling_state');
-      if (['disabled', '0'].includes(diagnostic)) return { label: 'Tilstand: av', color: '#64748b', kind: 'Rapportert diagnostikk' };
-      if (['daytime', '2'].includes(diagnostic)) return { label: 'Dagfase', color: '#38bdf8', kind: 'Rapportert diagnostikk' };
-      if (['temperatures_not_reliable', '3'].includes(diagnostic) || binary(s, e.free_cooling_reliable) === false) return { label: 'Temperaturer usikre', color: '#facc15', kind: 'Rapportert diagnostikk' };
+      if (['disabled', '0'].includes(diagnostic)) return { label: 'Tilstand: av', tone: 'neutral', kind: 'Rapportert diagnostikk' };
+      if (['daytime', '2'].includes(diagnostic)) return { label: 'Dagfase', tone: 'neutral', kind: 'Rapportert diagnostikk' };
+      if (['temperatures_not_reliable', '3'].includes(diagnostic) || binary(s, e.free_cooling_reliable) === false) return { label: 'Temperaturer usikre', tone: 'attention', kind: 'Rapportert diagnostikk' };
       const local = this._raw('free_cooling_diagnosis');
       for (const [fragment, label] of [['Kandidat nå', 'Kandidat'], ['utenfor', 'Venter tid'], ['Dagvilkår', 'Dag ikke OK'], ['For varmt', 'For varmt'], ['For kaldt', 'For kaldt'], ['Rom kaldt', 'Rom kaldt']]) {
-        if (local?.includes(fragment)) return { label, color: '#38bdf8', kind: 'Lokal HA-diagnose' };
+        if (local?.includes(fragment)) return { label, tone: 'neutral', kind: 'Lokal HA-diagnose' };
       }
-      return { label: 'På', color: '#38bdf8', kind: 'Rapportert · inaktiv' };
+      return { label: 'På', tone: 'neutral', kind: 'Rapportert · inaktiv' };
     }
     _recoveryStatus(){
       const id=this._config.entities.recovery_output,entity=this._hass.states[id],value=number(this._hass.states,id);
       const problem=!id?'Velg entitet':!entity?'Entitet ikke funnet':value===null?'Pådrag ukjent':null;
-      return{label:problem||`${value.toFixed(0)} %`,color:problem?'#facc15':'#c084fc',kind:!id||!entity?'Kontroller entitetskobling':'Rapportert pådrag'};
+      return{label:problem||`${value.toFixed(0)} %`,tone:problem?'attention':'neutral',kind:!id||!entity?'Kontroller entitetskobling':'Rapportert pådrag'};
     }
     _statuses() {
       const e = this._config.entities, s = this._hass.states;
@@ -1210,18 +1275,18 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const mode = this._raw('mode'), source = this._raw('auto_source');
       const loadLabel = load === null ? 'Ukjent' : Math.round(Math.abs(load)) === 0 ? '≈ 0 W' : load < 0 ? `≈ ${Math.abs(load).toFixed(0)} W varme` : `≈ ${load.toFixed(0)} W${cooling === true ? ' kjøl' : cooling === false ? ' tap' : ''}`;
       return {
-        balance: { label: difference === null ? 'Ukjent' : `≈ ${difference > 0 ? '+' : ''}${difference} m³/h`, color: difference === null ? '#facc15' : Math.abs(difference) < this._config.balance_tolerance ? '#4ade80' : '#fb923c', kind: 'Estimat' },
+        balance: { label: difference === null ? 'Ukjent' : `≈ ${difference > 0 ? '+' : ''}${difference} m³/h`, tone: difference === null ? 'attention' : 'neutral', detailTone: difference !== null && Math.abs(difference) >= this._config.balance_tolerance ? 'attention' : null, kind: difference !== null && Math.abs(difference) >= this._config.balance_tolerance ? 'Estimat · ulik luftmengde' : 'Estimat' },
         free_cooling: this._freeCooling(),
-        eco: { label: `${enabled === null ? 'Valg ukjent' : enabled ? 'På' : 'Av'} · ${eco === null ? 'status ukjent' : eco ? 'Aktiv' : 'Inaktiv'}`, color: eco === null ? '#facc15' : eco ? '#a3e635' : '#64748b', kind: 'Rapportert' },
-        hood: { label: hood === null ? 'Ukjent' : hood ? 'Aktiv' : 'Av', color: hood === null ? '#facc15' : '#fb923c', kind: 'Rapportert' },
-        heater: { label: heater === null ? 'Pådrag ukjent' : `${heat === null ? 'Ukjent · ' : ''}${heater.toFixed(0)} %`, color: heat === null ? '#facc15' : heat ? '#f87171' : '#fb923c', kind: heat === null ? 'Varmestatus ukjent' : heat ? 'Varmefunksjon aktiv' : 'Varmefunksjon inaktiv' },
-        electric: { label: power === null ? 'Ikke tilgjengelig' : `${power.toFixed(0)} W`, color: power === null ? '#94a3b8' : '#38bdf8', kind: 'Valgfri måling' },
-        house_load: { label: loadLabel, color: load === null ? '#facc15' : cooling === true ? '#38bdf8' : '#fb923c', kind: 'Beregnet i kortet' },
-        auto: { label: !Object.hasOwn(MODE_NAMES, mode) ? 'Modus ukjent' : mode !== 'auto' ? 'Ikke aktiv' : AUTO_NAMES[source] || 'Styrekilde ukjent', color: !Object.hasOwn(MODE_NAMES, mode) || mode === 'auto' && (!Object.hasOwn(AUTO_NAMES, source) || source === 'configuration_fault') ? '#facc15' : '#84cc16', kind: 'Rapportert styrekilde' },
-        temperature: { label: this._raw('supply_setpoint') ? this._value('supply_setpoint') : 'Settpunkt ukjent', color: this._raw('supply_setpoint') ? '#fb923c' : '#facc15', kind: ({supply_air:'Tilluft',room:'Rom',exhaust:'Avtrekk'})[this._raw('regulation_mode')] || 'Regulering ukjent' },
+        eco: { label: `${enabled === null ? 'Valg ukjent' : enabled ? 'På' : 'Av'} · ${eco === null ? 'status ukjent' : eco ? 'Aktiv' : 'Inaktiv'}`, tone: eco === null || enabled === null ? 'attention' : eco ? 'active' : 'neutral', kind: 'Rapportert' },
+        hood: { label: hood === null ? 'Ukjent' : hood ? 'Aktiv' : 'Av', tone: hood === null ? 'attention' : hood ? 'active' : 'neutral', kind: 'Rapportert' },
+        heater: { label: heater === null ? 'Pådrag ukjent' : `${heat === null ? 'Ukjent · ' : ''}${heater.toFixed(0)} %`, tone: heater === null || heat === null ? 'attention' : 'neutral', detailTone: heat === null ? 'attention' : heat ? 'active' : null, kind: heat === null ? 'Varmestatus ukjent' : heat ? 'Varmefunksjon aktiv' : 'Varmefunksjon inaktiv' },
+        electric: { label: power === null ? 'Ikke tilgjengelig' : `${power.toFixed(0)} W`, tone: power === null && e.electric_power ? 'attention' : 'neutral', kind: 'Valgfri måling' },
+        house_load: { label: loadLabel, tone: load === null ? 'attention' : 'neutral', kind: 'Beregnet i kortet' },
+        auto: { label: !Object.hasOwn(MODE_NAMES, mode) ? 'Modus ukjent' : mode !== 'auto' ? 'Ikke aktiv' : AUTO_NAMES[source] || 'Styrekilde ukjent', tone: !Object.hasOwn(MODE_NAMES, mode) || mode === 'auto' && !Object.hasOwn(AUTO_NAMES, source) ? 'attention' : mode === 'auto' && source === 'configuration_fault' ? 'danger' : 'neutral', kind: 'Rapportert styrekilde' },
+        temperature: { label: this._raw('supply_setpoint') ? this._value('supply_setpoint') : 'Settpunkt ukjent', tone: this._raw('supply_setpoint') ? 'neutral' : 'attention', detailTone: this._raw('regulation_mode') ? null : 'attention', kind: ({supply_air:'Tilluft',room:'Rom',exhaust:'Avtrekk'})[this._raw('regulation_mode')] || 'Regulering ukjent' },
         recovery: this._recoveryStatus(),
-        pressure_guard: { label: binary(s, e.pressure_guard_active) === null ? 'Ukjent' : binary(s, e.pressure_guard_active) ? 'Aktiv' : 'Inaktiv', color: binary(s, e.pressure_guard_active) === null ? '#facc15' : '#38bdf8', kind: 'Rapportert funksjon' },
-        vacuum: { label: !Object.hasOwn(MODE_NAMES, mode) ? 'Modus ukjent' : mode === 'vacuum_cleaner' ? 'Aktiv' : 'Ikke rapportert aktiv', color: !Object.hasOwn(MODE_NAMES, mode) ? '#facc15' : '#38bdf8', kind: 'Rapportert modus' },
+        pressure_guard: { label: binary(s, e.pressure_guard_active) === null ? 'Ukjent' : binary(s, e.pressure_guard_active) ? 'Aktiv' : 'Inaktiv', tone: binary(s, e.pressure_guard_active) === null ? 'attention' : binary(s, e.pressure_guard_active) ? 'active' : 'neutral', kind: 'Rapportert funksjon' },
+        vacuum: { label: !Object.hasOwn(MODE_NAMES, mode) ? 'Modus ukjent' : mode === 'vacuum_cleaner' ? 'Aktiv' : 'Ikke rapportert aktiv', tone: !Object.hasOwn(MODE_NAMES, mode) ? 'attention' : mode === 'vacuum_cleaner' ? 'active' : 'neutral', kind: 'Rapportert modus' },
       };
     }
     _value(role) {
@@ -1258,9 +1323,11 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       if (oldDetails) this._technicalOpen[oldDetails.dataset.technicalTopic] = oldDetails.open;
       const topics = this._visibleTopics(), topic = topics.find(item => item.key === this._selected);
       if (!topic) this._selected = null;
-      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${topics.map(item => {
+      this.shadowRoot.innerHTML = `<style>${SHARED_STYLE}${EXPLANATION_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}${this._missingNotice()}<div class="status-grid">${topics.map(item => {
         const status = statuses[item.key];
-        return `<button class="status-button" type="button" data-topic="${item.key}" aria-expanded="${this._selected === item.key}" aria-controls="explanation-panel" style="--accent:${status.color};--tile-tint:${status.color}12"><ha-icon icon="${item.icon}" aria-hidden="true"></ha-icon><strong>${escape(item.name)}</strong><span class="reading">${escape(status.label)}</span><span class="kind">${escape(status.kind)}</span></button>`;
+        const marked = status.tone && status.tone !== 'neutral';
+        const marker = status.tone === 'active' ? 'mdi:check' : status.tone === 'danger' ? 'mdi:alert-circle-outline' : 'mdi:information-outline';
+        return `<button class="status-button" type="button" data-topic="${item.key}" aria-expanded="${this._selected === item.key}" aria-controls="explanation-panel"><ha-icon icon="${item.icon}" aria-hidden="true"></ha-icon><strong>${escape(item.name)}</strong><span class="reading${marked ? ' state-chip' : ''}" data-tone="${status.tone || 'neutral'}">${marked ? `<ha-icon icon="${marker}" aria-hidden="true"></ha-icon>` : ''}${uiText(status.label)}</span><span class="kind${status.detailTone ? ' state-chip' : ''}" ${status.detailTone ? `data-tone="${status.detailTone}"` : ''}>${uiText(status.kind)}</span></button>`;
       }).join('')}</div><section id="explanation-panel" class="explanation-panel" aria-labelledby="explanation-title" ${topic ? '' : 'hidden'}>${topic ? this._details(topic, statuses[topic.key]) : ''}</section></ha-card>`;
       if (focus) this.shadowRoot.querySelector(`button[data-topic="${focus}"]`)?.focus({ preventScroll: true });
       else if (focusRole) this.shadowRoot.querySelector(`button[data-entity-role="${focusRole}"]`)?.focus({ preventScroll: true });
@@ -1280,31 +1347,29 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     FIELD('cooling_min_extract','Frikjøling – minste avtrekksnivå','select','select.systemair_save_frikjoling_min_avtrekk',{optional:true}),
   ];
   const SETTING_SECTIONS = [
-    {key:'temperature',name:'Temperatur og ECO',icon:'mdi:thermostat',color:'#fb923c'},
-    {key:'cooling',name:'Frikjøling',icon:'mdi:weather-night',color:'#38bdf8'},
+    {key:'temperature',name:'Temperatur og ECO',icon:'mdi:thermometer'},
+    {key:'cooling',name:'Frikjøling',icon:'mdi:weather-windy'},
   ];
   const SETTING_LABELS = {free_cooling_day_min:'Daggrense',free_cooling_night_high:'Øvre nattgrense',free_cooling_night_low:'Nedre nattgrense',free_cooling_room_cancel:'Avbryt ved rom-/avtrekkstemperatur',cooling_min_supply:'Minste tilluftnivå',cooling_min_extract:'Minste avtrekksnivå'};
   const SETTINGS_STYLE = `
     :host{container-type:inline-size}ha-card{display:block;padding:18px;border-radius:22px;background:var(--card-background-color,#1c1c1c);color:var(--primary-text-color,#e2e8f0)}
-    .settings-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.setting-topic{min-height:150px;padding:16px 10px;gap:8px;border-radius:20px;border-color:var(--accent);background:linear-gradient(145deg,var(--tile-tint),transparent);text-align:center;overflow-wrap:anywhere}
-    .setting-topic ha-icon{--mdc-icon-size:32px}.setting-topic strong{font-size:16px}.setting-reading{font-size:22px;font-weight:800;line-height:1.25}.setting-sub{font-size:12px;color:var(--secondary-text-color,#9b9b9b);line-height:1.35}.setting-topic:last-child:nth-child(odd){grid-column:1/-1}.setting-topic[aria-expanded=true]{box-shadow:inset 0 0 0 2px var(--accent)}
-    .settings-panel{margin-top:20px;padding-top:18px;border-top:1px solid var(--divider-color,#636363);font-size:15px;line-height:1.5}.settings-panel[hidden]{display:none}.settings-panel h3{font-size:21px;margin:0 0 8px}.settings-panel p{margin:8px 0 16px}.panel-title{display:flex;align-items:center;gap:10px}.panel-title ha-icon{--mdc-icon-size:28px;color:var(--accent)}
+    .settings-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.setting-topic{min-height:150px;padding:16px 10px;gap:8px;border-radius:20px;text-align:center;overflow-wrap:anywhere}
+    .setting-topic ha-icon{--mdc-icon-size:32px}.setting-topic strong{font-size:16px}.setting-reading{font-size:22px;font-weight:800;line-height:1.25}.setting-sub{font-size:12px;color:var(--secondary-text-color,#9b9b9b);line-height:1.35}.setting-topic:last-child:nth-child(odd){grid-column:1/-1}
+    .settings-panel{margin-top:20px;padding-top:18px;border-top:1px solid var(--divider-color,#636363);font-size:15px;line-height:1.5}.settings-panel[hidden]{display:none}.settings-panel h3{font-size:21px;margin:0 0 8px}.settings-panel p{margin:8px 0 16px}.panel-title{display:flex;align-items:center;gap:10px}.panel-title ha-icon{--mdc-icon-size:28px;}
     .readouts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.readout{flex:1 1 130px;padding:10px 12px;border-radius:14px;background:rgba(127,127,127,.07);overflow-wrap:anywhere}.readout[data-role="regulation_mode"]{flex-basis:100%}.readout span{display:block;font-size:12px;color:var(--secondary-text-color,#9b9b9b)}.readout strong{display:block;margin-top:2px;font-size:16px}
     .setting-control{margin:12px 0;padding:14px;border:1px solid var(--divider-color,#636363);border-radius:16px;background:rgba(127,127,127,.035)}.setting-control label,.control-label{display:block;font-size:15px;font-weight:650;margin-bottom:5px;overflow-wrap:anywhere}.reported,.draft-note{font-size:12px;line-height:1.4;color:var(--secondary-text-color,#9b9b9b);margin:4px 0}.draft-note[data-pending=true]{color:var(--primary-color,#03a9f4)}
     .number-entry{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;margin-top:10px}.number-entry button,.apply,.switch-button,.settings-close,.info-button{min-height:44px;border-radius:12px;padding:8px 12px;font-size:15px;line-height:1.3;gap:4px}.number-entry button{font-size:24px;padding:4px}.apply{margin-top:10px;min-width:78px;width:auto;margin-left:auto;background:rgba(3,169,244,.14);color:inherit;border:1px solid var(--primary-color,#03a9f4);font-weight:700}
     input,select{font:inherit;line-height:1.4;min-width:0;min-height:44px;box-sizing:border-box;width:100%;padding:8px 10px;border:1px solid var(--divider-color,#636363);border-radius:10px;background:var(--card-background-color,#1c1c1c);color:inherit}input[type=number]{font-size:20px;text-align:center}input[type=time]{font-size:20px}input:focus-visible,select:focus-visible{outline:2px solid var(--primary-color,#03a9f4);outline-offset:1px}input:disabled,select:disabled{opacity:.55}
     .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.switch-row .control-label{margin:0}.switch-button{min-width:76px;flex-direction:row}.switch-button[aria-checked=true]{background:rgba(3,169,244,.16);color:inherit;border-color:var(--primary-color,#03a9f4)}
     .time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.time-grid .setting-control{min-width:0;margin-top:0}.select-control select{margin-top:6px}
-    details{border:1px solid var(--divider-color,#636363);border-radius:14px;margin:16px 0;padding:0 12px}summary{cursor:pointer;min-height:44px;box-sizing:border-box;padding:12px 0;font-weight:650}details>div{padding-bottom:10px}.service-hero{display:flex;align-items:center;gap:14px;padding:18px;border-radius:18px;background:linear-gradient(130deg,var(--hero-tint),transparent);margin:14px 0}.service-hero ha-icon{--mdc-icon-size:46px;color:var(--hero-accent)}.service-hero strong{font-size:22px}.service-hero span{display:block;font-size:14px;margin-top:4px}
+    details{border:1px solid var(--divider-color,#636363);border-radius:14px;margin:16px 0;padding:0 12px}summary{cursor:pointer;min-height:44px;box-sizing:border-box;padding:12px 0;font-weight:650}details>div{padding-bottom:10px}
     .info-table{width:100%;border-collapse:collapse;table-layout:fixed}.info-table td{padding:10px 4px;border-bottom:1px solid var(--divider-color,#636363);vertical-align:top;overflow-wrap:anywhere}.info-table td:first-child{width:48%}.info-button{display:block;width:100%;text-align:left;background:transparent;border:0;padding:8px 0;font:inherit;overflow-wrap:anywhere}.info-button .source{display:block;font:12px/1.4 monospace;color:var(--secondary-text-color,#9b9b9b);margin-top:4px}
     .settings-foot{display:flex;justify-content:flex-end;margin-top:16px}.settings-close{flex-direction:row}.settings-close ha-icon{--mdc-icon-size:20px}.setting-feedback{font-size:14px;line-height:1.5;padding:10px 12px;border-radius:12px;margin:12px 0;background:rgba(3,169,244,.10)}.setting-feedback:empty{display:none}.setting-error{background:rgba(239,68,68,.12);color:var(--error-color,#ef4444)}
     @container(max-width:380px){ha-card{padding:12px}.settings-menu{gap:8px}.setting-topic{padding:14px 6px;min-height:144px}.setting-reading{font-size:20px}.setting-control{padding:10px}.time-grid{grid-template-columns:minmax(0,1fr)}}
   `;
   const DURATION_STYLE = `
-    .duration-toggle[aria-expanded=true]{border:2px solid var(--accent);background:linear-gradient(135deg,var(--tint),transparent)}
     .duration-panel{padding:14px;border:1px solid var(--divider-color,#636363);border-radius:20px;margin:16px 0}.duration-panel h3{font-size:18px;margin-bottom:12px}
     .duration-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.duration-choice{min-height:78px;border-radius:14px;gap:4px;padding:8px 4px;overflow-wrap:anywhere}.duration-choice ha-icon{--mdc-icon-size:24px}.duration-choice strong{font-size:14px}.duration-choice small{font-size:13px}
-    .duration-choice[aria-expanded=true]{border:2px solid var(--accent);background:var(--tint)}
     .duration-readonly{margin-top:12px}.duration-readonly .info-button{font-size:20px;font-weight:700}.duration-readonly small{display:block;font-size:13px;line-height:1.5;color:var(--secondary-text-color,#9b9b9b)}.duration-help{margin-top:12px!important}
     .duration-panel .settings-foot{margin-top:12px}
     @container(max-width:380px){.duration-panel{padding:10px}.duration-mode-grid{gap:6px}}
@@ -1382,13 +1447,13 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       let content='';
       if(section.key==='temperature')content=`<p>Valgt temperatur og ECO. Rapportert reguleringstype viser hvordan settpunktet skal vurderes.</p>${this._config.entities.regulation_mode?`<p class="regulation-note">Regulerer etter: <strong>${escape(({supply_air:'Tilluft',room:'Rom',exhaust:'Avtrekk'})[this._entity('regulation_mode')?.state]||this._display('regulation_mode'))}</strong></p>`:''}${this._numberControl('supply_setpoint','Temperatursettpunkt')}${this._switchControl('eco_enabled','ECO aktivert')}${this._details('eco','Flere innstillinger',this._numberControl('eco_offset','ECO – senking av ettervarmegrense'))}`;
       if(section.key==='cooling')content=`<p>Tillat frikjøling og velg tidsvindu. Aktiv drift rapporteres separat av aggregatet.</p>${this._readouts(['free_cooling_active'])}${this._switchControl('free_cooling_enabled','Frikjøling tillatt')}<div class="time-grid">${this._timeControl('start')}${this._timeControl('end')}</div>${this._details('cooling','Flere innstillinger',['free_cooling_day_min','free_cooling_night_high','free_cooling_night_low','free_cooling_room_cancel'].map(role=>this._numberControl(role)).join('')+this._selectControl('cooling_min_supply')+this._selectControl('cooling_min_extract'))}`;
-      return`<section class="settings-panel" aria-labelledby="settings-panel-title" style="--accent:${section.color}"><div class="panel-title"><ha-icon icon="${section.icon}" aria-hidden="true"></ha-icon><h3 id="settings-panel-title">${section.name}</h3></div>${content}<div class="settings-foot"><button type="button" class="settings-close" data-settings-close data-focus-key="close"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div></section>`;
+      return`<section class="settings-panel" aria-labelledby="settings-panel-title"><div class="panel-title"><ha-icon icon="${section.icon}" aria-hidden="true"></ha-icon><h3 id="settings-panel-title">${section.name}</h3></div>${content}<div class="settings-foot"><button type="button" class="settings-close" data-settings-close data-focus-key="close"><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button></div></section>`;
     }
     _render(){
       for(const detail of this.shadowRoot.querySelectorAll('details[data-details]'))this._detailsOpen[detail.dataset.details]=detail.open;
       const focus=this.shadowRoot.activeElement?.dataset.focusKey||this._pendingFocus;
       const sections=SETTING_SECTIONS.filter(s=>this._config['show_'+s.key]),section=sections.find(s=>s.key===this._section),summaries=this._summaries();if(!section)this._section=null;
-      this.shadowRoot.innerHTML=`<style>${SHARED_STYLE}${SETTINGS_STYLE}</style><ha-card>${this._heading()}<div class="settings-menu">${sections.map(s=>`<button class="setting-topic" type="button" data-section="${s.key}" data-focus-key="topic-${s.key}" aria-expanded="${this._section===s.key}" aria-controls="settings-content" style="--accent:${s.color};--tile-tint:${s.color}16"><ha-icon icon="${s.icon}" aria-hidden="true"></ha-icon><strong>${s.name}</strong><span class="setting-reading">${escape(summaries[s.key].label)}</span><span class="setting-sub">${escape(summaries[s.key].sub)}</span></button>`).join('')}</div><div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div><div id="settings-content">${section?this._panel(section):''}</div>${sections.length?'':'<p>Velg hvilke temaer som skal vises i kortets oppsett.</p>'}</ha-card>`;
+      this.shadowRoot.innerHTML=`<style>${SHARED_STYLE}${SETTINGS_STYLE}${UI_STYLE}</style><ha-card>${this._heading()}<div class="settings-menu">${sections.map(s=>`<button class="setting-topic" type="button" data-section="${s.key}" data-focus-key="topic-${s.key}" aria-expanded="${this._section===s.key}" aria-controls="settings-content"><ha-icon icon="${s.icon}" aria-hidden="true"></ha-icon><strong>${s.name}</strong><span class="setting-reading">${escape(summaries[s.key].label)}</span><span class="setting-sub">${escape(summaries[s.key].sub)}</span></button>`).join('')}</div><div class="setting-feedback" role="status">${escape(this._message)}</div><div class="setting-feedback setting-error" role="alert">${escape(this._error)}</div><div id="settings-content">${section?this._panel(section):''}</div>${sections.length?'':'<p>Velg hvilke temaer som skal vises i kortets oppsett.</p>'}</ha-card>`;
       if(focus)Array.from(this.shadowRoot.querySelectorAll('[data-focus-key]')).find(el=>el.dataset.focusKey===focus)?.focus({preventScroll:true});
     }
   }

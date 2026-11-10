@@ -62,6 +62,14 @@ adds recovery-binding diagnostics. The actual user's card mappings have not
 been read or changed. Cross-card agreement is locally tested with simulated
 HA states; it is not a new real-unit measurement.
 
+Version 1.5.0, 2026-11-10, changes only presentation of Control, explanations
+and Settings: semantic colors and relevant native MDI icons. Numerical sources,
+calculations and service contracts stay in place. The airflow comparison retains
+its configured tolerance and now labels the estimate difference explicitly.
+Cockpit and its shared base are byte-identical apart from the package version.
+Local visual checks use simulated states and a bundled MDI font; they are not
+measurements or verification on the physical unit.
+
 ## External software and documentation
 
 | Source | Use in this package |

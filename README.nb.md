@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.4.1**.
+med grafisk valg av entiteter. Kortversjon: **1.5.0**.
 Referanseoppsettet er HA 2026.10.2 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -25,7 +25,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.4.1`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.5.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -74,7 +74,31 @@ lokale diagnose- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.4.1
+## Endringer i 1.5.0
+
+Kontrollpanel, Status og forklaringer og Innstillinger har fått et felles visuelt
+uttrykk med nøytrale flater, tydelige rammer og samme knapper. Cockpit beholder
+sin eksisterende grafikk og fargebruk.
+
+| Farge | Betydning |
+| --- | --- |
+| Nøytral | Vanlige knapper, verdier og inaktiv funksjon |
+| Blå | Valgt modus, åpnet felt og betjening |
+| Grønn | Egen markering for rapportert aktivitet |
+| Ravgul | Manglende nødvendig informasjon, usikre data eller avvik mellom luftmengdeestimatene |
+| Rød | Rapportert konfigurasjonsfeil eller mislykket tjenestekall |
+
+Tekst og symboler følger fargene. Prosent og watt er nøytrale måle-/pådragsverdier;
+normal ettervarme er ingen rød alarm. Grønt betyr rapportert aktivitet, ikke
+bekreftet virkningsgrad eller fysisk balanse. Blå «På» i Innstillinger gjelder
+konfigurasjon; aktiv drift rapporteres separat.
+
+Begge HA-temaer støttes, også når tema byttes uten nye entitetsverdier.
+Tre kolonner på mobil, historikk, innstillinger, varigheter og eksisterende
+entitetskoblinger videreføres. Oppdater i HACS og last nettleseren helt på nytt;
+det er ikke nødvendig å legge inn kortene eller entitetene på nytt.
+
+## Historikk – 1.4.1
 
 Varigheter i Kontrollpanel åpner først fem kompakte modusvalg med gjeldende tid.
 Velg en modus for å åpne bare dens varighetsfelt; nytt trykk lukker feltet.

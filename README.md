@@ -4,7 +4,7 @@ Four Home Assistant cards for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer**, and optional
 **Systemair Innstillinger**,
 with graphical entity selection. Current card
-version: **1.4.1**. Reference setup: HA 2026.10.2 and
+version: **1.5.0**. Reference setup: HA 2026.10.2 and
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
 [Norsk veiledning](README.nb.md)
@@ -27,7 +27,7 @@ once through HACS. Keep the existing card configurations.
 
 1. Download [vsr300-cards.js](vsr300-cards.js) using GitHub's **Download raw file** button.
 2. Copy it to `/config/www/vsr300/vsr300-cards.js` in Home Assistant. Create the `vsr300` folder if needed.
-3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.4.1`** and type **JavaScript module**.
+3. Add a dashboard resource with URL **`/local/vsr300/vsr300-cards.js?v=1.5.0`** and type **JavaScript module**.
 4. Fully reload the browser, edit the dashboard and add the cards you want from the card picker.
 
 ## Configure the cards
@@ -76,7 +76,31 @@ local diagnosis and electrical-meter entities. Clear optional fields you do not
 use. Keep the old YAML card until the new card's configuration is checked, then
 replace it. The SVG and control card configurations stay as they are.
 
-## Changes in 1.4.1
+## Changes in 1.5.0
+
+Control, Status og forklaringer and Settings share neutral surfaces, consistent
+borders and buttons, and a semantic palette. Cockpit keeps its existing graphics
+and colors.
+
+| Color | Meaning |
+| --- | --- |
+| Neutral | Ordinary controls, values and inactive functions |
+| Blue | Selected mode, open section and actions |
+| Green | Separate marker for reported activity |
+| Amber | Missing required data, uncertain data or an airflow-estimate difference |
+| Red | Reported configuration fault or failed service call |
+
+Text and icons accompany colors. Percentages and watts stay neutral; normal
+heating is not an alarm. Green indicates reported activity, not verified
+performance or physical balance. A blue On switch in Settings means enabled;
+actual operation is reported separately.
+
+Both HA themes are supported, including theme-only updates with unchanged
+states. Three mobile columns, history, settings, durations and saved mappings
+are retained. Update in HACS and fully reload each browser. Keep existing cards
+and entity bindings.
+
+## History — 1.4.1
 
 Varigheter in the control card first opens five compact mode choices. Select one
 mode to open its duration editor; select it again to collapse. Opening/closing
@@ -171,7 +195,7 @@ thermal efficiency, and no new history is created by the card.
 
 ![Optional settings card with simulated values](images/settings-mobile-simulated.png)
 
-*Simulated values and placeholder icons; Home Assistant supplies the actual icons.*
+*Simulated HA values. Preview icons use the local Material Design Icons font; Home Assistant renders its own icons.*
 
 [Entity bindings](ENTITETSKART.md) · [Changelog](CHANGELOG.md) ·
 [Verification and test limits](VERIFIKASJON.md) · [Sources](SOURCES.md) · [MIT license](LICENSE)
