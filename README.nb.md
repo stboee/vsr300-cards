@@ -3,7 +3,7 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.7.0**.
+med grafisk valg av entiteter. Kortversjon: **1.7.1**.
 Vedlikeholderen oppgir HA 2026.11.1 og
 [Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
 
@@ -25,7 +25,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.7.0`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.7.1`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -78,7 +78,21 @@ døgnmaks- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.7.0
+## Endringer i 1.7.1
+
+Kontrollpanel viser nå gjenstående tid for aktiv Ildsted, Boost, Party, Borte
+eller Ferie, med samme lokale nedtellingsberegning som Cockpit. Inaktive knapper
+viser fortsatt innstilt varighet. Velg **Rapportert resttid (sekunder)** i
+Kontrollpanelets editor, med samme sensor som Cockpit. Referansen er
+`sensor.systemair_save_countdown_mode_time`. Lagrede koblinger beholdes;
+det nye feltet må derfor velges i et eksisterende kort.
+
+Sendt varighet beholdes i redigeringsfeltet, merket som sendt mens HA fortsatt
+rapporterer den gamle verdien. Rapportert verdi vises separat. Et nytt HA-uttak
+bekrefter verdien; tjenestekvitteringen brukes ikke til å starte en lokal modus
+eller påstå at innstillingen er bekreftet. Se [modusvarigheter](SETTINGS.md).
+
+## Historikk – 1.7.0
 
 Frikjølingskandidaten beregnes nå i Status og forklaringer. Grunnlaget er valgte
 integrasjonstemperaturer, grenser og start-/sluttid, samt eksisterende døgnmaks

@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.7.0
+# Entitetskart – kortpakke 1.7.1
 
 Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
 korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke
@@ -50,6 +50,7 @@ fylt automatisk. Ingen HA-entiteter slettes av kortpakken.
 | `party_button` | `button.systemair_save_party` |
 | `away_button` | `button.systemair_save_borte` |
 | `holiday_button` | `button.systemair_save_ferie` |
+| `countdown` | `sensor.systemair_save_countdown_mode_time` |
 | `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
 | `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
 | `party_duration` | `number.systemair_save_party_varighet` |
@@ -146,3 +147,7 @@ er ulike signaler. Klikk på verdirader åpner valgt HA-entitet.
 Frikjølingskandidaten beregnes i forklaringskortet fra disse kildene.
 Den tidligere `free_cooling_diagnosis`-koblingen ignoreres. Døgnmaks er fortsatt
 en lokal HA-statistikksensor; se [oppsett og overgang](FREE-COOLING.md).
+
+Fra 1.7.1 velges Kontrollpanelets `countdown` med samme kilde som Cockpit.
+Aktiv tidsstyrt modus teller ned lokalt mellom rapportene. Sendte varigheter
+merkes separat inntil HA bekrefter dem; dette endrer ingen HA-tilstand.

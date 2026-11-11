@@ -51,7 +51,8 @@
       "boost_duration": "number.systemair_save_oppfriskning_varighet",
       "party_duration": "number.systemair_save_party_varighet",
       "away_duration": "number.systemair_save_borte_varighet",
-      "holiday_duration": "number.systemair_save_ferietid_varighet"
+      "holiday_duration": "number.systemair_save_ferietid_varighet",
+      "countdown": "sensor.systemair_save_countdown_mode_time"
     }
   },
   "explanations": {

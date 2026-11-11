@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.7.1 — 2026-11-11
+
+- Show remaining time in Control's active timed-mode tile and expanded panel,
+  using the unchanged Cockpit countdown calculation shared by both cards.
+  Cover Ildsted, Boost, Party, Borte and Ferie, with local elapsed-time ticks
+  between HA reports, resynchronization and timer cleanup. Inactive tiles
+  retain configured duration; unknown rest time is never guessed.
+- Add an optional graphical countdown binding. Existing users select the same
+  sensor as Cockpit; no saved binding is guessed or overwritten.
+- Preserve successfully sent durations as explicitly pending request values
+  until HA confirms them. Keep old reported values separate and never paint
+  HA state or active mode optimistically. Plus/minus and reverting to an old
+  reported value use the visible requested value correctly.
+- Preserve service order, confirmations, busy guards and failure handling.
+  Ildsted remains read-only for duration. Countdown ticks update only text,
+  preserving editor drafts and focus, without additional polling or services.
+- Document migration and add offline coverage for delayed reports, all timed
+  modes, source changes, errors, resynchronization and timer lifecycle.
+
 ## 1.7.0 — 2026-11-10
 
 - Calculate free-cooling candidacy in Status og forklaringer from integration

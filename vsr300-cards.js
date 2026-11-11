@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.7.0 · 2026-11-10
+/* VSR300 custom cards · version 1.7.1 · 2026-11-11
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.7.0';
+  const VERSION = '1.7.1';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -50,6 +50,7 @@
     FIELD('party_button', 'Party-knapp', 'button', 'button.systemair_save_party'),
     FIELD('away_button', 'Borte-knapp', 'button', 'button.systemair_save_borte'),
     FIELD('holiday_button', 'Ferie-knapp', 'button', 'button.systemair_save_ferie'),
+    FIELD('countdown', 'Rapportert resttid (sekunder)', 'sensor', 'sensor.systemair_save_countdown_mode_time', { optional: true }),
     FIELD('fireplace_duration', 'Innstilt Ildsted-varighet (min)', 'sensor', 'sensor.systemair_save_fireplace_mode_duration', { optional: true, group: 'Innstilte varigheter' }),
     FIELD('boost_duration', 'Innstilt Boost-varighet (min)', 'number', 'number.systemair_save_oppfriskning_varighet', { optional: true, group: 'Innstilte varigheter' }),
     FIELD('party_duration', 'Innstilt Party-varighet (timer)', 'number', 'number.systemair_save_party_varighet', { optional: true, group: 'Innstilte varigheter' }),
@@ -69,6 +70,42 @@
   const MODE_NAMES = { auto: 'Auto', manual_stop: 'Manuell – Stopp', manual_low: 'Manuell – Lav', manual_normal: 'Manuell – Normal', manual_high: 'Manuell – Høy', manual_unknown: 'Manuell – Ukjent', party: 'Party', boost: 'Boost', fireplace: 'Ildsted', away: 'Borte', holiday: 'Ferie', cooker_hood: 'Kjøkkenhette', vacuum_cleaner: 'Støvsuger', cdi1: 'CDI1', cdi2: 'CDI2', cdi3: 'CDI3', pressure_guard: 'Trykkvakt' };
   const AUTO_NAMES = { week_schedule: 'Styres av ukeprogram', demand_control: 'Behovsstyring', external_control: 'Ekstern styring', configuration_fault: 'Konfigurasjonsfeil' };
   const TIMED = { fireplace: ['fireplace_duration', 60], boost: ['boost_duration', 60], party: ['party_duration', 3600], away: ['away_duration', 3600], holiday: ['holiday_duration', 86400] };
+  function modeTiming(card) {
+    const states = card._hass?.states || {}, e = card._config?.entities || {};
+    const mode = state(states, e.mode), timed = Object.hasOwn(TIMED, mode) ? TIMED[mode] : undefined;
+    if (!timed) {
+      card._countdownSample = undefined;
+      const known = Object.hasOwn(MODE_NAMES, mode);
+      return { text: known ? 'Ikke tidsstyrt' : 'Modus ukjent', pct: known ? 100 : 0, running: false };
+    }
+    const raw = number(states, e.countdown), entity = states[e.countdown];
+    if (raw === null || raw < 0) {
+      card._countdownSample = undefined;
+      return { text: 'Resttid ukjent', pct: 0, running: false };
+    }
+    // A report anchors the local display clock; other entity updates do not.
+    // HA's last_reported may be absent from frontend states, so use last_updated.
+    const reported = [entity?.last_reported, entity?.last_updated, entity?.last_changed]
+      .map(value => ({ value, ms: typeof value === 'string' ? Date.parse(value) : NaN }))
+      .find(stamp => Number.isFinite(stamp.ms));
+    const signature = JSON.stringify([e.mode, e.countdown, mode, raw, reported?.value ?? null]);
+    const now = Date.now();
+    if (signature !== card._countdownSample?.signature) {
+      const observedAt = reported ? Math.min(now, reported.ms) : now;
+      card._countdownSample = { signature, deadline: observedAt + raw * 1000 };
+    }
+    // Use elapsed time, not a decrement per tick: background throttling must not drift.
+    const seconds = Math.max(0, Math.min(raw, (card._countdownSample.deadline - now) / 1000));
+    const remaining = Math.ceil(seconds);
+    const [durationRole, scale] = timed, duration = number(states, e[durationRole]);
+    const total = duration !== null && duration > 0 ? duration * scale : null;
+    const pct = total === null ? 0 : Math.max(0, Math.min(100, seconds / total * 100));
+    let text;
+    if (remaining >= 86400) text = `${Math.floor(remaining / 86400)}d ${Math.floor(remaining % 86400 / 3600)}t igjen`;
+    else if (remaining >= 3600) text = `${Math.floor(remaining / 3600)}t ${Math.floor(remaining % 3600 / 60)}m igjen`;
+    else text = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} igjen`;
+    return { text, pct, running: seconds > 0 };
+  }
   function normalize(config, fields, title, supportsAnimation) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Kortoppsettet må være et objekt.');
     if (config.entities != null && (typeof config.entities !== 'object' || Array.isArray(config.entities))) throw new Error('entities må inneholde entitetskoblingene.');
@@ -198,42 +235,7 @@
       if (this._countdownInterval !== undefined) clearInterval(this._countdownInterval);
       this._countdownInterval = undefined;
     }
-    _modeTiming() {
-      const states = this._hass?.states || {}, e = this._config?.entities || {};
-      const mode = state(states, e.mode), timed = Object.hasOwn(TIMED, mode) ? TIMED[mode] : undefined;
-      if (!timed) {
-        this._countdownSample = undefined;
-        const known = Object.hasOwn(MODE_NAMES, mode);
-        return { text: known ? 'Ikke tidsstyrt' : 'Modus ukjent', pct: known ? 100 : 0, running: false };
-      }
-      const raw = number(states, e.countdown), entity = states[e.countdown];
-      if (raw === null || raw < 0) {
-        this._countdownSample = undefined;
-        return { text: 'Resttid ukjent', pct: 0, running: false };
-      }
-      // A report anchors the local display clock; other entity updates do not.
-      // HA's last_reported may be absent from frontend states, so use last_updated.
-      const reported = [entity?.last_reported, entity?.last_updated, entity?.last_changed]
-        .map(value => ({ value, ms: typeof value === 'string' ? Date.parse(value) : NaN }))
-        .find(stamp => Number.isFinite(stamp.ms));
-      const signature = JSON.stringify([e.mode, e.countdown, mode, raw, reported?.value ?? null]);
-      const now = Date.now();
-      if (signature !== this._countdownSample?.signature) {
-        const observedAt = reported ? Math.min(now, reported.ms) : now;
-        this._countdownSample = { signature, deadline: observedAt + raw * 1000 };
-      }
-      // Use elapsed time, not a decrement per tick: background throttling must not drift.
-      const seconds = Math.max(0, Math.min(raw, (this._countdownSample.deadline - now) / 1000));
-      const remaining = Math.ceil(seconds);
-      const [durationRole, scale] = timed, duration = number(states, e[durationRole]);
-      const total = duration !== null && duration > 0 ? duration * scale : null;
-      const pct = total === null ? 0 : Math.max(0, Math.min(100, seconds / total * 100));
-      let text;
-      if (remaining >= 86400) text = `${Math.floor(remaining / 86400)}d ${Math.floor(remaining % 86400 / 3600)}t igjen`;
-      else if (remaining >= 3600) text = `${Math.floor(remaining / 3600)}t ${Math.floor(remaining % 3600 / 60)}m igjen`;
-      else text = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')} igjen`;
-      return { text, pct, running: seconds > 0 };
-    }
+    _modeTiming() { return modeTiming(this); }
     _updateCountdown() {
       if (!this._hass || !this._config) { this._stopCountdownTimer(); return; }
       const timing = this._modeTiming();
@@ -827,10 +829,10 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     _moreInfo(role){const id=this._config.entities[role];if(this._field(role)&&id&&this._entity(role))this.dispatchEvent(new CustomEvent('hass-action',{bubbles:true,composed:true,detail:{config:{entity:id,tap_action:{action:'more-info'}},action:'tap'}}));}
     _numberControl(role,label,options={}){
       if(!this._config.entities[role])return'';
-      const m=this._numberModel(role),disabled=this._busy||!m.valid,raw=this._drafts[role]??(m.value===null?'':String(m.value)),n=raw.trim()===''?NaN:Number(raw),pending=Object.hasOwn(this._drafts,role);
+      const m=this._numberModel(role),disabled=this._busy||!m.valid,raw=this._drafts[role]??options.value??(m.value===null?'':String(m.value)),n=raw.trim()===''?NaN:Number(raw),pending=Object.hasOwn(this._drafts,role);
       const submitLabel=options.submitLabel||'Bruk';
       const actions=options.actions??`<button class="apply" type="submit" data-focus-key="apply-${role}" ${disabled?'disabled':''}>${escape(submitLabel)}</button>`;
-      return`<form class="setting-control" data-number-form="${role}"><label for="input-${role}">${escape(label||SETTING_LABELS[role]||this._field(role).label)}</label><div class="reported">Rapportert: ${escape(this._display(role))}</div><div class="number-entry"><button type="button" data-step-role="${role}" data-delta="-1" data-focus-key="minus-${role}" aria-label="Reduser ${escape(this._field(role).label)}" ${disabled||n<=m.min?'disabled':''}>−</button><input id="input-${role}" type="number" inputmode="decimal" data-draft-key="${role}" data-focus-key="input-${role}" value="${escape(raw)}" ${m.valid?`min="${m.min}" max="${m.max}" step="${m.step}"`:''} ${disabled?'disabled':''} required/><button type="button" data-step-role="${role}" data-delta="1" data-focus-key="plus-${role}" aria-label="Øk ${escape(this._field(role).label)}" ${disabled||n>=m.max?'disabled':''}>+</button></div><div class="draft-note" data-draft-note data-pending="${pending}">${pending?'Ikke lagret':m.valid?'Velg verdi og trykk '+escape(submitLabel)+'.':'Innstillingen er ikke tilgjengelig.'}</div>${actions}</form>`;
+      return`<form class="setting-control" data-number-form="${role}"><label for="input-${role}">${escape(label||SETTING_LABELS[role]||this._field(role).label)}</label><div class="reported">Rapportert: ${escape(this._display(role))}</div><div class="number-entry"><button type="button" data-step-role="${role}" data-delta="-1" data-focus-key="minus-${role}" aria-label="Reduser ${escape(this._field(role).label)}" ${disabled||n<=m.min?'disabled':''}>−</button><input id="input-${role}" type="number" inputmode="decimal" data-draft-key="${role}" data-focus-key="input-${role}" value="${escape(raw)}" ${m.valid?`min="${m.min}" max="${m.max}" step="${m.step}"`:''} ${disabled?'disabled':''} required/><button type="button" data-step-role="${role}" data-delta="1" data-focus-key="plus-${role}" aria-label="Øk ${escape(this._field(role).label)}" ${disabled||n>=m.max?'disabled':''}>+</button></div><div class="draft-note" data-draft-note data-pending="${pending||!!options.note}">${pending?'Ikke lagret':options.note?escape(options.note):m.valid?'Velg verdi og trykk '+escape(submitLabel)+'.':'Innstillingen er ikke tilgjengelig.'}</div>${actions}</form>`;
     }
   }
 
@@ -845,6 +847,43 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     static fields = CONTROL_FIELDS;
     static defaultTitle = '';
     static settingFields = CONTROL_FIELDS.filter(field=>field.key.endsWith('_duration'));
+    static getConfigForm(){
+      const form=super.getConfigForm(),helper=form.computeHelper;
+      form.computeHelper=field=>field.name==='countdown'?'Velg samme resttidssensor som i Cockpit. Aktiv modus telles ned lokalt mellom HA-avlesningene.':helper(field);
+      return form;
+    }
+    connectedCallback(){this._updateCountdown();}
+    disconnectedCallback(){this._stopCountdownTimer();}
+    setConfig(config){this._sentDurations={};this._countdownSample=undefined;super.setConfig(config);}
+    _stopCountdownTimer(){if(this._countdownInterval!==undefined)clearInterval(this._countdownInterval);this._countdownInterval=undefined;}
+    _modeTiming(){return modeTiming(this);}
+    _updateCountdown(){
+      if(!this._hass||!this._config){this._stopCountdownTimer();return;}
+      const timing=this._modeTiming(),nodes=this.shadowRoot.querySelectorAll('[data-control-countdown]');
+      for(const node of nodes)if(node.textContent!==timing.text)node.textContent=timing.text;
+      if(this.isConnected&&nodes.length&&timing.running){
+        if(this._countdownInterval===undefined)this._countdownInterval=setInterval(()=>this._updateCountdown(),1000);
+      }else this._stopCountdownTimer();
+    }
+    _sentDuration(role){
+      const sent=this._sentDurations?.[role];if(!sent)return;
+      const entity=this._entity(role),value=number(this._hass.states,this._config.entities[role]);
+      if(sent.entityId!==this._config.entities[role]||entity!==sent.observed&&(value===sent.value||value!==null&&value!==sent.observedValue)){
+        delete this._sentDurations[role];return;
+      }
+      return sent;
+    }
+    _durationInput(role){return this._drafts[role]??String(this._sentDuration(role)?.value??this._numberModel(role).value??'');}
+    _step(role,delta){
+      const sent=this._sentDuration(role);
+      if(sent&&!this._busy&&!Object.hasOwn(this._drafts,role))this._drafts[role]=String(sent.value);
+      super._step(role,delta);
+    }
+    _moreInfo(role){
+      if(role!=='countdown')return super._moreInfo(role);
+      const id=this._config.entities.countdown;
+      if(id&&this._hass.states[id])this.dispatchEvent(new CustomEvent('hass-action',{bubbles:true,composed:true,detail:{config:{entity:id,tap_action:{action:'more-info'}},action:'tap'}}));
+    }
     constructor() {
       super();this._durationRole=null;
       this.shadowRoot.addEventListener('click',event=>{
@@ -877,9 +916,10 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const timed=CONTROL_MODES.find(mode=>mode.action===action),expanded=timed?.role===this._durationRole;
       const enabled=!this._busy&&(timed||this._available(['manual','fireplace'].includes(action)?'mode_select':action+'_button'));
       const speed=['low','normal','high'].includes(action);
-      return`<button type="button" ${timed?`data-mode-choice="${action}" aria-expanded="${expanded}" aria-controls="duration-settings"`:`data-action="${action}" aria-pressed="${active}"`} data-focus-key="mode-${action}" class="${large?'large ':''}${active?'active ':''}${expanded?'mode-open':''}" ${enabled?'':'disabled'} title="${escape(timed?'Åpne varighet og startvalg for '+name:enabled?name:name+' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong>${active?`<span class="state-chip" data-tone="${speed?'selected':'active'}"><ha-icon icon="mdi:check" aria-hidden="true"></ha-icon>${speed?'Valgt':'Aktiv'}</span>`:''}<small>${escape(label)}</small>${timed?`<span class="mode-disclosure"><ha-icon icon="${expanded?'mdi:chevron-up':'mdi:chevron-down'}" aria-hidden="true"></ha-icon><span class="visually-hidden">${expanded?'Lukk':'Åpne'} valg</span></span>`:''}</button>`;
+      const remaining=timed&&active;
+      return`<button type="button" ${timed?`data-mode-choice="${action}" aria-expanded="${expanded}" aria-controls="duration-settings"`:`data-action="${action}" aria-pressed="${active}"`} data-focus-key="mode-${action}" class="${large?'large ':''}${active?'active ':''}${expanded?'mode-open':''}" ${enabled?'':'disabled'} title="${escape(timed?'Åpne varighet og startvalg for '+name:enabled?name:name+' – betjening utilgjengelig')}"><ha-icon icon="${icon}" aria-hidden="true"></ha-icon><strong>${name}</strong>${active?`<span class="state-chip" data-tone="${speed?'selected':'active'}"><ha-icon icon="mdi:check" aria-hidden="true"></ha-icon>${speed?'Valgt':'Aktiv'}</span>`:''}<small ${remaining?'data-control-countdown':''}>${escape(remaining?this._modeTiming().text:label)}</small>${timed?`<span class="mode-disclosure"><ha-icon icon="${expanded?'mdi:chevron-up':'mdi:chevron-down'}" aria-hidden="true"></ha-icon><span class="visually-hidden">${expanded?'Lukk':'Åpne'} valg</span></span>`:''}</button>`;
     }
-    _duration(role,unit){const v=number(this._hass.states,this._config.entities[role]);return v===null||v<0?'Varighet ukjent':`${v} ${unit}`;}
+    _duration(role,unit){const sent=this._sentDuration(role),v=sent?.value??number(this._hass.states,this._config.entities[role]);return v===null||v<0?'Varighet ukjent':`${v} ${unit}${sent?' · sendt':''}`;}
     _render(){
       const focus=this.shadowRoot.activeElement?.dataset.focusKey||this._pendingFocus;
       const states=this._hass.states,e=this._config.entities,mode=state(states,e.mode),source=state(states,e.auto_source),speed=state(states,e.manual_speed);
@@ -895,22 +935,26 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
         ${this._durationRole?this._durationPanel():''}</ha-card>`;
       if(this._serviceError)this.shadowRoot.querySelector('.error').textContent=this._serviceError;
       if(focus)Array.from(this.shadowRoot.querySelectorAll('[data-focus-key]')).find(el=>el.dataset.focusKey===focus)?.focus({preventScroll:true});
+      this._updateCountdown();
     }
     getCardSize(){return this._durationRole?13:8;}
     _durationPanel(){
       const mode=CONTROL_MODES.find(mode=>mode.role===this._durationRole);if(!mode)return'';
       const {role,name,action}=mode,editable=role!=='fireplace_duration'&&!!this._config.entities[role]&&this._numberModel(role).valid;
+      const active=state(this._hass.states,this._config.entities.mode)===action;
+      const remaining=active?`<div class="readout"><span>Gjenstående tid</span><button type="button" class="info-button" data-info-role="countdown" data-focus-key="info-countdown" ${this._entity('countdown')?'':'disabled'}><strong data-control-countdown>${escape(this._modeTiming().text)}</strong></button><small>Beregnet mellom HA-avlesningene.${this._config.entities.countdown?'':' Velg Rapportert resttid i kortets entitetskoblinger, med samme kilde som Cockpit.'}</small></div>`:'';
       let startAvailable=false;try{this._modeCommand(action);startAvailable=true;}catch{}
       const close=`<button type="button" class="settings-close" data-duration-close data-focus-key="duration-close" ${this._busy?'disabled':''}><ha-icon icon="mdi:close" aria-hidden="true"></ha-icon>Lukk</button>`;
       let content;
       if(editable){
         const actions=`<div class="duration-actions"><button class="apply duration-save" type="submit" data-focus-key="apply-${role}" ${this._busy?'disabled':''}>Lagre</button><button class="apply duration-start" type="button" data-save-start="${role}" data-focus-key="save-start-${role}" ${this._busy||!startAvailable?'disabled':''}>Lagre og start</button>${close}</div>`;
-        content=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[mode.unit]+')',{submitLabel:'Lagre',actions});
+        const sent=this._sentDuration(role);
+        content=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[mode.unit]+')',{submitLabel:'Lagre',actions,...(sent?{value:String(sent.value),note:`Sendt ${sent.value} ${mode.unit}. Venter på bekreftet varighet fra HA.`}:{})});
       }else{
         const explanation=role==='fireplace_duration'?'Avlesning. Ildsted-varigheten endres i Systemair-appen eller på aggregatets betjeningspanel.':!this._config.entities[role]?'Velg varighetsentiteten i kortets oppsett for å kunne redigere den.':'Varigheten kan ikke redigeres nå. Kontroller entitetens verdi og grenser.';
         content=`<div class="readout duration-readonly"><span>Rapportert varighet</span><button type="button" class="info-button" data-info-role="${role}" data-focus-key="info-${role}" ${this._entity(role)?'':'disabled'}>${escape(this._display(role))}</button><small>${explanation} Start bruker varigheten som allerede ligger i aggregatet.</small></div><div class="duration-actions"><button class="apply duration-start" type="button" data-action="${action}" data-focus-key="start-${role}" ${this._busy||!startAvailable?'disabled':''}>Start</button>${close}</div>`;
       }
-      return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><div class="panel-title"><ha-icon icon="${mode.icon}" aria-hidden="true"></ha-icon><h3 id="duration-title">${name} · varighet og start</h3></div>${content}${startAvailable?'':'<p class="duration-help">Start er utilgjengelig. Kontroller modusentiteten i kortets oppsett.</p>'}</section>`;
+      return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><div class="panel-title"><ha-icon icon="${mode.icon}" aria-hidden="true"></ha-icon><h3 id="duration-title">${name} · varighet og start</h3></div>${remaining}${content}${startAvailable?'':'<p class="duration-help">Start er utilgjengelig. Kontroller modusentiteten i kortets oppsett.</p>'}</section>`;
     }
     _setNumber(role){this._commitDuration(role,false);}
     async _commitDuration(role,start){
@@ -918,25 +962,28 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       const mode=CONTROL_MODES.find(mode=>mode.role===role);if(!mode||role==='fireplace_duration')return;
       this._error='';this._message='';this._serviceError='';let duration,activation;
       try{
-        const raw=this._drafts[role]??String(this._numberModel(role).value??'');
+        const raw=this._durationInput(role);
         duration=this._command(role,raw.trim()===''?NaN:Number(raw));
+        if(this._sentDuration(role))duration.same=false;
         if(start)activation=this._modeCommand(mode.action);
       }catch(error){this._error=error.message;this._renderIfReady();return;}
       if(start&&!window.confirm(`Starte ${mode.name}-modus med varighet ${duration.data.value} ${mode.unit}?`))return;
       if(!start&&duration.same){delete this._drafts[role];this._message='Varigheten er allerede rapportert.';this._renderIfReady();return;}
-      const durationId=this._config.entities[role];
+      const durationId=this._config.entities[role],observed=this._entity(role),observedValue=number(this._hass.states,durationId);
       this._pendingFocus=this.shadowRoot.activeElement?.dataset.focusKey;this._busy=true;
       this._message=start?'Lagrer varighet og sender startkommando …':'Lagrer varighet …';this._renderIfReady();let saved=duration.same;
       try{
         if(!duration.same)await this._hass.callService(duration.domain,duration.service,duration.data);
         saved=true;
+        if(!duration.same&&this._config.entities[role]===durationId)this._sentDurations[role]={entityId:durationId,value:duration.data.value,observed,observedValue};
+        if(this._config.entities[role]===durationId)delete this._drafts[role];
         if(start){
           const current=this._modeCommand(mode.action);
           if(this._config.entities[role]!==durationId||current.data.entity_id!==activation.data.entity_id)throw new Error('Entitetskobling endret.');
           await this._hass.callService(activation.domain,activation.service,activation.data);
         }
         delete this._drafts[role];
-        this._message=start?'Startkommando sendt. Verdiene viser siste rapportering.':'Varighet sendt. Verdien viser siste rapportering.';
+        this._message=start?'Startkommando sendt. Aktiv modus og resttid følger HA.':'Varighet sendt.';
       }catch(error){
         this._message='';
         this._error=start&&saved?'Varigheten er sendt eller allerede rapportert, men modusen kunne ikke startes. Kontroller status før nytt forsøk.':start?'Kunne ikke lagre varigheten. Ingen startkommando ble sendt.':'Kunne ikke lagre varigheten. Kontroller integrasjonen og prøv igjen.';

@@ -1,4 +1,44 @@
-# Verifikasjon – 1.7.0 – 2026-11-10
+# Verifikasjon – 1.7.1 – 2026-11-11
+
+## Gjennomført lokalt – 1.7.1
+
+Sju nye logikkgrupper, sju eksisterende frikjølingsgrupper og tre
+nettlesergrupper består med simulerte HA-data.
+
+- Den opprinnelige Cockpit-nedtellingens funksjonskropp er sammenlignet med
+  den delte beregningen, med bare mottakerens navn og innrykk normalisert.
+  Resttidsformat, tidsankring, bakgrunnsforløp, null og synkronisering er uendret.
+- Alle fem tidsstyrte moduser viser samme resttid som Cockpit. Nye rapporter
+  synkroniserer visningen; andre kildeoppdateringer starter ikke klokken på nytt.
+  Manglende resttid blir ukjent. Lokal null avslutter ikke rapportert modus.
+- Den rapporterte 2 → 1-minuttssekvensen er gjenskapt lokalt: number-entiteten
+  beholder 2 mens modusen starter med 60 sekunder. Begge kort og utvidet panel
+  viser 1:00 og deretter 0:59; inndata beholder sendt 1 med eget ventemerke.
+- Lagre alene starter ingen modus. Varighet sendes før start under samme
+  busy-lås. Avbryt, ugyldig verdi, feilet lagring, feilet start etter lagring
+  og endret kobling under sending beholder avgrenset og tydelig feilstatus.
+- Gjentatt gammelt svar bekrefter ikke en sendt verdi. Ny samsvarende eller
+  annen endret HA-verdi overtar. Pluss/minus bruker vist verdi, og retur til
+  en gammel rapportert verdi sender faktisk kommandoen mens et ønske venter.
+- En lokal sekundtidtaker oppdaterer bare resttidstekst, slik at redigering,
+  utkast og fokus bevares. Den ryddes ved frakobling, ukjent resttid, lokal null
+  og når modusen ikke lenger er tidsstyrt. Ingen ekstra polling innføres.
+- Resttidsfeltets HA-historikk åpner valgt kilde. Manglende ny kobling vises
+  eksplisitt. Lyst/mørkt tema ved 320/360/412/900 CSS-piksler passer uten
+  horisontal overflyt. Ingen sidefeil eller eksterne forespørsler ble registrert.
+- Forklaringskortets/frikjølingens kode og Innstillinger-koden er identiske
+  med 1.7.0. Den delte tallrendereren har kun valgfrie overstyringer som brukes
+  av Kontrollpanel; Innstillingers rapporterte verdier og utkast er kontrollert
+  uten disse overstyringene og beholder tidligere oppførsel.
+
+Gjenta logikkontrollene med `node tests/control-countdown.cjs` og
+`node tests/free-cooling.cjs`. Nettleserkontrollen bruker en lokal simulering,
+ikke brukerens installerte HA. Det er ikke fastslått hvorfor integrasjonen
+rapporterte varighetsinnstillingen sent. Ingen HA-konfigurasjon eller Modbus
+endres her. HACS-oppdatering og valg av resttidssensor i Kontrollpanel gjenstår
+som brukerkontroll.
+
+## Historisk kontrollgrunnlag – 1.7.0
 
 ## Gjennomført lokalt – 1.7.0
 

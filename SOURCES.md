@@ -103,6 +103,19 @@ The local rolling maximum and candidate result are not represented as firmware
 measurements. Time-window evaluation assumes HA's configured time zone agrees
 with the unit clock. Installation and migration are in [FREE-COOLING.md](FREE-COOLING.md).
 
+Version 1.7.1, 2026-11-11, addresses the maintainer's report that Control kept
+showing a two-minute configured Boost duration after a one-minute Save and
+start, while Cockpit correctly counted down one minute. The code review found
+that Control displayed the configured-duration source rather than the separate
+remaining-time source. It does not establish why the installed integration
+reported the setting late; no live HA history was obtained for that sequence.
+
+The existing Cockpit countdown body is extracted without changing its logic
+and shared with Control. A card-local request record retains the last sent
+duration explicitly as pending, separate from reported HA state. This is not
+optimistic confirmation, additional Modbus access or a replacement regulator.
+Native service order, confirmations and partial-failure behavior are preserved.
+
 ## External software and documentation
 
 | Source | Use in this package |

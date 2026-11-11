@@ -1,4 +1,4 @@
-# Innstillinger – kortpakke 1.7.0
+# Innstillinger – kortpakke 1.7.1
 
 Et valgfritt fjerde kort i samme JavaScript-pakke. Oppdater gjennom HACS,
 last dashboardet på nytt og legg til **Systemair Innstillinger** fra kortvelgeren:
@@ -41,6 +41,33 @@ Klokkeslett bruker to number-entiteter. Begge valideres før sending, men
 endringen er ikke atomisk. Delvis feil vises uten automatisk tilbakerulling.
 
 ## Modusvarigheter i Kontrollpanel
+
+Fra 1.7.1 viser aktiv Ildsted, Boost, Party, Borte eller Ferie en lokal
+nedtelling, med samme beregning som Cockpit. Den utvidede modusvisningen viser
+også resttiden og kan åpne resttidssensorens vanlige HA-historikk.
+
+Velg **Rapportert resttid (sekunder)** i Kontrollpanelets entitetskoblinger,
+med samme sensor som i Cockpit. Referanseinstallasjonen bruker
+`sensor.systemair_save_countdown_mode_time`. Et nytt felt fylles ikke med en
+gjettet kilde i eksisterende kort. Manglende eller utilgjengelig kilde viser
+**Resttid ukjent**. De inaktive modusene viser innstilt varighet.
+
+Nedtellingen starter først når HA rapporterer en aktiv tidsstyrt modus. Den
+synkroniseres med nye resttidsrapporter og beregner forløpt tid mellom disse.
+Ved 0:00 beholdes rapportert modus til HA melder noe annet; kortet avslutter
+ikke ventilasjon eller velger en annen modus. Ingen ekstra polling innføres.
+
+Ved **Lagre** eller **Lagre og start** kan number-entiteten fortsatt vise gammel
+varighet en stund. Kortet beholder da den sendte verdien i redigeringsfeltet,
+tydelig merket **Sendt … Venter på bekreftet varighet fra HA**. Den sist rapporterte
+verdien vises separat. Dette er en kvittering på tjenestekallet, ikke en endring
+av HA-tilstanden eller en fysisk bekreftelse. Et uendret gammelt svar regnes ikke
+som bekreftelse. Ny bekreftet eller annen endret verdi fra HA overtar visningen.
+
+Pluss/minus bruker den viste sendte verdien. En bevisst endring tilbake til den
+gamle HA-verdien sendes også, selv om den gamle rapporteringen fortsatt er lik
+denne verdien. Sendt-markeringen gjelder bare denne kortøkten og ryddes ved
+nytt kortoppsett eller sideinnlasting.
 
 Trykk direkte på Ildsted, Boost, Party, Borte eller Ferie. Ett felt åpnes
 under modusknappene; nytt trykk på samme modus lukker. Åpning og lukking sender
