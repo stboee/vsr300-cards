@@ -1,10 +1,9 @@
-# VSR300 – 01-SVG.yaml
-# Kortpakke: 1.7.1
-# Endret: 2026-11-02
+# VSR300 – Cockpit / SVG
+# Referanseoppsett for v1.8.0 – 2026-11-25
 # VIKTIG: Kontroller alle entitets-ID-er under entities: og tilpass dem til din egen HA.
 # Navnene nedenfor er eksempler fra referanseoppsettet. Tøm valgfrie felt du ikke bruker.
 type: custom:vsr300-svg-card
-title: ''
+title: Systemair SVG
 show_title: false
 animation: 'on'
 entities:
@@ -24,10 +23,13 @@ entities:
   countdown: sensor.systemair_save_countdown_mode_time
   filter_warning: binary_sensor.systemair_save_filtervarsel
   filter_alarm: binary_sensor.systemair_save_filteralarm
-  alarm_a: binary_sensor.systemair_save_a_alarm
-  alarm_b: binary_sensor.systemair_save_b_alarm
-  alarm_c: binary_sensor.systemair_save_c_alarm
-  outdoor_humidity: sensor.a4_c1_38_23_90_74_9074_humidity
+  # Valgfrie samlealarmer. Fjern kommentartegnene hvis du vil vise dem.
+  # alarm_a: binary_sensor.systemair_save_a_alarm
+  # alarm_b: binary_sensor.systemair_save_b_alarm
+  # alarm_c: binary_sensor.systemair_save_c_alarm
+  # Velg en lokal utendørs fuktighetssensor hvis du har en.
+  outdoor_humidity: ''
+  # Innstilt varighet til fremdriftslinjen. Resttid leses fra countdown over.
   fireplace_duration: sensor.systemair_save_fireplace_mode_duration
   boost_duration: number.systemair_save_oppfriskning_varighet
   party_duration: number.systemair_save_party_varighet

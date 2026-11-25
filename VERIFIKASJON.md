@@ -15,8 +15,9 @@
   `node tests/control-countdown.cjs` og `node tests/free-cooling.cjs`.
   Brukerforløpet er også kontrollert i Chromium ved 360 px med simulerte HA-data.
 
-Det er bekreftet at tallentiteten finnes i referanseinstallasjonen. Skriving
-fra det oppdaterte kortet på det fysiske aggregatet er ikke verifisert.
+Vedlikeholderen bekreftet 2026-11-25 at **Lagre** for Ildsted-varighet fungerte
+i egen HA med Systemair Modbus 2.0.0. **Lagre og start** er lokalt kontrollert
+med simulerte HA-data; praktisk verifikasjon av den sekvensen er ikke rapportert.
 
 ## Historisk kontrollgrunnlag – 1.7.1
 

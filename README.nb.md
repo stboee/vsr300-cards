@@ -44,11 +44,14 @@ HACS. Behold eksisterende kortoppsett.
 tilsvarende entiteter i din egen Home Assistant-installasjon. Tøm valgfrie felt
 du ikke bruker.
 
-Komplette YAML-oppsett ligger i [01-SVG.yaml](examples/01-SVG.yaml),
-[02-Kontrollpanel.yaml](examples/02-Kontrollpanel.yaml) og
-[03-Status-og-forklaringer.yaml](examples/03-Status-og-forklaringer.yaml). **Bruker du disse
-oppsettene, må du også kontrollere og tilpasse alle entitets-ID-er under
-`entities:` før kortene tas i bruk.** Navnene er eksempler fra én installasjon.
+YAML-referanser: [Cockpit](examples/01-SVG.yaml),
+[Kontrollpanel](examples/02-Kontrollpanel.yaml),
+[Status og forklaringer](examples/03-Status-og-forklaringer.yaml) og
+[Innstillinger](examples/04-Innstillinger.yaml). Etter installasjon kan du
+lime inn én fil om gangen i YAML-editoren for det aktuelle dashboardkortet.
+**Kontroller og tilpass alle entitets-ID-er under `entities:`.** De tre første
+filene tar utgangspunkt i vedlikeholderens oppsett. Innstillinger er et eget
+eksempel. Velg din egen **Peis – varighet** for å redigere Ildsted-varigheten.
 Selve frontendfilen krever ingen omstart av Home Assistant.
 
 For den valgfrie frikjølingsvurderingen må

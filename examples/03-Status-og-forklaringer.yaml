@@ -1,5 +1,6 @@
 # VSR300 – Status og forklaringer
-# Kortpakke: 1.7.1
+# Referanseoppsett for v1.8.0 – 2026-11-25
+# Tilpass alle entitets-ID-er. Tøm valgfrie kilder du ikke har eller bruker.
 type: custom:vsr300-explanations-card
 title: "Status og forklaringer"
 show_title: true
@@ -22,15 +23,18 @@ entities:
   outdoor_temperature: sensor.systemair_save_utetemperatur
   free_cooling_state: ''
   free_cooling_reliable: binary_sensor.loft_systemair_save_frikjoling_temperaturer_palitelige
+  # Lokal HA-statistikksensor for kandidatberegningen. Se systemair_24h.yaml og FREE-COOLING.md.
   outdoor_max_24h: sensor.systemair_ute_max_siste_24t
   free_cooling_day_min: number.systemair_save_frikjoling_dag_min_temperatur
   free_cooling_night_high: number.systemair_save_frikjoling_natt_hoy_grense
   free_cooling_night_low: number.systemair_save_frikjoling_natt_lav_grense
   free_cooling_room_cancel: number.systemair_save_frikjoling_rom_avbryt_temperatur
+  # Velg de samme fire tidsentitetene som i Innstillinger for kandidatberegningen.
   cooling_start_hour: number.systemair_save_frikjoling_start_time
   cooling_start_minute: number.systemair_save_frikjoling_start_min
   cooling_end_hour: number.systemair_save_frikjoling_slutt_time
   cooling_end_minute: number.systemair_save_frikjoling_slutt_min
+  # Valgfrie lokale målere. Tøm koblingene hvis du ikke bruker slike målere.
   electric_power: sensor.vsr300_power
   electric_energy: sensor.vsr300_energy
   supply_setpoint: number.systemair_save_tilluft_setpunkt_degc
@@ -40,12 +44,6 @@ entities:
   regulation_mode: sensor.systemair_save_regulering
   active_season: sensor.systemair_save_aktiv_sesong
   recovery_output: sensor.systemair_save_varmegjenvinning
-  legacy_triac: sensor.systemair_save_triac_control_signal
-  legacy_eco: binary_sensor.systemair_save_oko_funksjon_aktiv
-  pressure_guard_active: binary_sensor.systemair_save_trykkvakt_aktiv
-show_sources: false
-balance_tolerance: 15
-show_temperature: true
-show_recovery: true
-show_pressure_guard: false
-show_vacuum: false
+show_sources: true
+# 0 markerer alle gyldige avvik, også 0 m³/h. Standardgrensen er 15 m³/h.
+balance_tolerance: 0

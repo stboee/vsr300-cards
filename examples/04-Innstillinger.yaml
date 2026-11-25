@@ -1,5 +1,5 @@
 # VSR300 – Innstillinger
-# Kortpakke: 1.7.1
+# Eksempel for v1.8.0 – ikke eksportert fra referanseinstallasjonen.
 # Kontroller entitets-ID-er og tilpass dem til din egen HA.
 type: custom:vsr300-settings-card
 title: "Innstillinger"

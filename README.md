@@ -46,11 +46,14 @@ Open **Entitetskoblinger**, check every field and replace the example IDs with
 the matching entities from your own Home Assistant installation. Clear optional
 fields you do not use.
 
-Complete YAML configurations are available in [01-SVG.yaml](examples/01-SVG.yaml),
-[02-Kontrollpanel.yaml](examples/02-Kontrollpanel.yaml), and
-[03-Status-og-forklaringer.yaml](examples/03-Status-og-forklaringer.yaml). **When using these
-examples, also check and adapt every entity ID under `entities:` before using
-the cards.** The prefilled IDs are installation-specific examples.
+YAML references: [Cockpit](examples/01-SVG.yaml),
+[Control](examples/02-Kontrollpanel.yaml),
+[Status and explanations](examples/03-Status-og-forklaringer.yaml) and
+[Settings](examples/04-Innstillinger.yaml). Paste one file at a time into the
+corresponding dashboard card's YAML editor after installing the package.
+**Check and adapt every entity ID under `entities:`.** The first three
+examples are based on the maintainer's setup. Settings is a separate example.
+For Fireplace editing, select your own **Fireplace – duration** number.
 The frontend file itself does not require a Home Assistant restart.
 
 For the optional free-cooling candidate assessment, configure the
