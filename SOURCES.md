@@ -116,6 +116,17 @@ duration explicitly as pending, separate from reported HA state. This is not
 optimistic confirmation, additional Modbus access or a replacement regulator.
 Native service order, confirmations and partial-failure behavior are preserved.
 
+Version 1.8.0, 2026-11-25, adds writable Fireplace duration in Control.
+[Systemair Modbus 2.0.0](https://github.com/Howard0000/home-assistant-systemair-modbus/releases/tag/2.0.0)
+exposes a [native number entity](https://github.com/Howard0000/home-assistant-systemair-modbus/blob/2.0.0/custom_components/systemair_modbus/number.py)
+with 1–60 minutes in one-minute steps ([upstream issue #98](https://github.com/Howard0000/home-assistant-systemair-modbus/issues/98)).
+The maintainer reported the entity with an 8-minute value in HA. This is an
+entity readout, not a verified write on the physical unit. Control accepts
+either a number or a sensor in the existing field. The
+[HA entity filter](https://github.com/home-assistant/frontend/blob/20261028.5/src/data/selector.ts)
+supports both domains in a single picker. [Marketplace documentation](https://www.home-assistant.io/integrations/marketplace/)
+covers HA 2026.11 and its migration from HACS.
+
 ## External software and documentation
 
 | Source | Use in this package |

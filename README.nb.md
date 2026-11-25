@@ -3,11 +3,20 @@
 Fire Home Assistant-kort for Systemair SAVE VSR300: **Systemair SVG**,
 **Systemair Kontrollpanel**, **Systemair Status og forklaringer** og det valgfrie
 **Systemair Innstillinger**,
-med grafisk valg av entiteter. Kortversjon: **1.7.1**.
+med grafisk valg av entiteter. Kortversjon: **1.8.0**.
 Vedlikeholderen oppgir HA 2026.11.1 og
-[Howard systemair_modbus 1.3.0](https://github.com/Howard0000/home-assistant-systemair-modbus).
+[Howard Systemair Modbus 2.0.0](https://github.com/Howard0000/home-assistant-systemair-modbus/releases/tag/2.0.0).
 
-## Installer med HACS – egendefinert repository
+## Installer via Markedsplassen (Home Assistant 2026.11 eller nyere)
+
+1. Åpne **Innstillinger → Markedsplassen → Legg til fra lenke**.
+2. Legg til **`https://github.com/stboee/vsr300-cards`** som type **Dashbord**, og installer VSR300 Cards. Koble til GitHub hvis Markedsplassen ber om det.
+3. Last nettleseren helt på nytt, legg til kortene fra kortvelgeren og tilpass entitetskoblingene.
+
+Markedsplassen registrerer dashboardressursen automatisk når den styres i HA.
+Pakker som allerede er installert via HACS, følger med ved migrering til Markedsplassen og trenger ikke legges til på nytt.
+
+## Installer med HACS – for eldre Home Assistant
 
 1. Åpne trepunktsmenyen i HACS og velg **Egendefinerte repositorier / Custom repositories**.
 2. Legg til **`https://github.com/stboee/vsr300-cards`**, velg type **Dashboard** (Plugin/Lovelace i eldre HACS-versjoner), og legg til repositoriet.
@@ -25,7 +34,7 @@ HACS. Behold eksisterende kortoppsett.
 
 1. Last ned [vsr300-cards.js](vsr300-cards.js) med GitHubs **Download raw file**-knapp.
 2. Kopier filen til `/config/www/vsr300/vsr300-cards.js` i Home Assistant. Opprett mappen `vsr300` ved behov.
-3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.7.1`** og type **JavaScript-modul**.
+3. Legg til en dashboardressurs med URL **`/local/vsr300/vsr300-cards.js?v=1.8.0`** og type **JavaScript-modul**.
 4. Last nettlesersiden helt på nytt. Rediger dashboardet og legg til kortene du ønsker fra kortvelgeren.
 
 ## Oppsett av kortene
@@ -52,7 +61,9 @@ Hvis installasjon av 1.3.0 feiler med melding om manglende `hacs.json`, oppdater
 du repositoryinformasjonen i HACS og velger **1.3.1 eller nyere**. Denne versjonen
 inneholder den manglende installasjonsfilen. Behold kortene og entitetsvalgene dine.
 
-**HACS:** Installer tilbudt oppdatering i HACS og last nettlesersiden helt på
+**Markedsplassen:** Installer oppdateringen for **VSR300 Cards** under **Innstillinger → Oppdateringer** eller fra pakkens side i Markedsplassen. Last nettleseren helt på nytt, også på mobilen, og behold kortoppsettene.
+
+**Eldre HACS:** Installer tilbudt oppdatering i HACS og last nettlesersiden helt på
 nytt, også på mobilen. HACS håndterer filen og ressursversjonen; du trenger ikke
 endre versjonstillegget manuelt. Behold kortoppsettene og entitetsvalgene.
 Vises ikke releasen ennå, velger du **Oppdater informasjon / Update information**
@@ -78,7 +89,20 @@ døgnmaks- og effektmålerentitetene. Tøm valgfrie felt du ikke bruker.
 Behold det gamle YAML-kortet til oppsettet i det nye er kontrollert, og erstatt
 så det gamle kortet. SVG- og Kontrollpanel-oppsettene beholdes.
 
-## Endringer i 1.7.1
+## Endringer i 1.8.0
+
+**Ildsted** i Kontrollpanel kan nå redigeres når feltet **Innstilt Ildsted-varighet (min)**
+under **Entitetskoblinger** peker på integrasjonens **Peis – varighet**
+(`number`, fra Systemair Modbus 2.0.0). Eksempel:
+`number.loft_systemair_vsr_300_save_peis_varighet`. Velg din egen entitet.
+**Lagre** endrer varigheten uten å starte Ildsted. **Lagre og start** sender
+varigheten før startkommandoen.
+
+Eksisterende sensorkoblinger beholder avlesning og **Start**. Resttid bruker
+samme sensor som før. Ingen omkobling er nødvendig i Cockpit.
+Se [modusvarigheter](SETTINGS.md).
+
+## Historikk – 1.7.1
 
 Kontrollpanel viser nå gjenstående tid for aktiv Ildsted, Boost, Party, Borte
 eller Ferie, med samme lokale nedtellingsberegning som Cockpit. Inaktive knapper

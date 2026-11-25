@@ -1,4 +1,4 @@
-/* VSR300 custom cards · version 1.7.1 · 2026-11-11
+/* VSR300 custom cards · version 1.8.0 · 2026-11-25
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2026 stboee
  * Based on Systemair SVG / Kontrollpanel 4.8.1.
@@ -8,7 +8,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.7.1';
+  const VERSION = '1.8.0';
   const FIELD = (key, label, domain, defaultId, extra = {}) => ({ key, label, domain, defaultId, ...extra });
   const SVG_FIELDS = [
     FIELD('mode', 'Rapportert driftsmodus', 'sensor', 'sensor.systemair_save_modus'),
@@ -51,7 +51,7 @@
     FIELD('away_button', 'Borte-knapp', 'button', 'button.systemair_save_borte'),
     FIELD('holiday_button', 'Ferie-knapp', 'button', 'button.systemair_save_ferie'),
     FIELD('countdown', 'Rapportert resttid (sekunder)', 'sensor', 'sensor.systemair_save_countdown_mode_time', { optional: true }),
-    FIELD('fireplace_duration', 'Innstilt Ildsted-varighet (min)', 'sensor', 'sensor.systemair_save_fireplace_mode_duration', { optional: true, group: 'Innstilte varigheter' }),
+    FIELD('fireplace_duration', 'Innstilt Ildsted-varighet (min)', ['number', 'sensor'], 'sensor.systemair_save_fireplace_mode_duration', { optional: true, group: 'Innstilte varigheter' }),
     FIELD('boost_duration', 'Innstilt Boost-varighet (min)', 'number', 'number.systemair_save_oppfriskning_varighet', { optional: true, group: 'Innstilte varigheter' }),
     FIELD('party_duration', 'Innstilt Party-varighet (timer)', 'number', 'number.systemair_save_party_varighet', { optional: true, group: 'Innstilte varigheter' }),
     FIELD('away_duration', 'Innstilt Borte-varighet (timer)', 'number', 'number.systemair_save_borte_varighet', { optional: true, group: 'Innstilte varigheter' }),
@@ -115,7 +115,8 @@
       if (entities[f.key] == null) entities[f.key] = '';
       if (typeof entities[f.key] !== 'string') throw new Error(`Ugyldig entitetskobling: ${f.label}`);
       entities[f.key] = entities[f.key].trim();
-      if (entities[f.key] && (!/^[a-z_]+\.[a-z0-9_]+$/.test(entities[f.key]) || !entities[f.key].startsWith(f.domain + '.'))) throw new Error(`Feil entitetstype for ${f.label}: forventer ${f.domain}.`);
+      const domains = [].concat(f.domain);
+      if (entities[f.key] && (!/^[a-z_]+\.[a-z0-9_]+$/.test(entities[f.key]) || !domains.some(domain => entities[f.key].startsWith(domain + '.')))) throw new Error(`Feil entitetstype for ${f.label}: forventer ${domains.join(' eller ')}.`);
     }
     if (config.show_title != null && typeof config.show_title !== 'boolean') throw new Error('Vis overskrift må være på eller av.');
     const result = { ...config, title: config.title === undefined ? title : String(config.title ?? ''), show_title: config.show_title ?? false, entities };
@@ -778,11 +779,14 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
       if(this._hass.formatEntityState)return this._hass.formatEntityState(entity);
       return raw+(entity.attributes?.unit_of_measurement?' '+entity.attributes.unit_of_measurement:'');
     }
+    _isNumberRole(role){
+      return [].concat(this._field(role)?.domain).includes('number')&&this._config.entities[role]?.startsWith('number.');
+    }
     _numberModel(role){
       const entity=this._entity(role),a=entity?.attributes||{},value=number(this._hass.states,this._config.entities[role]);
       const strict=raw=>raw==null||String(raw).trim()===''?null:Number.isFinite(Number(raw))?Number(raw):null;
       const min=strict(a.min),max=strict(a.max),step=strict(a.step);
-      return{value,min,max,step,valid:this._field(role)?.domain==='number'&&value!==null&&min!==null&&max!==null&&max>=min&&step!==null&&step>0};
+      return{value,min,max,step,valid:!!this._isNumberRole(role)&&value!==null&&min!==null&&max!==null&&max>=min&&step!==null&&step>0};
     }
     _validateNumber(role,value){
       const model=this._numberModel(role);
@@ -809,7 +813,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     _command(role,value){
       const field=this._field(role),entity=this._entity(role),id=this._config.entities[role];
       if(!field||!entity||entity.state==='unavailable')throw new Error('Innstillingen er ikke tilgjengelig.');
-      if(field.domain==='number'){this._validateNumber(role,value);return{role,domain:'number',service:'set_value',data:{entity_id:id,value},same:Number(entity.state)===value};}
+      if(this._isNumberRole(role)){this._validateNumber(role,value);return{role,domain:'number',service:'set_value',data:{entity_id:id,value},same:Number(entity.state)===value};}
       if(field.domain==='switch'&&typeof value==='boolean'&&binary(this._hass.states,id)!==null)return{role,domain:'switch',service:value?'turn_on':'turn_off',data:{entity_id:id},same:(entity.state==='on')===value};
       if(field.domain==='select'&&typeof value==='string'&&Array.isArray(entity.attributes?.options)&&entity.attributes.options.includes(value))return{role,domain:'select',service:'select_option',data:{entity_id:id,option:value},same:entity.state===value};
       throw new Error('Velg et tilgjengelig alternativ fra listen.');
@@ -849,7 +853,11 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     static settingFields = CONTROL_FIELDS.filter(field=>field.key.endsWith('_duration'));
     static getConfigForm(){
       const form=super.getConfigForm(),helper=form.computeHelper;
-      form.computeHelper=field=>field.name==='countdown'?'Velg samme resttidssensor som i Cockpit. Aktiv modus telles ned lokalt mellom HA-avlesningene.':helper(field);
+      form.computeHelper=field=>{
+        if(field.name==='countdown')return 'Velg samme resttidssensor som i Cockpit. Aktiv modus telles ned lokalt mellom HA-avlesningene.';
+        if(field.name==='fireplace_duration')return 'Velg Peis – varighet (number) fra Systemair Modbus 2.0.0 eller nyere for å redigere. En sensor gir bare avlesning.';
+        return helper(field);
+      };
       return form;
     }
     connectedCallback(){this._updateCountdown();}
@@ -940,7 +948,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     getCardSize(){return this._durationRole?13:8;}
     _durationPanel(){
       const mode=CONTROL_MODES.find(mode=>mode.role===this._durationRole);if(!mode)return'';
-      const {role,name,action}=mode,editable=role!=='fireplace_duration'&&!!this._config.entities[role]&&this._numberModel(role).valid;
+      const {role,name,action}=mode,editable=this._numberModel(role).valid;
       const active=state(this._hass.states,this._config.entities.mode)===action;
       const remaining=active?`<div class="readout"><span>Gjenstående tid</span><button type="button" class="info-button" data-info-role="countdown" data-focus-key="info-countdown" ${this._entity('countdown')?'':'disabled'}><strong data-control-countdown>${escape(this._modeTiming().text)}</strong></button><small>Beregnet mellom HA-avlesningene.${this._config.entities.countdown?'':' Velg Rapportert resttid i kortets entitetskoblinger, med samme kilde som Cockpit.'}</small></div>`:'';
       let startAvailable=false;try{this._modeCommand(action);startAvailable=true;}catch{}
@@ -951,7 +959,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
         const sent=this._sentDuration(role);
         content=this._numberControl(role,name+' ('+({min:'minutter',t:'timer',d:'døgn'})[mode.unit]+')',{submitLabel:'Lagre',actions,...(sent?{value:String(sent.value),note:`Sendt ${sent.value} ${mode.unit}. Venter på bekreftet varighet fra HA.`}:{})});
       }else{
-        const explanation=role==='fireplace_duration'?'Avlesning. Ildsted-varigheten endres i Systemair-appen eller på aggregatets betjeningspanel.':!this._config.entities[role]?'Velg varighetsentiteten i kortets oppsett for å kunne redigere den.':'Varigheten kan ikke redigeres nå. Kontroller entitetens verdi og grenser.';
+        const explanation=role==='fireplace_duration'&&!this._isNumberRole(role)?'Velg Peis – varighet (number) fra Systemair Modbus 2.0.0 eller nyere i kortets entitetskoblinger for å redigere.':!this._config.entities[role]?'Velg varighetsentiteten i kortets oppsett for å kunne redigere den.':'Varigheten kan ikke redigeres nå. Kontroller entitetens verdi og grenser.';
         content=`<div class="readout duration-readonly"><span>Rapportert varighet</span><button type="button" class="info-button" data-info-role="${role}" data-focus-key="info-${role}" ${this._entity(role)?'':'disabled'}>${escape(this._display(role))}</button><small>${explanation} Start bruker varigheten som allerede ligger i aggregatet.</small></div><div class="duration-actions"><button class="apply duration-start" type="button" data-action="${action}" data-focus-key="start-${role}" ${this._busy||!startAvailable?'disabled':''}>Start</button>${close}</div>`;
       }
       return`<section id="duration-settings" class="settings-panel duration-panel" aria-labelledby="duration-title"><div class="panel-title"><ha-icon icon="${mode.icon}" aria-hidden="true"></ha-icon><h3 id="duration-title">${name} · varighet og start</h3></div>${remaining}${content}${startAvailable?'':'<p class="duration-help">Start er utilgjengelig. Kontroller modusentiteten i kortets oppsett.</p>'}</section>`;
@@ -959,7 +967,7 @@ const portRow = (role, x, y, height, content) => `<g ${action(role)}><rect class
     _setNumber(role){this._commitDuration(role,false);}
     async _commitDuration(role,start){
       if(this._busy||role!==this._durationRole)return;
-      const mode=CONTROL_MODES.find(mode=>mode.role===role);if(!mode||role==='fireplace_duration')return;
+      const mode=CONTROL_MODES.find(mode=>mode.role===role);if(!mode||!this._isNumberRole(role))return;
       this._error='';this._message='';this._serviceError='';let duration,activation;
       try{
         const raw=this._durationInput(role);

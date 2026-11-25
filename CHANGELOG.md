@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.8.0 — 2026-11-25
+
+- Let Control edit Fireplace duration using the native `number` entity in
+  Systemair Modbus 2.0.0. Reuse the existing **Save**, **Save and start**
+  and **Close** actions and validate against the bounds from Home Assistant.
+- Keep existing sensor bindings as readouts with **Start** and preserve all
+  other mappings. No automatic selection, new helpers or changes to the
+  countdown or Cockpit display.
+- Document the built-in Home Assistant Marketplace alongside legacy HACS.
+
 ## 1.7.1 — 2026-11-11
 
 - Show remaining time in Control's active timed-mode tile and expanded panel,

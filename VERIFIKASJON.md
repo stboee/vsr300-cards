@@ -1,4 +1,24 @@
-# Verifikasjon – 1.7.1 – 2026-11-11
+# Verifikasjon – 1.8.0 – 2026-11-25
+
+## Gjennomført lokalt – 1.8.0
+
+- Kontrollpanelets eksisterende Ildsted-felt tar både `sensor` og `number`.
+  Gamle sensorkoblinger, tømte felt og utilgjengelige tallentiteter fører
+  ikke til at varighet skrives. Start med innstilt varighet er fortsatt mulig.
+- Den simulerte tallentiteten rapporterer 8 minutter med grensene 1–60 og
+  trinn 1, som brukeren leste i HA. Lagre sender bare varighet. Lagre og start
+  venter på varighetskallet før den eksisterende Ildsted-kommandoen. Avbryt,
+  ugyldig verdi og feilet lagring starter ikke Ildsted.
+- Sendt varighet og rapportert varighet vises separat. HA rapporterer modus
+  og resttid som før. Cockpits nedtellingsberegning er uendret.
+- Ti kontrollgrupper og sju frikjølingsgrupper består med
+  `node tests/control-countdown.cjs` og `node tests/free-cooling.cjs`.
+  Brukerforløpet er også kontrollert i Chromium ved 360 px med simulerte HA-data.
+
+Det er bekreftet at tallentiteten finnes i referanseinstallasjonen. Skriving
+fra det oppdaterte kortet på det fysiske aggregatet er ikke verifisert.
+
+## Historisk kontrollgrunnlag – 1.7.1
 
 ## Gjennomført lokalt – 1.7.1
 

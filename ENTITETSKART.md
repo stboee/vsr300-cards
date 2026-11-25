@@ -1,4 +1,4 @@
-# Entitetskart – kortpakke 1.7.1
+# Entitetskart – kortpakke 1.8.0
 
 Startkoblingene er eksempler fra én installasjon. Velg dine entiteter i hvert
 korts grafiske editor. Lagrede koblinger er autoritative; tømte felt blir ikke
@@ -51,7 +51,7 @@ fylt automatisk. Ingen HA-entiteter slettes av kortpakken.
 | `away_button` | `button.systemair_save_borte` |
 | `holiday_button` | `button.systemair_save_ferie` |
 | `countdown` | `sensor.systemair_save_countdown_mode_time` |
-| `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` |
+| `fireplace_duration` | `sensor.systemair_save_fireplace_mode_duration` for avlesning; velg din **Peis – varighet** (`number`) for redigering. |
 | `boost_duration` | `number.systemair_save_oppfriskning_varighet` |
 | `party_duration` | `number.systemair_save_party_varighet` |
 | `away_duration` | `number.systemair_save_borte_varighet` |
@@ -135,9 +135,10 @@ kan ligge igjen i eldre YAML, men vises ikke eller brukes som skrivemål.
 Cockpits filterkoblinger, varsler og grafikk beholdes.
 
 Modusvarigheter bruker Kontrollpanelets eksisterende fem koblinger. Egne
-navn flyttes ikke automatisk fra et annet kort. Trykk direkte på en tidsstyrt
-modus for editor/avlesning med Lagre, Lagre og start og Lukk. Ildsted er kun
-avlesning med Start og Lukk. Ingen ny entitet er nødvendig.
+navn flyttes ikke automatisk fra et annet kort. Fra 1.8.0 støtter
+`fireplace_duration` både `number` og `sensor` i Kontrollpanel. Velg
+tallentiteten fra Systemair Modbus 2.0.0 for Lagre og Lagre og start. En
+sensorkobling gir fortsatt avlesning, Start og Lukk. Se [modusvarigheter](SETTINGS.md).
 
 Veksler krever `recovery_output` i forklaringskortet. Velg samme entitet som i
 Cockpit når begge brukes. Tom kobling, manglende entitet og utilgjengelig

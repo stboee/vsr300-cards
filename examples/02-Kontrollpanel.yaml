@@ -1,6 +1,6 @@
 # VSR300 – 02-Kontrollpanel.yaml
-# Kortpakke: 1.7.1
-# Endret: 2026-11-11
+# Kortpakke: 1.8.0
+# Endret: 2026-11-25
 # VIKTIG: Kontroller alle entitets-ID-er under entities: og tilpass dem til din egen HA.
 # Navnene nedenfor er eksempler fra referanseoppsettet. Tøm valgfrie felt du ikke bruker.
 type: custom:vsr300-control-card
@@ -20,6 +20,8 @@ entities:
   away_button: button.systemair_save_borte
   holiday_button: button.systemair_save_ferie
   countdown: sensor.systemair_save_countdown_mode_time
+  # Avlesning. Bytt til din Peis – varighet (number) fra Systemair Modbus 2.0.0 for redigering.
+  # Eksempel: fireplace_duration: number.loft_systemair_vsr_300_save_peis_varighet
   fireplace_duration: sensor.systemair_save_fireplace_mode_duration
   boost_duration: number.systemair_save_oppfriskning_varighet
   party_duration: number.systemair_save_party_varighet

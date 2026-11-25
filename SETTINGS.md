@@ -1,4 +1,4 @@
-# Innstillinger – kortpakke 1.7.1
+# Innstillinger – kortpakke 1.8.0
 
 Et valgfritt fjerde kort i samme JavaScript-pakke. Oppdater gjennom HACS,
 last dashboardet på nytt og legg til **Systemair Innstillinger** fra kortvelgeren:
@@ -84,11 +84,18 @@ Betjeningen blokkeres gjennom hele sekvensen for å hindre doble kommandoer.
 Før start brukes fortsatt den eksisterende modusbekreftelsen. Avbryt i
 bekreftelsen sender verken varighet eller startkommando.
 
-Ildsted er en sensor i Howard v1.3.0 og vises som avlesning med HA-historikk,
-**Start** og **Lukk**. Varigheten endres i Systemair-appen eller på aggregatets
-panel. Start bruker aggregatets eksisterende varighet. Det samme eksplisitte
-startvalget er tilgjengelig ved manglende/utilgjengelig valgfri varighet.
-Boost, Party, Borte og Ferie bruker native number-entiteter og deres grenser/trinn.
+Fra kortpakke 1.8.0 kan Ildsted redigeres som de andre tidsstyrte modusene.
+Åpne **Kontrollpanel → Entitetskoblinger → Innstilt Ildsted-varighet (min)**,
+og velg integrasjonens **Peis – varighet** (`number`, fra Systemair Modbus 2.0.0).
+Eksempel fra referanseinstallasjonen:
+`number.loft_systemair_vsr_300_save_peis_varighet`.
+Kortet leser grenser og trinn fra entiteten (1–60 minutter, trinn 1 i 2.0.0).
+
+Beholder du den gamle `sensor`-entiteten, får du fortsatt avlesning, **Start**
+og **Lukk**. Uten en tilgjengelig tallentitet med gyldige grenser kan du
+fortsatt velge **Start**, som bruker varigheten i aggregatet. Kortet finner
+eller erstatter ingen kobling automatisk. Cockpit kan fortsatt bruke den
+gamle sensoren for fremdriftslinjen; resttiden kommer fra en egen sensor.
 
 Kontroller varighetskoblingene i Kontrollpanelets editor. Eksisterende navn
 beholdes; de flyttes ikke automatisk fra andre kort. Auto/Manuell er uendret.
@@ -123,7 +130,9 @@ HA-filene endres ikke av kortpakken. Huslast beregnes fortsatt i forklaringskort
 Settings has two sections: temperature/ECO and free cooling. Mode durations are
 in the control card: tap a timed mode directly. Save only sends the duration;
 Save and start waits for that service before sending the mode command. Close
-sends nothing and retains drafts. Ildsted remains read-only with explicit Start.
+sends nothing and retains drafts. Fireplace is editable with the native number
+entity (Systemair Modbus 2.0.0 or later); a sensor binding remains read-only
+with explicit Start.
 Failed saves prevent Start; partial failure is explicit, without rollback.
 
 Verify entity bindings in each card. Retired System and Filter fields are

@@ -17,8 +17,60 @@ function control(){
  return c;
 }
 function report(c,role,value){const id=c.config.entities[role];c._hass.states={...c._hass.states,[id]:{...c._hass.states[id],state:String(value),last_updated:stamp()}};}
+function fireplaceNumber(c){
+ const id='number.example_peis_varighet';
+ c.setConfig({...c.config,entities:{...c.config.entities,fireplace_duration:id}});
+ c._hass.states[id]={entity_id:id,state:'8.0',attributes:{min:1,max:60,step:1,unit_of_measurement:'min'}};
+ c._durationRole='fireplace_duration';
+ return id;
+}
 const checks=[];async function check(name,fn){await fn();checks.push(name);}
 (async()=>{
+ await check('Existing Fireplace sensor stays read-only and a cleared mapping stays cleared',async()=>{
+  const role='fireplace_duration',c=control(),calls=[];c._durationRole=role;
+  c._hass.callService=async(...a)=>calls.push(a);c._render=()=>{};
+  const fireField=Control.getConfigForm().schema.find(s=>s.name==='entities').schema.find(f=>f.name===role);
+  assert.deepEqual(Array.from(fireField.selector.entity.filter.domain),['number','sensor']);
+  assert.match(c.config.entities[role],/^sensor\./);
+  assert.doesNotMatch(c._durationPanel(),/data-number-form|data-save-start/);
+  assert.match(c._durationPanel(),/data-action="fireplace"/);
+  await c._commitDuration(role,true);assert.equal(calls.length,0);
+  await c._activate('fireplace');assert.deepEqual(JSON.parse(JSON.stringify(calls)),[['select','select_option',{entity_id:c.config.entities.mode_select,option:'Fireplace'}]]);
+  const config={...c.config,entities:{...c.config.entities,[role]:''}};c.setConfig(config);
+  assert.equal(c.config.entities[role],'');assert.doesNotMatch(c._durationPanel(),/data-number-form/);
+  assert.throws(()=>c.setConfig({...config,entities:{...config.entities,[role]:'switch.invalid'}}),/Feil entitetstype/);
+ });
+ await check('Fireplace number uses HA limits, can save alone, and saves before selecting Fireplace',async()=>{
+  const role='fireplace_duration',c=control(),id=fireplaceNumber(c),calls=[];let finishWrite;
+  assert.match(c._durationPanel(),/min="1" max="60" step="1"/);
+  c._hass.callService=async(...a)=>calls.push(a);
+  for(const bad of ['0','61','8.5']){c._drafts[role]=bad;await c._commitDuration(role,true);assert.match(c._error,/grensene/);}
+  assert.equal(calls.length,0);
+  c._drafts[role]='9';await c._commitDuration(role,false);
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)),[['number','set_value',{entity_id:id,value:9}]]);
+  assert.equal(c._entity('mode').state,'auto');assert.equal(c._entity(role).state,'8.0');
+  assert.equal(c._durationInput(role),'9');assert.match(c._durationPanel(),/Sendt 9 min/);
+  report(c,role,'9.0');assert.equal(c._sentDuration(role),undefined);
+  calls.length=0;c._drafts[role]='10';
+  c._hass.callService=async(...a)=>{calls.push(a);if(a[0]==='number')await new Promise(resolve=>finishWrite=resolve);};
+  const pending=c._commitDuration(role,true);assert.equal(calls.length,1);
+  finishWrite();await pending;
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)),[['number','set_value',{entity_id:id,value:10}],['select','select_option',{entity_id:c.config.entities.mode_select,option:'Fireplace'}]]);
+  assert.equal(c._entity('mode').state,'auto','call responses never imply confirmed mode');
+  report(c,'mode','fireplace');report(c,'countdown','479');assert.equal(c._modeTiming().text,'7:59 igjen');
+ });
+ await check('Unavailable Fireplace numbers do not offer editing; failed or cancelled writes do not start',async()=>{
+  const role='fireplace_duration',c=control(),id=fireplaceNumber(c),calls=[];
+  c._hass.callService=async(...a)=>{calls.push(a);throw Error('write failed');};c._drafts[role]='10';
+  context.window.confirm=()=>false;await c._commitDuration(role,true);context.window.confirm=()=>true;
+  assert.equal(calls.length,0);
+  await c._commitDuration(role,true);assert.equal(calls.length,1);assert.match(c._error,/Ingen startkommando/);
+  assert.equal(c._durationInput(role),'10');assert.equal(c._sentDuration(role),undefined);
+  report(c,role,'unavailable');assert.doesNotMatch(c._durationPanel(),/data-number-form|data-save-start/);assert.match(c._durationPanel(),/data-action="fireplace"/);
+  await c._commitDuration(role,true);assert.equal(calls.length,1);
+  c._hass.states[id]={state:'8',attributes:{min:1,max:60}};
+  assert.doesNotMatch(c._durationPanel(),/data-number-form/);
+ });
  await check('All five modes use the same elapsed-time countdown as Cockpit',()=>{
   for(const mode of ['boost','fireplace','party','away','holiday']){
    now=Date.parse('2026-11-11T12:00:00Z');const c=control();report(c,'mode',mode);
